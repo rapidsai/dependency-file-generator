@@ -17,6 +17,9 @@ envs:
       arch: [x86_64] # the architecture variants that should be generated
     includes: # the names of the keys whose lists should be included in the final environment file
       - build
+channels: # which channels should be included in environment file
+  - rapidsai
+  - nvidia
 specifics: # CUDA/arch specific dependencies go in here
   x86_64-11.5: # key which defines packages that are specific to x86_64 architecture and CUDA 11.5
     build: # arbitrarily named key whose contents will be merged with a top-level `build` list if it exists
@@ -50,9 +53,6 @@ Running `reg` on the `envs.yaml` file above will produce the following two files
 channels:
   - rapidsai
   - nvidia
-  - rapidsai-nightly
-  - dask/label/dev
-  - conda-forge
 dependencies:
   - cudatoolkit==11.5.0
   - django=3
@@ -73,9 +73,6 @@ and
 channels:
   - rapidsai
   - nvidia
-  - rapidsai-nightly
-  - dask/label/dev
-  - conda-forge
 dependencies:
   - cudatoolkit==11.6.0
   - django=3
@@ -106,6 +103,9 @@ envs:
     includes:
       - build
       - test
+channels:
+  - rapidsai
+  - nvidia
 specifics:
 build:
   - django=3

@@ -31,17 +31,11 @@ def grid(gridspec):
         yield dict(zip(gridspec.keys(), values))
 
 
-def make_env(name, dependencies):
+def make_env(name, channels, dependencies):
     return yaml.dump(
         {
             "name": name,
-            "channels": [
-                "rapidsai",
-                "nvidia",
-                "rapidsai-nightly",
-                "dask/label/dev",
-                "conda-forge",
-            ],
+            "channels": channels,
             "dependencies": dependencies,
         }
     )
@@ -50,7 +44,14 @@ def make_env(name, dependencies):
 def main(config_file, envs, output_path, to_stdout):
     with open(config_file, "r") as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
-
+    default_channels = [
+        "rapidsai",
+        "nvidia",
+        "rapidsai-nightly",
+        "dask/label/dev",
+        "conda-forge",
+    ]
+    channels = parsed_config.get("channels") or default_channels
     envs = envs if envs else parsed_config["envs"]
     for env_name, env_config in envs.items():
         includes = env_config["includes"]
@@ -71,7 +72,7 @@ def main(config_file, envs, output_path, to_stdout):
                     .get(include, [])
                 )
             deduped_pkgs = dedupe(env_pkgs + matrix_combo_pkgs)
-            env = make_env(full_env_name, deduped_pkgs)
+            env = make_env(full_env_name, channels, deduped_pkgs)
             if to_stdout:
                 print(env)
             if output_path:

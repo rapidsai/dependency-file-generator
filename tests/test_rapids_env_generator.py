@@ -20,17 +20,11 @@ def test_dedupe():
 
 
 def test_make_env():
-    env = make_env("tmp_env", ["dep1", "dep2"])
+    env = make_env("tmp_env", ["rapidsai", "nvidia"], ["dep1", "dep2"])
     assert env == yaml.dump(
         {
             "name": "tmp_env",
-            "channels": [
-                "rapidsai",
-                "nvidia",
-                "rapidsai-nightly",
-                "dask/label/dev",
-                "conda-forge",
-            ],
+            "channels": ["rapidsai", "nvidia"],
             "dependencies": ["dep1", "dep2"],
         }
     )
