@@ -4,7 +4,7 @@
 
 ## Usage
 
-By default, when `reg` is run, it will look for a `conda/environments/envs.yaml` file relative to the directory from which it's invoked. `reg` will then generate the corresponding environment files based on the contents of the `envs.yaml` file. By default, the generated environment files will be output to the same directory as the `envs.yaml` file (i.e. `conda/environments` by default).
+By default, when `reg` is run, it will look for a `conda/environments/envs.yaml` file relative to the directory from which it's invoked. `reg` will then generate the corresponding environment files based on the contents of the `envs.yaml` file. By default, the generated environment files will be output to the same directory as the `envs.yaml` file (i.e. `conda/environments`).
 
 Here is an example of an `envs.yaml` file:
 
@@ -43,7 +43,7 @@ build:
   - pytorch
 ```
 
-Running `reg` on the `envs.yaml` file above will produce the following two files:
+Running `reg` on the `envs.yaml` file above will produce the following two files, where the dependencies from the top-level `build` key and the `build` keys in the `specifics` object have been merged.
 
 ```yaml
 # build_cuda-11.5_arch-x86_64.yaml
