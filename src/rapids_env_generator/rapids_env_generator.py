@@ -66,7 +66,7 @@ def main(config_file, envs, output_path, to_stdout):
             matrix_combo_pkgs = []
             for include in includes:
                 matrix_combo_pkgs.extend(
-                    parsed_config["specifics"]
+                    (parsed_config.get("specifics", {}) or {})
                     .get(f"{arch}-{cuda_version}", {})
                     .get(include, [])
                 )
