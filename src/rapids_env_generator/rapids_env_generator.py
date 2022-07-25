@@ -66,9 +66,9 @@ def main(config_file, envs, output_path, to_stdout):
             matrix_combo_pkgs = []
             for include in includes:
                 matrix_combo_pkgs.extend(
-                    parsed_config["specifics"][f"{arch}-{cuda_version}"].get(
-                        include, []
-                    )
+                    parsed_config["specifics"]
+                    .get(f"{arch}-{cuda_version}", {})
+                    .get(include, [])
                 )
             deduped_pkgs = dedupe(env_pkgs + matrix_combo_pkgs)
             env = make_env(full_env_name, deduped_pkgs)
