@@ -42,7 +42,7 @@ def main():
     )
     parser.add_argument(
         "--config",
-        default="conda/environments/conda.yaml",
+        default="conda/environments/envs.yaml",
         help="path to YAML config file",
     )
 
