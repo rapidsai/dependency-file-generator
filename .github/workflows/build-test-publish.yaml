@@ -36,7 +36,7 @@ jobs:
           #!/bin/bash
           for PKG in dist/*; do
             echo "$PKG"
-            pip uninstall -y rapids_env_generator
+            pip uninstall -y rapids-env-generator
             pip install "$PKG"
             pytest
             rapids-env-generator -h # test CLI output
