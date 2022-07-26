@@ -1,0 +1,16 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "setup.cfg"
+      - "setup.py"
+      - "pyproject.toml"
+      - ".github/workflows/release.yaml"
+
+jobs:
+  build-test-release:
+    uses: ./.github/workflows/build-test-publish.yaml
+    with:
+      RELEASE: true

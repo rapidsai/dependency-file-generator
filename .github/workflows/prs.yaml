@@ -1,0 +1,10 @@
+name: prs
+
+on:
+  pull_request:
+
+jobs:
+  build-test:
+    uses: ./.github/workflows/build-test-publish.yaml
+    with:
+      RELEASE: false
