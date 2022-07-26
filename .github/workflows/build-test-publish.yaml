@@ -1,0 +1,59 @@
+on:
+  workflow_call:
+    inputs:
+      RELEASE:
+        required: false
+        type: boolean
+
+jobs:
+  pipeline:
+    env:
+      RELEASE_FILE_NAME: rapids_env_generator_bundle.tar.gz
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install Python Packages
+        run: pip install build pytest
+      - name: Compute Next Tag Name
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0")
+          NEXT_PATCH_VERSION=$(echo ${LAST_TAG} | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          echo "NEXT_PATCH_VERSION=$NEXT_PATCH_VERSION" >> $GITHUB_ENV
+      - name: Update Package Version
+        run: echo "__version__ = \"${NEXT_PATCH_VERSION}\"" > ./src/rapids_env_generator/_version.py
+        env:
+          NEXT_PATCH_VERSION: ${{ env.NEXT_PATCH_VERSION }}
+      - name: Build Python Package
+        run: python -m build .
+      - name: Test Python Packages
+        run: |
+          #!/bin/bash
+          for PKG in dist/*; do
+            echo "$PKG"
+            pip uninstall -y rapids_env_generator
+            pip install "$PKG"
+            pytest
+            reg -h # test CLI output
+          done
+      - name: Tar dist/ folder
+        run: tar -czf ${{ env.RELEASE_FILE_NAME }} -C ./dist .
+      - name: Release
+        if: ${{ inputs.RELEASE == true }}
+        uses: softprops/action-gh-release@fe9a9bd3295828558c7a3c004f23f3bf77d155b2 # use unreleased version w/ "append_body" option
+        with:
+          files: |
+            ${{ env.RELEASE_FILE_NAME }}
+            dist/*
+          tag_name: ${{ env.NEXT_PATCH_VERSION }}
+          fail_on_unmatched_files: true
+          append_body: true
+          generate_release_notes: true
+          body: >
+            The `rapids_env_generator_bundle.tar.gz` artifact is a tarball of the build directory,
+            which contains the latest `.whl` and `.tar.gz` build artifacts.
