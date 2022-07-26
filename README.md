@@ -1,10 +1,10 @@
 # rapids-env-generator
 
-`rapids-env-generator` is a Python package that generates multiple `conda` environment files from a single YAML file. When installed via `pip`, it makes the `reg` CLI command available which is responsible for parsing an `envs.yaml` configuration file and generating the appropriate `conda` environment files.
+`rapids-env-generator` is a Python package that generates multiple `conda` environment files from a single YAML file. When installed via `pip`, it makes the `rapids-env-generator` CLI command available which is responsible for parsing an `envs.yaml` configuration file and generating the appropriate `conda` environment files.
 
 ## Usage
 
-By default, when `reg` is run, it will look for a `conda/environments/envs.yaml` file relative to the directory from which it's invoked. `reg` will then generate the corresponding environment files based on the contents of the `envs.yaml` file. By default, the generated environment files will be output to the same directory as the `envs.yaml` file (i.e. `conda/environments`).
+By default, when `rapids-env-generator` is run, it will look for a `conda/environments/envs.yaml` file relative to the directory from which it's invoked. `rapids-env-generator` will then generate the corresponding environment files based on the contents of the `envs.yaml` file. By default, the generated environment files will be output to the same directory as the `envs.yaml` file (i.e. `conda/environments`).
 
 Here is an example of an `envs.yaml` file:
 
@@ -46,7 +46,7 @@ build:
   - pytorch
 ```
 
-Running `reg` on the `envs.yaml` file above will produce the following two files, where the dependencies from the top-level `build` key and the `build` keys in the `specifics` object have been merged.
+Running `rapids-env-generator` on the `envs.yaml` file above will produce the following two files, where the dependencies from the top-level `build` key and the `build` keys in the `specifics` object have been merged.
 
 ```yaml
 # build_cuda-11.5_arch-x86_64.yaml
@@ -121,12 +121,12 @@ will create `build_and_test_cuda-11.5_arch-x86_64.yaml` and `build_cuda-11.5_arc
 
 ### CLI Arguments
 
-`reg` can also be invoked with arguments. This is useful for creating a one-off environment file that shouldn't necessarily be committed to the source repository. For example:
+`rapids-env-generator` can also be invoked with arguments. This is useful for creating a one-off environment file that shouldn't necessarily be committed to the source repository. For example:
 
 ```sh
 ENV_NAME="cudf_test"
 
-reg \
+rapids-env-generator \
   --env_name "$ENV_NAME" \
   --matrix "cuda_version=11.5;arch=x86_64" \
   --includes "test" \
@@ -137,4 +137,4 @@ mamba activate "$ENV_NAME"
 # install cudf packages built in CI and test them in newly created environment...
 ```
 
-Run `reg -h` to see the most up-to-date CLI arguments.
+Run `rapids-env-generator -h` to see the most up-to-date CLI arguments.
