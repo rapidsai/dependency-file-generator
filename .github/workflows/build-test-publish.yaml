@@ -57,7 +57,7 @@ jobs:
           body: >
             The `rapids_env_generator_bundle.tar.gz` artifact is a tarball of the build directory,
             which contains the latest `.whl` and `.tar.gz` build artifacts.
-      - name: Release
+      - name: Publish to PyPI
         if: ${{ inputs.RELEASE == true }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
