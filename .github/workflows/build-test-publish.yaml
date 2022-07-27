@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install Python Packages
-        run: pip install build pytest
+        run: pip install build pytest twine
       - name: Compute Next Tag Name
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0")
@@ -59,7 +59,9 @@ jobs:
             which contains the latest `.whl` and `.tar.gz` build artifacts.
       - name: Publish to PyPI
         if: ${{ inputs.RELEASE == true }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
+        run: |
+          twine upload \
+            --username __token__ \
+            --password ${{ secrets.RAPIDSAI_PYPI_TOKEN }} \
+            --disable-progress-bar \
+            dist/*
