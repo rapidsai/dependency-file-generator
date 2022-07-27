@@ -24,9 +24,9 @@ jobs:
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0")
           NEXT_PATCH_VERSION=$(echo ${LAST_TAG} | awk -F. -v OFS=. '{$NF += 1 ; print}')
-          echo "NEXT_PATCH_VERSION=$NEXT_PATCH_VERSION" >> $GITHUB_ENV
+          echo "NEXT_PATCH_VERSION=$NEXT_PATCH_VERSION" | tee -a $GITHUB_ENV
       - name: Update Package Version
-        run: echo "__version__ = \"${NEXT_PATCH_VERSION}\"" > ./src/rapids_env_generator/_version.py
+        run: echo "__version__ = \"${NEXT_PATCH_VERSION}\"" | tee ./src/rapids_env_generator/_version.py
         env:
           NEXT_PATCH_VERSION: ${{ env.NEXT_PATCH_VERSION }}
       - name: Build Python Package
