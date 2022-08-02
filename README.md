@@ -43,7 +43,6 @@ build:
   - pytorch
   - pip:
       - snakes
-  - pytorch
 ```
 
 Running `rapids-env-generator` on the `envs.yaml` file above will produce the following two files, where the dependencies from the top-level `build` key and the `build` keys in the `specifics` object have been merged.
@@ -112,7 +111,6 @@ build:
   - pytorch
   - pip:
       - snakes
-  - pytorch
 test:
   - pytest
 ```
