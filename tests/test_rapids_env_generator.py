@@ -1,4 +1,4 @@
-from rapids_env_generator.rapids_env_generator import dedupe, make_env
+from rapids_env_generator.rapids_env_generator import dedupe, make_dependency_file
 import yaml
 
 
@@ -20,7 +20,7 @@ def test_dedupe():
 
 
 def test_make_env():
-    env = make_env("tmp_env", ["rapidsai", "nvidia"], ["dep1", "dep2"])
+    env = make_dependency_file("tmp_env", ["rapidsai", "nvidia"], ["dep1", "dep2"])
     assert env == yaml.dump(
         {
             "name": "tmp_env",

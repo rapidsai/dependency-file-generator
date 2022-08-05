@@ -2,6 +2,11 @@ import itertools
 import yaml
 from collections import defaultdict
 from os.path import join
+from .constants import default_channels, default_env_dir, arch_cuda_key_fmt
+
+CONDA_TYPE = "conda"
+TXT_TYPE = "txt"
+CONDA_TXT_TYPE = f"{CONDA_TYPE}_{TXT_TYPE}"
 
 
 def dedupe(dependencies):
@@ -31,50 +36,87 @@ def grid(gridspec):
         yield dict(zip(gridspec.keys(), values))
 
 
-def make_env(name, channels, dependencies):
-    return yaml.dump(
-        {
-            "name": name,
-            "channels": channels,
-            "dependencies": dependencies,
-        }
+def make_dependency_file(file_type, name, conda_channels, dependencies):
+    file_contents = ""
+    if file_type == CONDA_TYPE:
+        file_contents = yaml.dump(
+            {
+                "name": name,
+                "channels": conda_channels,
+                "dependencies": dependencies,
+            }
+        )
+    if file_type == TXT_TYPE:
+        file_contents = "\n".join(dependencies)
+    return file_contents
+
+
+def get_file_types_to_generate(generate_value):
+    if generate_value == "both":
+        return [CONDA_TYPE, TXT_TYPE]
+    if generate_value == CONDA_TYPE or generate_value == TXT_TYPE:
+        return [generate_value]
+    raise Exception(
+        f"'generate' key can only be '{CONDA_TYPE}', '{TXT_TYPE}', or 'both'."
     )
 
 
-def main(config_file, envs, output_path, to_stdout):
+def get_filename(file_type, file_prefix, cuda_version, arch):
+    prefix = ""
+    suffix = ""
+    if file_type == CONDA_TYPE:
+        suffix = ".yaml"
+    if file_type == TXT_TYPE:
+        suffix = ".txt"
+        prefix = "requirements_"
+
+    return f"{prefix}{file_prefix}_cuda-{cuda_version}_arch-{arch}{suffix}"
+
+
+def main(config_file, files, output_path, to_stdout):
     with open(config_file, "r") as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
-    default_channels = [
-        "rapidsai",
-        "nvidia",
-        "rapidsai-nightly",
-        "dask/label/dev",
-        "conda-forge",
-    ]
-    channels = parsed_config.get("channels") or default_channels
-    envs = envs if envs else parsed_config["envs"]
-    for env_name, env_config in envs.items():
-        includes = env_config["includes"]
-        env_pkgs = []
-        for include in includes:
-            env_pkgs.extend(parsed_config[include])
 
-        for matrix_combo in grid(env_config["matrix"]):
-            full_env_name = env_name
-            cuda_version = matrix_combo["cuda_version"]
-            arch = matrix_combo["arch"]
-            full_env_name += f"_cuda-{cuda_version}_arch-{arch}"
-            matrix_combo_pkgs = []
-            for include in includes:
-                matrix_combo_pkgs.extend(
-                    (parsed_config.get("specifics", {}) or {})
-                    .get(f"{arch}-{cuda_version}", {})
-                    .get(include, [])
+    channels = parsed_config.get("channels") or default_channels
+    dependencies = parsed_config.get("dependencies")
+    files = files or parsed_config["files"]
+    for file_name, file_config in files.items():
+        includes = file_config["includes"]
+        file_types_to_generate = get_file_types_to_generate(file_config["generate"])
+
+        for file_type in file_types_to_generate:
+            file_deps = []
+
+            # Add common dependencies to file list
+            for ecosystem in [file_type, CONDA_TXT_TYPE]:
+                for include in includes:
+                    file_deps.extend(
+                        dependencies.get(ecosystem, {})
+                        .get("common", {})
+                        .get(include, [])
+                    )
+
+            # Add cuda-arch specific dependencies to file list
+            for matrix_combo in grid(file_config["matrix"]):
+                cuda_version = matrix_combo["cuda_version"]
+                arch = matrix_combo["arch"]
+                matrix_combo_deps = []
+                for ecosystem in [file_type, CONDA_TXT_TYPE]:
+                    for include in includes:
+                        matrix_combo_deps.extend(
+                            dependencies.get(ecosystem, {})
+                            .get(arch_cuda_key_fmt(arch, cuda_version), {})
+                            .get(include, [])
+                        )
+
+                # Dedupe deps and print / write to filesystem
+                full_file_name = get_filename(file_type, file_name, cuda_version, arch)
+                deduped_deps = dedupe(file_deps + matrix_combo_deps)
+                env = make_dependency_file(
+                    file_type, full_file_name, channels, deduped_deps
                 )
-            deduped_pkgs = dedupe(env_pkgs + matrix_combo_pkgs)
-            env = make_env(full_env_name, channels, deduped_pkgs)
-            if to_stdout:
-                print(env)
-            if output_path:
-                with open(join(output_path, f"{full_env_name}.yaml"), "w") as f:
-                    f.write(env)
+                if to_stdout:
+                    print(env)
+                if output_path:
+                    with open(join(output_path, full_file_name), "w") as f:
+                        f.write(env)
