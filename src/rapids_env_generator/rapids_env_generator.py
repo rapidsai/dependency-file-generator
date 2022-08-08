@@ -1,7 +1,7 @@
 import itertools
 import yaml
 from collections import defaultdict
-from os.path import join
+from os.path import join, relpath
 from .constants import (
     default_channels,
     default_conda_dir,
@@ -41,10 +41,16 @@ def grid(gridspec):
         yield dict(zip(gridspec.keys(), values))
 
 
-def make_dependency_file_contents(file_type, name, conda_channels, dependencies):
-    file_contents = ""
+def make_dependency_file(
+    file_type, name, config_file, output_path, conda_channels, dependencies
+):
+    relative_path_to_config_file = relpath(config_file, output_path)
+    file_contents = f"""\
+# This file was automatically generated. Changes should not be made directly to this file.
+# Instead, edit {relative_path_to_config_file} and rerun `rapids-env-generator`.
+"""
     if file_type == CONDA_TYPE:
-        file_contents = yaml.dump(
+        file_contents += yaml.dump(
             {
                 "name": name,
                 "channels": conda_channels,
@@ -52,7 +58,7 @@ def make_dependency_file_contents(file_type, name, conda_channels, dependencies)
             }
         )
     if file_type == TXT_TYPE:
-        file_contents = "\n".join(dependencies)
+        file_contents += "\n".join(dependencies) + "\n"
     return file_contents
 
 
@@ -127,13 +133,21 @@ def main(config_file, files):
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_name, cuda_version, arch)
                 deduped_deps = dedupe(file_deps + matrix_combo_deps)
-                contents = make_dependency_file_contents(
-                    file_type, full_file_name, channels, deduped_deps
+                make_dependency_file_factory = lambda output_path: make_dependency_file(
+                    file_type,
+                    full_file_name,
+                    config_file,
+                    output_path,
+                    channels,
+                    deduped_deps,
                 )
 
                 if to_stdout:
+                    output_path = "."
+                    contents = make_dependency_file_factory(output_path)
                     print(contents)
                 else:
                     output_path = get_output_path(file_type, file_config)
+                    contents = make_dependency_file_factory(output_path)
                     with open(join(output_path, full_file_name), "w") as f:
                         f.write(contents)
