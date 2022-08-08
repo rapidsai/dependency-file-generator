@@ -6,6 +6,7 @@ default_channels = [
     "conda-forge",
 ]
 
-default_env_dir = "conda/environments"
+default_conda_dir = "conda/environments"
+default_txt_dir = "python"
 
 arch_cuda_key_fmt = lambda arch, cuda_ver: f"{arch}-{cuda_ver}"

@@ -74,4 +74,4 @@ def main():
         args.output_path = dirname(abspath(args.config))
     validate_args(args)
     env = generate_env_obj(args.env_name, args.matrix, args.includes)
-    reg(args.config, env, args.output_path, args.stdout)
+    reg(args.config, env)

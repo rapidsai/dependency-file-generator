@@ -2,7 +2,12 @@ import itertools
 import yaml
 from collections import defaultdict
 from os.path import join
-from .constants import default_channels, default_env_dir, arch_cuda_key_fmt
+from .constants import (
+    default_channels,
+    default_conda_dir,
+    default_txt_dir,
+    arch_cuda_key_fmt,
+)
 
 CONDA_TYPE = "conda"
 TXT_TYPE = "txt"
@@ -36,7 +41,7 @@ def grid(gridspec):
         yield dict(zip(gridspec.keys(), values))
 
 
-def make_dependency_file(file_type, name, conda_channels, dependencies):
+def make_dependency_file_contents(file_type, name, conda_channels, dependencies):
     file_contents = ""
     if file_type == CONDA_TYPE:
         file_contents = yaml.dump(
@@ -73,12 +78,22 @@ def get_filename(file_type, file_prefix, cuda_version, arch):
     return f"{prefix}{file_prefix}_cuda-{cuda_version}_arch-{arch}{suffix}"
 
 
-def main(config_file, files, output_path, to_stdout):
+def get_output_path(file_type, file_config):
+    output_path = "."
+    if file_type == CONDA_TYPE:
+        output_path = file_config.get("conda_dir", default_conda_dir)
+    if file_type == TXT_TYPE:
+        output_path = file_config.get("txt_dir", default_txt_dir)
+    return output_path
+
+
+def main(config_file, files):
     with open(config_file, "r") as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
 
-    channels = parsed_config.get("channels") or default_channels
-    dependencies = parsed_config.get("dependencies")
+    channels = parsed_config.get("channels", default_channels) or default_channels
+    dependencies = parsed_config["dependencies"]
+    to_stdout = True if files else False
     files = files or parsed_config["files"]
     for file_name, file_config in files.items():
         includes = file_config["includes"]
@@ -112,11 +127,13 @@ def main(config_file, files, output_path, to_stdout):
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_name, cuda_version, arch)
                 deduped_deps = dedupe(file_deps + matrix_combo_deps)
-                env = make_dependency_file(
+                contents = make_dependency_file_contents(
                     file_type, full_file_name, channels, deduped_deps
                 )
+
                 if to_stdout:
-                    print(env)
-                if output_path:
+                    print(contents)
+                else:
+                    output_path = get_output_path(file_type, file_config)
                     with open(join(output_path, full_file_name), "w") as f:
-                        f.write(env)
+                        f.write(contents)
