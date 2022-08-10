@@ -43,7 +43,7 @@ def main():
     inclusive_group = parser.add_argument_group("optional, but mutually inclusive")
     inclusive_group.add_argument(
         "--file_key",
-        help="The file key to generate",
+        help="The file key from `dependencies.yaml` to generate",
     )
     inclusive_group.add_argument(
         "--generate",
