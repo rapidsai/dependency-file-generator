@@ -2,7 +2,7 @@ on:
   workflow_call:
     inputs:
       RELEASE:
-        required: false
+        default: false
         type: boolean
 
 jobs:
