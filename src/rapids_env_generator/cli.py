@@ -1,9 +1,10 @@
 from .rapids_env_generator import main as reg
 from ._version import __version__ as version
+from .constants import GeneratorTypes
 import yaml
 import argparse
 
-# args.config, args.file_key, args.generate, args.cuda_version, args.arch
+
 def generate_file_obj(config_file, file_key, file_type, cuda_version, arch):
     if not (config_file and file_key and file_type and cuda_version and arch):
         return {}
@@ -47,7 +48,7 @@ def main():
     inclusive_group.add_argument(
         "--generate",
         help="The file type to generate",
-        choices=["conda", "requirements"],
+        choices=[str(x) for x in [GeneratorTypes.CONDA, GeneratorTypes.REQUIREMENTS]],
     )
     inclusive_group.add_argument(
         "--cuda_version",

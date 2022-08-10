@@ -1,3 +1,18 @@
+from enum import Enum
+
+
+class GeneratorTypes(Enum):
+    CONDA = "conda"
+    REQUIREMENTS = "requirements"
+    NONE = "none"
+    BOTH = "both"
+
+    def __str__(self):
+        return self.value
+
+
+conda_requirements_key = f"{GeneratorTypes.CONDA}_{GeneratorTypes.REQUIREMENTS}"
+
 default_channels = [
     "rapidsai",
     "nvidia",

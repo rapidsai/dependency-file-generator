@@ -3,15 +3,13 @@ import yaml
 from collections import defaultdict
 from os.path import join, relpath
 from .constants import (
+    arch_cuda_key_fmt,
+    conda_requirements_key,
     default_channels,
     default_conda_dir,
     default_requirements_dir,
-    arch_cuda_key_fmt,
+    GeneratorTypes,
 )
-
-CONDA_TYPE = "conda"
-REQUIREMENTS_TYPE = "requirements"
-CONDA_REQUIREMENTS_TYPE = f"{CONDA_TYPE}_{REQUIREMENTS_TYPE}"
 
 
 def dedupe(dependencies):
@@ -49,7 +47,7 @@ def make_dependency_file(
 # This file was automatically generated. Changes should not be made directly to this file.
 # Instead, edit {relative_path_to_config_file} and rerun `rapids-env-generator`.
 """
-    if file_type == CONDA_TYPE:
+    if file_type == str(GeneratorTypes.CONDA):
         file_contents += yaml.dump(
             {
                 "name": name,
@@ -57,29 +55,33 @@ def make_dependency_file(
                 "dependencies": dependencies,
             }
         )
-    if file_type == REQUIREMENTS_TYPE:
+    if file_type == str(GeneratorTypes.REQUIREMENTS):
         file_contents += "\n".join(dependencies) + "\n"
     return file_contents
 
 
 def get_file_types_to_generate(generate_value):
-    if generate_value == "both":
-        return [CONDA_TYPE, REQUIREMENTS_TYPE]
-    if generate_value == "none":
+    if generate_value == str(GeneratorTypes.BOTH):
+        return [str(GeneratorTypes.CONDA), str(GeneratorTypes.REQUIREMENTS)]
+    if generate_value == str(GeneratorTypes.NONE):
         return []
-    if generate_value == CONDA_TYPE or generate_value == REQUIREMENTS_TYPE:
+    if generate_value == str(GeneratorTypes.CONDA) or generate_value == str(
+        GeneratorTypes.REQUIREMENTS
+    ):
         return [generate_value]
     raise Exception(
-        f"'generate' key can only be '{CONDA_TYPE}', '{REQUIREMENTS_TYPE}', or 'both'."
+        "'generate' key can only be "
+        + ", ".join([f"'{x}'" for x in GeneratorTypes])
+        + "."
     )
 
 
 def get_filename(file_type, file_prefix, cuda_version, arch):
     prefix = ""
     suffix = ""
-    if file_type == CONDA_TYPE:
+    if file_type == str(GeneratorTypes.CONDA):
         suffix = ".yaml"
-    if file_type == REQUIREMENTS_TYPE:
+    if file_type == str(GeneratorTypes.REQUIREMENTS):
         suffix = ".txt"
         prefix = "requirements_"
 
@@ -88,9 +90,9 @@ def get_filename(file_type, file_prefix, cuda_version, arch):
 
 def get_output_path(file_type, file_config):
     output_path = "."
-    if file_type == CONDA_TYPE:
+    if file_type == str(GeneratorTypes.CONDA):
         output_path = file_config.get("conda_dir", default_conda_dir)
-    if file_type == REQUIREMENTS_TYPE:
+    if file_type == str(GeneratorTypes.REQUIREMENTS):
         output_path = file_config.get("requirements_dir", default_requirements_dir)
     return output_path
 
@@ -111,7 +113,7 @@ def main(config_file, files):
             file_deps = []
 
             # Add common dependencies to file list
-            for ecosystem in [file_type, CONDA_REQUIREMENTS_TYPE]:
+            for ecosystem in [file_type, conda_requirements_key]:
                 for include in includes:
                     file_deps.extend(
                         dependencies.get(ecosystem, {})
@@ -124,7 +126,7 @@ def main(config_file, files):
                 cuda_version = matrix_combo["cuda_version"]
                 arch = matrix_combo["arch"]
                 matrix_combo_deps = []
-                for ecosystem in [file_type, CONDA_REQUIREMENTS_TYPE]:
+                for ecosystem in [file_type, conda_requirements_key]:
                     for include in includes:
                         matrix_combo_deps.extend(
                             dependencies.get(ecosystem, {})
