@@ -1,4 +1,4 @@
-from .rapids_dep_file_generator import main as reg
+from .rapids_dep_file_generator import main as dfg
 from ._version import __version__ as version
 from .constants import GeneratorTypes, default_dependency_file_path
 import yaml
@@ -32,7 +32,7 @@ def validate_args(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=f"Generates environment files for RAPIDS libraries (version: {version})"
+        description=f"Generates dependency files for RAPIDS libraries (version: {version})"
     )
     parser.add_argument(
         "--config",
@@ -61,7 +61,7 @@ def main():
 
     args = parser.parse_args()
     validate_args(args)
-    env = generate_file_obj(
+    file = generate_file_obj(
         args.config, args.file_key, args.generate, args.cuda_version, args.arch
     )
-    reg(args.config, env)
+    dfg(args.config, file)
