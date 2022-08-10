@@ -1,34 +1,32 @@
 from .rapids_env_generator import main as reg
 from ._version import __version__ as version
+import yaml
 import argparse
-import sys
-from os.path import dirname, abspath
 
-
-def generate_env_obj(name, matrix_values, includes):
-    if not (matrix_values and includes):
+# args.config, args.file_key, args.generate, args.cuda_version, args.arch
+def generate_file_obj(config_file, file_key, file_type, cuda_version, arch):
+    if not (config_file and file_key and file_type and cuda_version and arch):
         return {}
-    columns = matrix_values.split(";")
-    matrix = {}
-    for column in columns:
-        [key, values] = column.split("=")
-        values = values.split(",")
-        if len(values) > 1:
-            values = [values[0]]
-            print(
-                "The CLI configuration only supports a single matrix combination.",
-                file=sys.stderr,
-            )
-            print(f"Keeping '{values[0]}' for '{key}'", file=sys.stderr)
-        matrix[key] = values
-    return {name: {"matrix": matrix, "includes": includes.split(",")}}
+    with open(config_file, "r") as f:
+        parsed_config = yaml.load(f, Loader=yaml.FullLoader)
+    matrix = {"cuda_version": [cuda_version], "arch": [arch]}
+    parsed_config["files"][file_key]["matrix"] = matrix
+    parsed_config["files"][file_key]["generate"] = file_type
+    return {file_key: parsed_config["files"][file_key]}
 
 
 def validate_args(args):
-    if args.matrix and not args.includes:
-        raise Exception("The --includes flag must be used with --matrix")
-    if args.includes and not args.matrix:
-        raise Exception("The --matrix flag must be used with --includes")
+    mutually_exclusive_arg_keys = ["file_key", "generate", "cuda_version", "arch"]
+    mutually_exclusive_arg_values = []
+    for i in range(len(mutually_exclusive_arg_keys)):
+        mutually_exclusive_arg_values.append(
+            getattr(args, mutually_exclusive_arg_keys[i])
+        )
+    if any(mutually_exclusive_arg_values) and not all(mutually_exclusive_arg_values):
+        raise Exception(
+            "The following arguments are mutually exclusive and must be used together:"
+            + "".join([f"\n  --{x}" for x in mutually_exclusive_arg_keys])
+        )
 
 
 def main():
@@ -36,42 +34,33 @@ def main():
         description=f"Generates environment files for RAPIDS libraries (version: {version})"
     )
     parser.add_argument(
-        "--env_name",
-        default="tmp_env",
-        help="When used with --matrix and --includes, sets the name of the generated environment",
-    )
-    parser.add_argument(
         "--config",
         default="conda/environments/envs.yaml",
         help="path to YAML config file",
     )
 
-    inclusive_group = parser.add_argument_group("mutually inclusive")
+    inclusive_group = parser.add_argument_group("optional, but mutually inclusive")
     inclusive_group.add_argument(
-        "--matrix",
-        help="string representing which matrix combination should be generated. i.e. --matrix='cuda_version=11.5;arch=amd64'",
+        "--file_key",
+        help="The file key to generate",
     )
     inclusive_group.add_argument(
-        "--includes",
-        help="dependency lists from config file to include in output",
+        "--generate",
+        help="The file type to generate",
+        choices=["conda", "requirements"],
     )
-
-    exclusive_group = parser.add_argument_group(
-        "mutually exclusive"
-    ).add_mutually_exclusive_group()
-    exclusive_group.add_argument(
-        "--stdout",
-        action="store_true",
-        default=False,
-        help="Whether to print output to stdout",
+    inclusive_group.add_argument(
+        "--cuda_version",
+        help="The CUDA version used for generating the output",
     )
-    exclusive_group.add_argument(
-        "--output_path", help="The directory to write the output files to"
+    inclusive_group.add_argument(
+        "--arch",
+        help="The architecture version used for generating the output",
     )
 
     args = parser.parse_args()
-    if not (args.stdout or args.output_path):
-        args.output_path = dirname(abspath(args.config))
     validate_args(args)
-    env = generate_env_obj(args.env_name, args.matrix, args.includes)
+    env = generate_file_obj(
+        args.config, args.file_key, args.generate, args.cuda_version, args.arch
+    )
     reg(args.config, env)
