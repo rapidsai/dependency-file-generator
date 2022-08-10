@@ -4,6 +4,7 @@ from collections import defaultdict
 from os.path import join, relpath
 from .constants import (
     arch_cuda_key_fmt,
+    cli_name,
     conda_requirements_key,
     default_channels,
     default_conda_dir,
@@ -45,7 +46,7 @@ def make_dependency_file(
     relative_path_to_config_file = relpath(config_file, output_path)
     file_contents = f"""\
 # This file was automatically generated. Changes should not be made directly to this file.
-# Instead, edit {relative_path_to_config_file} and rerun `rapids-env-generator`.
+# Instead, edit {relative_path_to_config_file} and rerun `{cli_name}`.
 """
     if file_type == str(GeneratorTypes.CONDA):
         file_contents += yaml.dump(

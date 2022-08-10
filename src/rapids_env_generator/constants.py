@@ -13,6 +13,8 @@ class GeneratorTypes(Enum):
 
 conda_requirements_key = f"{GeneratorTypes.CONDA}_{GeneratorTypes.REQUIREMENTS}"
 
+cli_name = "rapids-env-generator"
+
 default_channels = [
     "rapidsai",
     "nvidia",
