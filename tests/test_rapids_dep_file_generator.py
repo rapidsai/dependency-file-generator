@@ -1,8 +1,9 @@
 from unittest import mock
-from rapids_env_generator.rapids_env_generator import (
+from rapids_dep_file_generator.rapids_dep_file_generator import (
     dedupe,
     make_dependency_file,
 )
+from rapids_dep_file_generator.constants import cli_name
 import yaml
 
 
@@ -23,13 +24,13 @@ def test_dedupe():
     assert deduped == ["dep1", {"pip": ["pip_dep1", "pip_dep2"]}]
 
 
-@mock.patch("rapids_env_generator.rapids_env_generator.relpath")
+@mock.patch("rapids_dep_file_generator.rapids_dep_file_generator.relpath")
 def test_make_dependency_file(mock_relpath):
     relpath = "../../dependencies.yaml"
     mock_relpath.return_value = relpath
     header = f"""\
 # This file was automatically generated. Changes should not be made directly to this file.
-# Instead, edit {relpath} and rerun `rapids-env-generator`.
+# Instead, edit {relpath} and rerun `{cli_name}`.
 """
     env = make_dependency_file(
         "conda",

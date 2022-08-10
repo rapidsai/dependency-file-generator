@@ -13,7 +13,7 @@ class GeneratorTypes(Enum):
 
 conda_requirements_key = f"{GeneratorTypes.CONDA}_{GeneratorTypes.REQUIREMENTS}"
 
-cli_name = "rapids-env-generator"
+cli_name = "rapids-dep-file-generator"
 
 default_channels = [
     "rapidsai",

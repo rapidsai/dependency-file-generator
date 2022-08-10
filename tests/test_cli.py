@@ -1,6 +1,6 @@
 from unittest import mock
 from unittest.mock import mock_open
-from rapids_env_generator.cli import generate_file_obj
+from rapids_dep_file_generator.cli import generate_file_obj
 
 mock_yaml = """
 files:

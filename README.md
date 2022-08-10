@@ -1,6 +1,6 @@
-# dependency-file-generator
+# rapids-dependency-file-generator
 
-`dependency-file-generator` is a Python CLI tool that generates `conda` environment files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`. When installed via `pip`, it makes the `rapids-dep-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate `conda` environment and `requirements.txt` dependency files.
+`rapids-dependency-file-generator` is a Python CLI tool that generates `conda` environment files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`. When installed via `pip`, it makes the `rapids-dep-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate `conda` environment and `requirements.txt` dependency files.
 
 ## Usage
 
@@ -81,7 +81,7 @@ channels:
   - conda-forge
 ```
 
-In the absence of a `channels` key, some sensible defaults for RAPIDS will be used (see [constants.py](./src/rapids_env_generator/constants.py)).
+In the absence of a `channels` key, some sensible defaults for RAPIDS will be used (see [constants.py](./src/rapids_dep_file_generator/constants.py)).
 
 ### `dependencies` Key
 
