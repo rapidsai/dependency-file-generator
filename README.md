@@ -2,6 +2,16 @@
 
 `rapids-dependency-file-generator` is a Python CLI tool that generates `conda` environment files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`. When installed via `pip`, it makes the `rapids-dep-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate `conda` environment and `requirements.txt` dependency files.
 
+## Table of Contents
+
+- [Usage](#usage)
+- [`dependencies.yaml` Format](#dependenciesyaml-format)
+  - [`files` key](#files-key)
+  - [`channels` key](#channels-key)
+  - [`dependencies` key](#dependencies-key)
+- [How Dependency Lists Are Merged](#how-dependency-lists-are-merged)
+- [Additional CLI Notes](#additional-cli-notes)
+
 ## Usage
 
 When `rapids-dep-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files. `dependencies.yaml` is intended to be committed to the root directory of repositories. It has specific keys (described below) that enable the bifurcation of dependencies for different CUDA versions, architectures, and dependency file types (i.e. `conda` environment files vs `requirements.txt`). The bifurcated dependency lists are merged according to the description in the [_How Dependency Lists Are Merged_](#how-dependency-lists-are-merged) section below.
