@@ -25,5 +25,6 @@ default_channels = [
 
 default_conda_dir = "conda/environments"
 default_requirements_dir = "python"
+default_dependency_file_path = "dependencies.yaml"
 
 arch_cuda_key_fmt = lambda arch, cuda_ver: f"{arch}-{cuda_ver}"
