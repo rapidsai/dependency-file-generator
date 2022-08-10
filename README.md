@@ -125,10 +125,10 @@ will create `build_and_test_cuda-11.5_arch-x86_64.yaml` and `build_cuda-11.5_arc
 ENV_NAME="cudf_test"
 
 rapids-env-generator \
-  --env_name "$ENV_NAME" \
-  --matrix "cuda_version=11.5;arch=x86_64" \
-  --includes "test" \
-  --stdout > env.yaml
+  --file_key "test" \
+  --generate "conda" \
+  --cuda_version "11.5" \
+  --arch $(arch) > env.yaml
 mamba env create --file env.yaml
 mamba activate "$ENV_NAME"
 
