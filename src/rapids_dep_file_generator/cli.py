@@ -24,8 +24,8 @@ def validate_args(args):
             getattr(args, mutually_exclusive_arg_keys[i])
         )
     if any(mutually_exclusive_arg_values) and not all(mutually_exclusive_arg_values):
-        raise Exception(
-            "The following arguments are mutually exclusive and must be used together:"
+        raise ValueError(
+            "The following arguments must be used together:"
             + "".join([f"\n  --{x}" for x in mutually_exclusive_arg_keys])
         )
 
@@ -56,7 +56,7 @@ def main():
     )
     inclusive_group.add_argument(
         "--arch",
-        help="The architecture version used for generating the output",
+        help="The architecture used for generating the output",
     )
 
     args = parser.parse_args()
