@@ -13,7 +13,7 @@ class GeneratorTypes(Enum):
 
 conda_requirements_key = f"{GeneratorTypes.CONDA}_{GeneratorTypes.REQUIREMENTS}"
 
-cli_name = "rapids-dep-file-generator"
+cli_name = "rapids-dependency-file-generator"
 
 default_channels = [
     "rapidsai",
@@ -26,6 +26,7 @@ default_channels = [
 default_conda_dir = "conda/environments"
 default_requirements_dir = "python"
 default_dependency_file_path = "dependencies.yaml"
+
 
 def arch_cuda_key_fmt(arch, cuda_version):
     return f"{arch}-{cuda_version}"

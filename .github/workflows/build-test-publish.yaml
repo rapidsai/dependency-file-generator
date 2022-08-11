@@ -39,7 +39,7 @@ jobs:
             pip uninstall -y rapids-dependency-file-generator
             pip install "$PKG"
             pytest
-            rapids-dep-file-generator -h # test CLI output
+            rapids-dependency-file-generator -h # test CLI output
           done
       - name: Tar dist/ folder
         run: tar -czf ${{ env.RELEASE_FILE_NAME }} -C ./dist .
