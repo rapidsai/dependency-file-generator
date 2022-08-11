@@ -24,10 +24,10 @@ def test_dedupe():
     assert deduped == ["dep1", {"pip": ["pip_dep1", "pip_dep2"]}]
 
 
-@mock.patch("rapids_dep_file_generator.rapids_dep_file_generator.relpath")
-def test_make_dependency_file(mock_relpath):
+@mock.patch("rapids_dep_file_generator.rapids_dep_file_generator.os.path")
+def test_make_dependency_file(mock_path):
     relpath = "../../dependencies.yaml"
-    mock_relpath.return_value = relpath
+    mock_path.relpath.return_value = relpath
     header = f"""\
 # This file was automatically generated. Changes should not be made directly to this file.
 # Instead, edit {relpath} and rerun `{cli_name}`.

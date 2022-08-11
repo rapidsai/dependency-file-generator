@@ -1,7 +1,7 @@
 import itertools
 import yaml
 from collections import defaultdict
-from os.path import join, relpath
+import os.path
 from .constants import (
     arch_cuda_key_fmt,
     cli_name,
@@ -43,7 +43,7 @@ def grid(gridspec):
 def make_dependency_file(
     file_type, name, config_file, output_path, conda_channels, dependencies
 ):
-    relative_path_to_config_file = relpath(config_file, output_path)
+    relative_path_to_config_file = os.path.relpath(config_file, output_path)
     file_contents = f"""\
 # This file was automatically generated. Changes should not be made directly to this file.
 # Instead, edit {relative_path_to_config_file} and rerun `{cli_name}`.
@@ -154,5 +154,5 @@ def main(config_file, files):
                 else:
                     output_path = get_output_path(file_type, file_config)
                     contents = make_dependency_file_factory(output_path)
-                    with open(join(output_path, full_file_name), "w") as f:
+                    with open(os.path.join(output_path, full_file_name), "w") as f:
                         f.write(contents)
