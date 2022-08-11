@@ -17,16 +17,14 @@ def generate_file_obj(config_file, file_key, file_type, cuda_version, arch):
 
 
 def validate_args(args):
-    mutually_exclusive_arg_keys = ["file_key", "generate", "cuda_version", "arch"]
-    mutually_exclusive_arg_values = []
-    for i in range(len(mutually_exclusive_arg_keys)):
-        mutually_exclusive_arg_values.append(
-            getattr(args, mutually_exclusive_arg_keys[i])
-        )
-    if any(mutually_exclusive_arg_values) and not all(mutually_exclusive_arg_values):
+    dependent_arg_keys = ["file_key", "generate", "cuda_version", "arch"]
+    dependent_arg_values = []
+    for i in range(len(dependent_arg_keys)):
+        dependent_arg_values.append(getattr(args, dependent_arg_keys[i]))
+    if any(dependent_arg_values) and not all(dependent_arg_values):
         raise ValueError(
             "The following arguments must be used together:"
-            + "".join([f"\n  --{x}" for x in mutually_exclusive_arg_keys])
+            + "".join([f"\n  --{x}" for x in dependent_arg_keys])
         )
 
 
