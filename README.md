@@ -1,6 +1,6 @@
 # rapids-dependency-file-generator
 
-`rapids-dependency-file-generator` is a Python CLI tool that generates `conda` environment files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`. When installed, it makes the `rapids-dep-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate `conda` environment and `requirements.txt` dependency files.
+`rapids-dependency-file-generator` is a Python CLI tool that generates conda `environment.yaml` files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`. When installed, it makes the `rapids-dep-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate conda `environment.yaml` and `requirements.txt` dependency files.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ pip install rapids-dependency-file-generator
 
 When `rapids-dep-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files.
 `dependencies.yaml` is intended to be committed to the root directory of repositories.
-It has specific keys (described below) that enable the bifurcation of dependencies for different CUDA versions, architectures, and dependency file types (i.e. `conda` environment files vs. `requirements.txt`).
+It has specific keys (described below) that enable the bifurcation of dependencies for different CUDA versions, architectures, and dependency file types (i.e. conda `environment.yaml` files vs. `requirements.txt`).
 The bifurcated dependency lists are merged according to the description in the [_How Dependency Lists Are Merged_](#how-dependency-lists-are-merged) section below.
 
 ## `dependencies.yaml` Format
@@ -36,7 +36,7 @@ The `dependencies.yaml` file has three relevant top-level keys: `files`, `channe
 
 The top-level `files` key is responsible for determining the following:
 
-- which types of dependency files should be generated (i.e. conda `environment.yml` files and/or `requirements.txt` files)
+- which types of dependency files should be generated (i.e. conda `environment.yaml` files and/or `requirements.txt` files)
 - where the generated files should be written to
 - which architecture and CUDA version variant files should be generated
 - which of the dependency lists from the top-level `dependencies` key should be included in the generated files
@@ -47,7 +47,7 @@ Here is an example of what the `files` key might look like:
 files:
   all: # used as the prefix for the generated dependency file names
     generate: both # which dependency file types to generate. required, can be "both", "env", "requirements", or "none"
-    conda_dir: conda/environments # where to put conda environment files. optional, defaults to "conda/environments"
+    conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
     matrix:
       cuda_version: ["11.5", "11.6"] # which CUDA version variant files to generate. The CUDA version is included in the output file name
@@ -91,7 +91,7 @@ When `generate: none` is used, the `conda_dir`, `requirements_dir` and `matrix` 
 
 ### `channels` Key
 
-The top-level `channels` key specifies the channels that should be included in any generated `conda` environment files.
+The top-level `channels` key specifies the channels that should be included in any generated conda `environment.yaml` files.
 
 It might look like this:
 
@@ -107,8 +107,8 @@ In the absence of a `channels` key, some sensible defaults for RAPIDS will be us
 
 The top-level `dependencies` key is where the bifurcated dependency lists should be specified. Directly beneath the `dependencies` key are 3 unique keys:
 
-- `conda_requirements` - contains dependency lists that are the sames for both `conda` environment files and `requirements.txt` files
-- `conda` - contains dependency lists that are specific to `conda` environment files
+- `conda_requirements` - contains dependency lists that are the sames for both conda `environment.yaml` files and `requirements.txt` files
+- `conda` - contains dependency lists that are specific to conda `environment.yaml` files
 - `requirements` - contains dependency lists that are specific to `requirements.txt` files
 
 Each of the above keys has the following children keys:
@@ -122,7 +122,7 @@ An example of the above structure is exemplified below:
 
 ```yaml
 dependencies:
-  conda_requirements: # common dependencies between `conda` environment & requirements.txt files
+  conda_requirements: # common dependencies between conda environment.yaml & requirements.txt files
     common: # common between archs/cudas
       build: # arbitrarily named dependency list
         - common_build_dep
@@ -131,11 +131,11 @@ dependencies:
     x86_64-11.5: # common dependencies specific to x86_64-11.5
       build:
         - a_random_x86_115_specific_dep
-  conda: # dependencies specific to conda environment files
+  conda: # dependencies specific to conda environment.yaml files
     common:
       build:
         - cupy
-        - pip: # supports `pip` key for `conda` environment files
+        - pip: # supports `pip` key for conda environment.yaml files
             - some_random_dep
     x86_64-11.5:
       build:
