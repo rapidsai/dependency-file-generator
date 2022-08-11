@@ -70,7 +70,7 @@ def get_file_types_to_generate(generate_value):
         GeneratorTypes.REQUIREMENTS
     ):
         return [generate_value]
-    raise Exception(
+    raise ValueError(
         "'generate' key can only be "
         + ", ".join([f"'{x}'" for x in GeneratorTypes])
         + "."
