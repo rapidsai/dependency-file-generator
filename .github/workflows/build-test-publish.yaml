@@ -2,13 +2,13 @@ on:
   workflow_call:
     inputs:
       RELEASE:
-        required: false
+        default: false
         type: boolean
 
 jobs:
   pipeline:
     env:
-      RELEASE_FILE_NAME: rapids_env_generator_bundle.tar.gz
+      RELEASE_FILE_NAME: rapids_dependency_file_generator_bundle.tar.gz
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,7 +26,7 @@ jobs:
           NEXT_PATCH_VERSION=$(echo ${LAST_TAG} | awk -F. -v OFS=. '{$NF += 1 ; print}')
           echo "NEXT_PATCH_VERSION=$NEXT_PATCH_VERSION" | tee -a $GITHUB_ENV
       - name: Update Package Version
-        run: echo "__version__ = \"${NEXT_PATCH_VERSION}\"" | tee ./src/rapids_env_generator/_version.py
+        run: echo "__version__ = \"${NEXT_PATCH_VERSION}\"" | tee ./src/rapids_dep_file_generator/_version.py
         env:
           NEXT_PATCH_VERSION: ${{ env.NEXT_PATCH_VERSION }}
       - name: Build Python Package
@@ -36,10 +36,10 @@ jobs:
           #!/bin/bash
           for PKG in dist/*; do
             echo "$PKG"
-            pip uninstall -y rapids-env-generator
+            pip uninstall -y rapids-dependency-file-generator
             pip install "$PKG"
             pytest
-            rapids-env-generator -h # test CLI output
+            rapids-dependency-file-generator -h # test CLI output
           done
       - name: Tar dist/ folder
         run: tar -czf ${{ env.RELEASE_FILE_NAME }} -C ./dist .
@@ -55,7 +55,7 @@ jobs:
           append_body: true
           generate_release_notes: true
           body: >
-            The `rapids_env_generator_bundle.tar.gz` artifact is a tarball of the build directory,
+            The `${{ env.RELEASE_FILE_NAME }}` artifact is a tarball of the build directory,
             which contains the latest `.whl` and `.tar.gz` build artifacts.
       - name: Publish to PyPI
         if: ${{ inputs.RELEASE == true }}
