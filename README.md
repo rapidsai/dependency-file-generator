@@ -101,7 +101,7 @@ channels:
   - conda-forge
 ```
 
-In the absence of a `channels` key, some sensible defaults for RAPIDS will be used (see [constants.py](./src/rapids_dep_file_generator/constants.py)).
+In the absence of a `channels` key, some sensible defaults for RAPIDS will be used (see [constants.py](./src/rapids_dependency_file_generator//constants.py)).
 
 ### `dependencies` Key
 

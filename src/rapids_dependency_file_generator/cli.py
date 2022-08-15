@@ -1,4 +1,4 @@
-from .rapids_dep_file_generator import main as dfg
+from .rapids_dependency_file_generator import main as dfg
 from ._version import __version__ as version
 from .constants import GeneratorTypes, default_dependency_file_path
 import yaml

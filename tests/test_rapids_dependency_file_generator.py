@@ -1,9 +1,9 @@
 from unittest import mock
-from rapids_dep_file_generator.rapids_dep_file_generator import (
+from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
     make_dependency_file,
 )
-from rapids_dep_file_generator.constants import cli_name
+from rapids_dependency_file_generator.constants import cli_name
 import yaml
 
 
@@ -24,7 +24,7 @@ def test_dedupe():
     assert deduped == ["dep1", {"pip": ["pip_dep1", "pip_dep2"]}]
 
 
-@mock.patch("rapids_dep_file_generator.rapids_dep_file_generator.os.path")
+@mock.patch("rapids_dependency_file_generator.rapids_dependency_file_generator.os.path")
 def test_make_dependency_file(mock_path):
     relpath = "../../dependencies.yaml"
     mock_path.relpath.return_value = relpath
