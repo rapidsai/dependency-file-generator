@@ -75,7 +75,7 @@ The result of the above configuration is that the following dependency files wou
 - `python/cudf/requirements_all_cuda-11.6_arch-x86_64.txt`
 - `python/cudf/requirements_build_cuda-11.5_arch-x86_64.txt`
 
-The `all*.yaml` and `requirements_all*.txt` files would include the contents of the `build`, `test`, and `runtime` dependency lists from the top-level `dependency` key. The `build*.yaml` and `requirements_build*.txt` files would only include the contents of the `build` dependency list from the top-level `dependency` key.
+The `all*.yaml` and `requirements_all*.txt` files would include the contents of the `build`, `test`, and `runtime` dependency lists from the top-level `dependency` key. The `requirements_build*.txt` file would only include the contents of the `build` dependency list from the top-level `dependency` key.
 
 The value of `generate` can also be `none` as shown below.
 
@@ -219,6 +219,6 @@ mamba activate "$ENV_NAME"
 
 The `--file_key` argument is passed the `test` key name from the `files` configuration. Additional flags are used to generate a single dependency file. When the CLI is used in this fashion, it will print to `stdout` instead of writing the resulting contents to the filesystem.
 
-The `--file_key`, `--generate`, `--cuda_version`, and `--arch` flags are mutually inclusive and therefore need to be used together.
+The `--file_key`, `--generate`, `--cuda_version`, and `--arch` flags must be used together.
 
 Running `rapids-dependency-file-generator -h` will show the most up-to-date CLI arguments.
