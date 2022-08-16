@@ -5,7 +5,7 @@ import os.path
 from .constants import (
     arch_cuda_key_fmt,
     cli_name,
-    conda_requirements_key,
+    conda_and_requirements_key,
     default_channels,
     default_conda_dir,
     default_requirements_dir,
@@ -114,7 +114,7 @@ def main(config_file, files):
             file_deps = []
 
             # Add common dependencies to file list
-            for ecosystem in [file_type, conda_requirements_key]:
+            for ecosystem in [file_type, conda_and_requirements_key]:
                 for include in includes:
                     file_deps.extend(
                         dependencies.get(ecosystem, {})
@@ -127,7 +127,7 @@ def main(config_file, files):
                 cuda_version = matrix_combo["cuda_version"]
                 arch = matrix_combo["arch"]
                 matrix_combo_deps = []
-                for ecosystem in [file_type, conda_requirements_key]:
+                for ecosystem in [file_type, conda_and_requirements_key]:
                     for include in includes:
                         matrix_combo_deps.extend(
                             dependencies.get(ecosystem, {})

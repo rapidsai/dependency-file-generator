@@ -107,7 +107,7 @@ In the absence of a `channels` key, some sensible defaults for RAPIDS will be us
 
 The top-level `dependencies` key is where the bifurcated dependency lists should be specified. Directly beneath the `dependencies` key are 3 unique keys:
 
-- `conda_requirements` - contains dependency lists that are the sames for both conda `environment.yaml` files and `requirements.txt` files
+- `conda_and_requirements` - contains dependency lists that are the sames for both conda `environment.yaml` files and `requirements.txt` files
 - `conda` - contains dependency lists that are specific to conda `environment.yaml` files
 - `requirements` - contains dependency lists that are specific to `requirements.txt` files
 
@@ -122,7 +122,7 @@ An example of the above structure is exemplified below:
 
 ```yaml
 dependencies:
-  conda_requirements: # common dependencies between conda environment.yaml & requirements.txt files
+  conda_and_requirements: # common dependencies between conda environment.yaml & requirements.txt files
     common: # common between archs/cudas
       build: # arbitrarily named dependency list
         - common_build_dep
@@ -174,10 +174,10 @@ files:
 
 For the `11.5` and `x86_64` matrix combination, the following dependency lists would be merged if they exist:
 
-- `conda_requirements.common.build`
-- `conda_requirements.common.test`
-- `conda_requirements.x86_64-11.5.build`
-- `conda_requirements.x86_64-11.5.test`
+- `conda_and_requirements.common.build`
+- `conda_and_requirements.common.test`
+- `conda_and_requirements.x86_64-11.5.build`
+- `conda_and_requirements.x86_64-11.5.test`
 - `conda.common.build`
 - `conda.common.test`
 - `conda.x86_64-11.5.build`
