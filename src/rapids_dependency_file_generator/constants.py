@@ -11,7 +11,7 @@ class GeneratorTypes(Enum):
         return self.value
 
 
-conda_requirements_key = f"{GeneratorTypes.CONDA}_{GeneratorTypes.REQUIREMENTS}"
+conda_requirements_key = f"{GeneratorTypes.CONDA}_and_{GeneratorTypes.REQUIREMENTS}"
 
 cli_name = "rapids-dependency-file-generator"
 
