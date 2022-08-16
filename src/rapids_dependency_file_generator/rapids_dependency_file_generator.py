@@ -51,7 +51,7 @@ def make_dependency_file(
     if file_type == str(GeneratorTypes.CONDA):
         file_contents += yaml.dump(
             {
-                "name": name,
+                "name": os.path.splitext(name)[0],
                 "channels": conda_channels,
                 "dependencies": dependencies,
             }
