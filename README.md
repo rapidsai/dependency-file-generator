@@ -209,8 +209,7 @@ ENV_NAME="cudf_test"
 rapids-dependency-file-generator \
   --file_key "test" \
   --generate "conda" \
-  --cuda_version "11.5" \
-  --arch $(arch) > env.yaml
+  --matrix "cuda=11.5;arch=$(arch)" > env.yaml
 mamba env create --file env.yaml
 mamba activate "$ENV_NAME"
 
