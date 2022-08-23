@@ -3,7 +3,6 @@ import yaml
 from collections import defaultdict
 import os.path
 from .constants import (
-    arch_cuda_key_fmt,
     cli_name,
     conda_and_requirements_key,
     default_channels,
@@ -77,16 +76,16 @@ def get_file_types_to_generate(generate_value):
     )
 
 
-def get_filename(file_type, file_prefix, cuda_version, arch):
+def get_filename(file_type, file_prefix, matrix_combo):
     prefix = ""
-    suffix = ""
+    file_ext = ""
     if file_type == str(GeneratorTypes.CONDA):
-        suffix = ".yaml"
+        file_ext = ".yaml"
     if file_type == str(GeneratorTypes.REQUIREMENTS):
-        suffix = ".txt"
+        file_ext = ".txt"
         prefix = "requirements_"
-
-    return f"{prefix}{file_prefix}_cuda-{cuda_version}_arch-{arch}{suffix}"
+    suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
+    return f"{prefix}{file_prefix}_{suffix}".replace(".", "") + file_ext
 
 
 def get_output_path(file_type, file_config):
@@ -96,6 +95,13 @@ def get_output_path(file_type, file_config):
     if file_type == str(GeneratorTypes.REQUIREMENTS):
         output_path = file_config.get("requirements_dir", default_requirements_dir)
     return output_path
+
+
+def should_use_specific_entry(matrix_combo, specific_entry_matrix):
+    for specific_key, specific_value in specific_entry_matrix.items():
+        if matrix_combo.get(specific_key) != specific_value:
+            return False
+    return True
 
 
 def main(config_file, files):
@@ -111,33 +117,34 @@ def main(config_file, files):
         file_types_to_generate = get_file_types_to_generate(file_config["generate"])
 
         for file_type in file_types_to_generate:
-            file_deps = []
+            common_deps = []
 
             # Add common dependencies to file list
             for ecosystem in [file_type, conda_and_requirements_key]:
                 for include in includes:
-                    file_deps.extend(
+                    common_deps.extend(
                         dependencies.get(ecosystem, {})
                         .get("common", {})
                         .get(include, [])
                     )
 
-            # Add cuda-arch specific dependencies to file list
+            # Add matrix specific dependencies to file list
             for matrix_combo in grid(file_config["matrix"]):
-                cuda_version = matrix_combo["cuda_version"]
-                arch = matrix_combo["arch"]
-                matrix_combo_deps = []
+                matrix_deps = []
                 for ecosystem in [file_type, conda_and_requirements_key]:
-                    for include in includes:
-                        matrix_combo_deps.extend(
-                            dependencies.get(ecosystem, {})
-                            .get(arch_cuda_key_fmt(arch, cuda_version), {})
-                            .get(include, [])
-                        )
+                    for specific_entry in dependencies.get(ecosystem, {}).get(
+                        "specific", []
+                    ):
+                        if not should_use_specific_entry(
+                            matrix_combo, specific_entry["matrix"]
+                        ):
+                            continue
+                        for include in includes:
+                            matrix_deps.extend(specific_entry.get(include, []))
 
                 # Dedupe deps and print / write to filesystem
-                full_file_name = get_filename(file_type, file_name, cuda_version, arch)
-                deduped_deps = dedupe(file_deps + matrix_combo_deps)
+                full_file_name = get_filename(file_type, file_name, matrix_combo)
+                deduped_deps = dedupe(common_deps + matrix_deps)
                 make_dependency_file_factory = lambda output_path: make_dependency_file(
                     file_type,
                     full_file_name,
