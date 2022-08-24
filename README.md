@@ -26,7 +26,7 @@ pip install rapids-dependency-file-generator
 When `rapids-dependency-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files. The `dependencies.yaml` file has the following characteristics:
 
 - it is intended to be committed to the root directory of repositories
-- it can define matrices that enable the outputted dependency files to vary according to any arbitrary specification (or combination of specifications), including CUDA version, machine architecture, Python version, etc.
+- it can define matrices that enable the output dependency files to vary according to any arbitrary specification (or combination of specifications), including CUDA version, machine architecture, Python version, etc.
 - it contains bifurcated lists of dependencies based on the dependency's purpose (i.e. build, runtime, test, etc.). The bifurcated dependency lists are merged according to the description in the [_How Dependency Lists Are Merged_](#how-dependency-lists-are-merged) section below.
 
 ## `dependencies.yaml` Format

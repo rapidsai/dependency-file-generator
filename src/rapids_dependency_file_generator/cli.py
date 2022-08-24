@@ -57,7 +57,7 @@ def main():
     )
     codependent_args.add_argument(
         "--matrix",
-        help='string representing which matrix combination should be generated. i.e. --matrix "cuda=11.5;arch=x86_64"',
+        help='string representing which matrix combination should be generated, such as `--matrix "cuda=11.5;arch=x86_64"`',
     )
 
     args = parser.parse_args()
