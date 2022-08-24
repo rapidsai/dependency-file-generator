@@ -23,10 +23,11 @@ pip install rapids-dependency-file-generator
 
 ## Usage
 
-When `rapids-dependency-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files.
-`dependencies.yaml` is intended to be committed to the root directory of repositories.
-It has specific keys (described below) that enable the bifurcation of dependencies for different CUDA versions, architectures, and dependency file types (i.e. conda `environment.yaml` files vs. `requirements.txt`).
-The bifurcated dependency lists are merged according to the description in the [_How Dependency Lists Are Merged_](#how-dependency-lists-are-merged) section below.
+When `rapids-dependency-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files. The `dependencies.yaml` file has the following characteristics:
+
+- it is intended to be committed to the root directory of repositories
+- it can define matrices that enable the outputted dependency files to vary according to any arbitrary specification (or combination of specifications), including CUDA version, machine architecture, Python version, etc.
+- it contains bifurcated lists of dependencies based on the dependency's purpose (i.e. build, runtime, test, etc.). The bifurcated dependency lists are merged according to the description in the [_How Dependency Lists Are Merged_](#how-dependency-lists-are-merged) section below.
 
 ## `dependencies.yaml` Format
 
@@ -38,7 +39,7 @@ The top-level `files` key is responsible for determining the following:
 
 - which types of dependency files should be generated (i.e. conda `environment.yaml` files and/or `requirements.txt` files)
 - where the generated files should be written to
-- which architecture and CUDA version variant files should be generated
+- which variant files should be generated (based on the provided matrix)
 - which of the dependency lists from the top-level `dependencies` key should be included in the generated files
 
 Here is an example of what the `files` key might look like:
@@ -49,9 +50,9 @@ files:
     generate: both # which dependency file types to generate. required, can be "both", "env", "requirements", or "none"
     conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
-    matrix:
-      cuda_version: ["11.5", "11.6"] # which CUDA version variant files to generate. The CUDA version is included in the output file name
-      arch: [x86_64] # which architecture version variant files to generate. The architecture is included in the output file name. This value should be the result of running the `arch` command on a given machine.
+    matrix: # contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
+      cuda: ["11.5", "11.6"] # which CUDA version variant files to generate.
+      arch: [x86_64] # which architecture version variant files to generate. This value should be the result of running the `arch` command on a given machine.
     includes: # a list of keys from the `dependencies` section which should be included in the generated files
       - build
       - test
@@ -61,19 +62,20 @@ files:
     conda_dir: conda/environments
     requirements_dir: python/cudf
     matrix:
-      cuda_version: ["11.5"]
+      cuda: ["11.5"]
       arch: [x86_64]
+      py: ["3.8"]
     includes:
       - build
 ```
 
 The result of the above configuration is that the following dependency files would be generated:
 
-- `conda/environments/all_cuda-11.5_arch-x86_64.yaml`
-- `conda/environments/all_cuda-11.6_arch-x86_64.yaml`
-- `python/cudf/requirements_all_cuda-11.5_arch-x86_64.txt`
-- `python/cudf/requirements_all_cuda-11.6_arch-x86_64.txt`
-- `python/cudf/requirements_build_cuda-11.5_arch-x86_64.txt`
+- `conda/environments/all_cuda-115_arch-x86_64.yaml`
+- `conda/environments/all_cuda-116_arch-x86_64.yaml`
+- `python/cudf/requirements_all_cuda-115_arch-x86_64.txt`
+- `python/cudf/requirements_all_cuda-116_arch-x86_64.txt`
+- `python/cudf/requirements_build_cuda-115_arch-x86_64_py-38.txt`
 
 The `all*.yaml` and `requirements_all*.txt` files would include the contents of the `build`, `test`, and `runtime` dependency lists from the top-level `dependency` key. The `requirements_build*.txt` file would only include the contents of the `build` dependency list from the top-level `dependency` key.
 
@@ -101,55 +103,69 @@ channels:
   - conda-forge
 ```
 
-In the absence of a `channels` key, some sensible defaults for RAPIDS will be used (see [constants.py](./src/rapids_dependency_file_generator//constants.py)).
+In the absence of a `channels` key, some sensible defaults for RAPIDS will be used (see [constants.py](./src/rapids_dependency_file_generator/constants.py)).
 
 ### `dependencies` Key
 
 The top-level `dependencies` key is where the bifurcated dependency lists should be specified. Directly beneath the `dependencies` key are 3 unique keys:
 
-- `conda_and_requirements` - contains dependency lists that are the sames for both conda `environment.yaml` files and `requirements.txt` files
+- `conda_and_requirements` - contains dependency lists that are the same for both conda `environment.yaml` files and `requirements.txt` files
 - `conda` - contains dependency lists that are specific to conda `environment.yaml` files
 - `requirements` - contains dependency lists that are specific to `requirements.txt` files
 
 Each of the above keys has the following children keys:
 
-- `common` - contains dependency lists that are the same across CUDA versions and architectures
-- `<arch>-<cuda_version>` (i.e. `x86_64-11.5`) - contains dependency lists that are specific to the respective architecture and CUDA versions
+- `common` - contains dependency lists that are the same across all matrix variations
+- `specific` - contains dependency lists that are specific to a particular matrix combination
 
-Below these keys are any number of arbitrarily named dependency lists (i.e. `build`, `test`, `libcuml_build`, `cuml_build`, etc.).
+The structure of these two keys varies slightly.
+
+The `common` key has children which are simple key-value pairs, where the key is an arbitrary name for the dependency list (i.e. `build`, `test`, `libcuml_build`, `cuml_build`, etc.) and the value is a list of dependencies.
+
+The `specific` key's value is an array of objects. Each object contains a `matrix` key and some arbitrarily named dependency lists (similar to the dependency lists under `common`). The `matrix` key is used to define which matrix combinations from `files.[*].matrix` these dependency lists should apply to. This is elaborated on in [How Dependency Lists Are Merged](#how-dependency-lists-are-merged)
 
 An example of the above structure is exemplified below:
 
 ```yaml
 dependencies:
   conda_and_requirements: # common dependencies between conda environment.yaml & requirements.txt files
-    common: # common between archs/cudas
+    common: # common between all matrix variations
       build: # arbitrarily named dependency list
         - common_build_dep
       test: # arbitrarily named dependency list
         - pytest
-    x86_64-11.5: # common dependencies specific to x86_64-11.5
-      build:
-        - a_random_x86_115_specific_dep
+    specific:
+      # dependencies specific to x86_64 and 11.5
+      - matrix:
+          cuda: "11.5"
+          arch: x86_64
+        build:
+          - a_random_x86_115_specific_dep
   conda: # dependencies specific to conda environment.yaml files
     common:
       build:
         - cupy
         - pip: # supports `pip` key for conda environment.yaml files
             - some_random_dep
-    x86_64-11.5:
-      build:
-        - cudatoolkit=11.5
-    x86_64-11.6:
-      build:
-        - cudatoolkit=11.6
+    specific:
+      - matrix:
+          cuda: "11.5"
+        build:
+          - cudatoolkit=11.5
+      - matrix:
+          cuda: "11.6"
+        build:
+          - cudatoolkit=11.6
   requirements: # dependencies specific to requirements.txt files
-    x86_64-11.5:
-      build:
-        - another_random_dep=11.5.0
-    x86_64-11.6:
-      build:
-        - another_random_dep=11.6.0
+    specific:
+      - matrix:
+          cuda: "11.5"
+        build:
+          - another_random_dep=11.5.0
+      - matrix:
+          cuda: "11.6"
+        build:
+          - another_random_dep=11.6.0
 ```
 
 ## How Dependency Lists Are Merged
@@ -165,7 +181,7 @@ files:
     conda_dir: conda/environments
     requirements_dir: python/cudf
     matrix:
-      cuda_version: ["11.5", "11.6"]
+      cuda: ["11.5", "11.6"]
       arch: [x86_64, arm]
     includes:
       - build
@@ -176,12 +192,37 @@ For the `11.5` and `x86_64` matrix combination, the following dependency lists w
 
 - `conda_and_requirements.common.build`
 - `conda_and_requirements.common.test`
-- `conda_and_requirements.x86_64-11.5.build`
-- `conda_and_requirements.x86_64-11.5.test`
 - `conda.common.build`
 - `conda.common.test`
-- `conda.x86_64-11.5.build`
-- `conda.x86_64-11.5.test`
+
+Additionally, any `build` and `test` lists from array entries under the `conda.specific` or `conda_and_requirements.specific` keys whose matrix value matches any of the definitions below would also be merged:
+
+```yaml
+specific:
+  - matrix:
+      cuda: "11.5"
+      arch: "x86_64"
+    build:
+      - some_dep1
+    test:
+      - some_dep2
+# or
+specific:
+  - matrix:
+      cuda: "11.5"
+    build:
+      - some_dep1
+    test:
+      - some_dep2
+# or
+specific:
+  - matrix:
+      arch: "x86_64"
+    build:
+      - some_dep1
+    test:
+      - some_dep2
+```
 
 Merged dependency lists are also deduped.
 
@@ -218,6 +259,6 @@ mamba activate "$ENV_NAME"
 
 The `--file_key` argument is passed the `test` key name from the `files` configuration. Additional flags are used to generate a single dependency file. When the CLI is used in this fashion, it will print to `stdout` instead of writing the resulting contents to the filesystem.
 
-The `--file_key`, `--generate`, `--cuda_version`, and `--arch` flags must be used together.
+The `--file_key`, `--generate`, and `--matrix` flags must be used together.
 
 Running `rapids-dependency-file-generator -h` will show the most up-to-date CLI arguments.
