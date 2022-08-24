@@ -1,6 +1,8 @@
 # rapids-dependency-file-generator
 
-`rapids-dependency-file-generator` is a Python CLI tool that generates conda `environment.yaml` files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`. When installed, it makes the `rapids-dependency-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate conda `environment.yaml` and `requirements.txt` dependency files.
+`rapids-dependency-file-generator` is a Python CLI tool that generates conda `environment.yaml` files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`.
+
+When installed, it makes the `rapids-dependency-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate conda `environment.yaml` and `requirements.txt` dependency files.
 
 ## Table of Contents
 
@@ -23,7 +25,9 @@ pip install rapids-dependency-file-generator
 
 ## Usage
 
-When `rapids-dependency-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files. The `dependencies.yaml` file has the following characteristics:
+When `rapids-dependency-file-generator` is invoked, it will read a `dependencies.yaml` file from the current directory and generate children dependency files.
+
+The `dependencies.yaml` file has the following characteristics:
 
 - it is intended to be committed to the root directory of repositories
 - it can define matrices that enable the output dependency files to vary according to any arbitrary specification (or combination of specifications), including CUDA version, machine architecture, Python version, etc.
