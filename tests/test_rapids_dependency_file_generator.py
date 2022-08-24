@@ -2,6 +2,7 @@ from unittest import mock
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
     make_dependency_file,
+    should_use_specific_entry,
 )
 from rapids_dependency_file_generator.constants import cli_name
 import yaml
@@ -59,3 +60,23 @@ def test_make_dependency_file(mock_relpath):
         ["dep1", "dep2"],
     )
     assert env == header + "dep1\ndep2\n"
+
+
+def test_should_use_specific_entry():
+    # no match
+    matrix_combo = {"cuda": "11.5", "arch": "x86_64"}
+    specific_entry = {"cuda": "11.6"}
+    result = should_use_specific_entry(matrix_combo, specific_entry)
+    assert result == False
+
+    # one match
+    matrix_combo = {"cuda": "11.5", "arch": "x86_64"}
+    specific_entry = {"cuda": "11.5"}
+    result = should_use_specific_entry(matrix_combo, specific_entry)
+    assert result == True
+
+    # many matches
+    matrix_combo = {"cuda": "11.5", "arch": "x86_64", "python": "3.6"}
+    specific_entry = {"cuda": "11.5", "arch": "x86_64"}
+    result = should_use_specific_entry(matrix_combo, specific_entry)
+    assert result == True
