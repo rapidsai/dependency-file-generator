@@ -62,6 +62,6 @@ def main():
 
     args = parser.parse_args()
     validate_args(args)
-    matrix = generate_matrix(args.matrix)
+    matrix = generate_matrix(args.matrix) if args.matrix else {}
     file = generate_file_obj(args.config, args.file_key, args.generate, matrix)
     dfg(args.config, file)
