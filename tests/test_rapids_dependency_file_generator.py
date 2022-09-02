@@ -108,13 +108,13 @@ def test_get_file_types_to_generate():
     )
     assert result == [str(GeneratorTypes.REQUIREMENTS), str(GeneratorTypes.CONDA)]
 
-    with pytest.raises(Exception):
-        get_file_types_to_generate("asdas")
+    with pytest.raises(ValueError):
+        get_file_types_to_generate("invalid_value")
 
-    with pytest.raises(Exception):
-        get_file_types_to_generate(["asdas"])
+    with pytest.raises(ValueError):
+        get_file_types_to_generate(["invalid_value"])
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         get_file_types_to_generate(
             [str(GeneratorTypes.NONE), str(GeneratorTypes.CONDA)]
         )

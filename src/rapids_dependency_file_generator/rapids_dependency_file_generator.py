@@ -61,7 +61,7 @@ def make_dependency_file(
 
 
 def get_file_types_to_generate(generate_value):
-    if type(generate_value) != list:
+    if not isinstance(generate_value, list):
         generate_value = [generate_value]
 
     if generate_value == [str(GeneratorTypes.NONE)]:
