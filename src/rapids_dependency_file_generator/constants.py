@@ -5,7 +5,6 @@ class GeneratorTypes(Enum):
     CONDA = "conda"
     REQUIREMENTS = "requirements"
     NONE = "none"
-    BOTH = "both"
 
     def __str__(self):
         return self.value

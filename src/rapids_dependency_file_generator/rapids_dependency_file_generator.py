@@ -61,19 +61,27 @@ def make_dependency_file(
 
 
 def get_file_types_to_generate(generate_value):
-    if generate_value == str(GeneratorTypes.BOTH):
-        return [str(GeneratorTypes.CONDA), str(GeneratorTypes.REQUIREMENTS)]
-    if generate_value == str(GeneratorTypes.NONE):
+    if type(generate_value) != list:
+        generate_value = [generate_value]
+
+    if generate_value == [str(GeneratorTypes.NONE)]:
         return []
-    if generate_value == str(GeneratorTypes.CONDA) or generate_value == str(
-        GeneratorTypes.REQUIREMENTS
-    ):
-        return [generate_value]
-    raise ValueError(
-        "'generate' key can only be "
-        + ", ".join([f"'{x}'" for x in GeneratorTypes])
-        + "."
-    )
+
+    if len(generate_value) > 1 and str(GeneratorTypes.NONE) in generate_value:
+        raise ValueError("'generate: [none]' cannot be combined with any other values.")
+
+    enum_values = [str(x) for x in GeneratorTypes]
+    non_none_enum_values = [
+        str(x) for x in GeneratorTypes if not x == GeneratorTypes.NONE
+    ]
+    for value in generate_value:
+        if value not in non_none_enum_values:
+            raise ValueError(
+                "'generate' key can only be "
+                + ", ".join(f"'{x}'" for x in enum_values)
+                + f" or a list of the non-'{GeneratorTypes.NONE}' values."
+            )
+    return generate_value
 
 
 def get_filename(file_type, file_prefix, matrix_combo):

@@ -1,10 +1,12 @@
+import pytest
 from unittest import mock
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
     make_dependency_file,
     should_use_specific_entry,
+    get_file_types_to_generate,
 )
-from rapids_dependency_file_generator.constants import cli_name
+from rapids_dependency_file_generator.constants import cli_name, GeneratorTypes
 import yaml
 
 
@@ -80,3 +82,39 @@ def test_should_use_specific_entry():
     specific_entry = {"cuda": "11.5", "arch": "x86_64"}
     result = should_use_specific_entry(matrix_combo, specific_entry)
     assert result == True
+
+
+def test_get_file_types_to_generate():
+    result = get_file_types_to_generate(str(GeneratorTypes.NONE))
+    assert result == []
+
+    result = get_file_types_to_generate([str(GeneratorTypes.NONE)])
+    assert result == []
+
+    result = get_file_types_to_generate(str(GeneratorTypes.CONDA))
+    assert result == [str(GeneratorTypes.CONDA)]
+
+    result = get_file_types_to_generate([str(GeneratorTypes.CONDA)])
+    assert result == [str(GeneratorTypes.CONDA)]
+
+    result = get_file_types_to_generate(str(GeneratorTypes.REQUIREMENTS))
+    assert result == [str(GeneratorTypes.REQUIREMENTS)]
+
+    result = get_file_types_to_generate([str(GeneratorTypes.REQUIREMENTS)])
+    assert result == [str(GeneratorTypes.REQUIREMENTS)]
+
+    result = get_file_types_to_generate(
+        [str(GeneratorTypes.REQUIREMENTS), str(GeneratorTypes.CONDA)]
+    )
+    assert result == [str(GeneratorTypes.REQUIREMENTS), str(GeneratorTypes.CONDA)]
+
+    with pytest.raises(Exception):
+        get_file_types_to_generate("asdas")
+
+    with pytest.raises(Exception):
+        get_file_types_to_generate(["asdas"])
+
+    with pytest.raises(Exception):
+        get_file_types_to_generate(
+            [str(GeneratorTypes.NONE), str(GeneratorTypes.CONDA)]
+        )
