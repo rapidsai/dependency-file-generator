@@ -51,7 +51,7 @@ Here is an example of what the `files` key might look like:
 ```yaml
 files:
   all: # used as the prefix for the generated dependency file names
-    generate: both # which dependency file types to generate. required, can be "both", "env", "requirements", or "none"
+    generate: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "none" or a list of non-"none" values
     conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
     matrix: # contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
