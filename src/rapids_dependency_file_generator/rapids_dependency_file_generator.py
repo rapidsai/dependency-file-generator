@@ -171,5 +171,8 @@ def main(config_file_path, files={}):
                         file_type, config_file_path, file_config
                     )
                     contents = make_dependency_file_factory(output_path)
-                    with open(os.path.join(output_path, full_file_name), "w") as f:
+                    with open(
+                        os.path.join(output_path, full_file_name),
+                        "w",
+                    ) as f:
                         f.write(contents)
