@@ -96,13 +96,13 @@ def get_filename(file_type, file_prefix, matrix_combo):
     return f"{prefix}{file_prefix}_{suffix}".replace(".", "") + file_ext
 
 
-def get_output_path(file_type, file_config):
+def get_output_path(file_type, config_file_path, file_config):
     output_path = "."
     if file_type == str(GeneratorTypes.CONDA):
         output_path = file_config.get("conda_dir", default_conda_dir)
     if file_type == str(GeneratorTypes.REQUIREMENTS):
         output_path = file_config.get("requirements_dir", default_requirements_dir)
-    return output_path
+    return os.path.join(os.path.dirname(config_file_path), output_path)
 
 
 def should_use_specific_entry(matrix_combo, specific_entry_matrix):
@@ -112,8 +112,8 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     return True
 
 
-def main(config_file, files):
-    with open(config_file, "r") as f:
+def main(config_file_path, files=None):
+    with open(config_file_path) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
 
     channels = parsed_config.get("channels", default_channels) or default_channels
@@ -156,7 +156,7 @@ def main(config_file, files):
                 make_dependency_file_factory = lambda output_path: make_dependency_file(
                     file_type,
                     full_file_name,
-                    config_file,
+                    config_file_path,
                     output_path,
                     channels,
                     deduped_deps,
@@ -167,7 +167,12 @@ def main(config_file, files):
                     contents = make_dependency_file_factory(output_path)
                     print(contents)
                 else:
-                    output_path = get_output_path(file_type, file_config)
+                    output_path = get_output_path(
+                        file_type, config_file_path, file_config
+                    )
                     contents = make_dependency_file_factory(output_path)
-                    with open(os.path.join(output_path, full_file_name), "w") as f:
+                    with open(
+                        os.path.join(output_path, full_file_name),
+                        "w",
+                    ) as f:
                         f.write(contents)
