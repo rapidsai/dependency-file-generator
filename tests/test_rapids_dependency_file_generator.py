@@ -1,13 +1,15 @@
-import pytest
 from unittest import mock
+
+import pytest
+import yaml
+
+from rapids_dependency_file_generator.constants import GeneratorTypes, cli_name
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
+    get_file_types_to_generate,
     make_dependency_file,
     should_use_specific_entry,
-    get_file_types_to_generate,
 )
-from rapids_dependency_file_generator.constants import cli_name, GeneratorTypes
-import yaml
 
 
 def test_dedupe():
@@ -69,19 +71,19 @@ def test_should_use_specific_entry():
     matrix_combo = {"cuda": "11.5", "arch": "x86_64"}
     specific_entry = {"cuda": "11.6"}
     result = should_use_specific_entry(matrix_combo, specific_entry)
-    assert result == False
+    assert result is False
 
     # one match
     matrix_combo = {"cuda": "11.5", "arch": "x86_64"}
     specific_entry = {"cuda": "11.5"}
     result = should_use_specific_entry(matrix_combo, specific_entry)
-    assert result == True
+    assert result is True
 
     # many matches
     matrix_combo = {"cuda": "11.5", "arch": "x86_64", "python": "3.6"}
     specific_entry = {"cuda": "11.5", "arch": "x86_64"}
     result = should_use_specific_entry(matrix_combo, specific_entry)
-    assert result == True
+    assert result is True
 
 
 def test_get_file_types_to_generate():

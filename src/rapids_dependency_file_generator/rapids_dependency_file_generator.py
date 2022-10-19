@@ -1,14 +1,16 @@
 import itertools
-import yaml
-from collections import defaultdict
 import os.path
+from collections import defaultdict
+
+import yaml
+
 from .constants import (
+    GeneratorTypes,
     cli_name,
     conda_and_requirements_key,
     default_channels,
     default_conda_dir,
     default_requirements_dir,
-    GeneratorTypes,
 )
 
 
@@ -153,14 +155,16 @@ def main(config_file_path, files=None):
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_name, matrix_combo)
                 deduped_deps = dedupe(common_deps + matrix_deps)
-                make_dependency_file_factory = lambda output_path: make_dependency_file(
-                    file_type,
-                    full_file_name,
-                    config_file_path,
-                    output_path,
-                    channels,
-                    deduped_deps,
-                )
+
+                def make_dependency_file_factory(output_path):
+                    return make_dependency_file(
+                        file_type,
+                        full_file_name,
+                        config_file_path,
+                        output_path,
+                        channels,
+                        deduped_deps,
+                    )
 
                 if to_stdout:
                     output_path = "."

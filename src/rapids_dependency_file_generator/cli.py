@@ -1,14 +1,16 @@
-from .rapids_dependency_file_generator import main as dfg
+import argparse
+
+import yaml
+
 from ._version import __version__ as version
 from .constants import GeneratorTypes, default_dependency_file_path
-import yaml
-import argparse
+from .rapids_dependency_file_generator import main as dfg
 
 
 def generate_file_obj(config_file, file_key, file_type, matrix):
     if not (config_file and file_key and file_type and matrix):
         return {}
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
     parsed_config["files"][file_key]["matrix"] = matrix
     parsed_config["files"][file_key]["generate"] = file_type
@@ -57,7 +59,10 @@ def main():
     )
     codependent_args.add_argument(
         "--matrix",
-        help='string representing which matrix combination should be generated, such as `--matrix "cuda=11.5;arch=x86_64"`',
+        help=(
+            "string representing which matrix combination should be generated, "
+            'such as `--matrix "cuda=11.5;arch=x86_64"`'
+        ),
     )
 
     args = parser.parse_args()
