@@ -112,8 +112,8 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     return True
 
 
-def main(config_file_path, files={}):
-    with open(config_file_path, "r") as f:
+def main(config_file_path, files=None):
+    with open(config_file_path) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
 
     channels = parsed_config.get("channels", default_channels) or default_channels
