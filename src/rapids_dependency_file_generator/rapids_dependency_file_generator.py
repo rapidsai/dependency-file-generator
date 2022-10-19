@@ -1,5 +1,5 @@
 import itertools
-import os.path
+import os
 from collections import defaultdict
 
 import yaml
@@ -175,6 +175,7 @@ def main(config_file_path, files=None):
                         file_type, config_file_path, file_config
                     )
                     contents = make_dependency_file_factory(output_path)
+                    os.makedirs(output_path, exist_ok=True)
                     with open(
                         os.path.join(output_path, full_file_name),
                         "w",
