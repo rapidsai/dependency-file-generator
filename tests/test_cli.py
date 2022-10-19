@@ -1,5 +1,6 @@
 from unittest import mock
 from unittest.mock import mock_open
+
 from rapids_dependency_file_generator.cli import generate_file_obj, generate_matrix
 
 mock_yaml = """
@@ -49,4 +50,4 @@ def test_generate_file_obj():
 
 def test_generate_matrix():
     matrix = generate_matrix("cuda=11.5;arch=x86_64")
-    assert matrix == {'cuda': ["11.5"], "arch": ["x86_64"]}
+    assert matrix == {"cuda": ["11.5"], "arch": ["x86_64"]}
