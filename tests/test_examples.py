@@ -27,8 +27,9 @@ def make_file_set(file_dir):
     }
 
 
-def test_integration():
-    test_dir = CURRENT_DIR.joinpath("examples", "integration")
+@pytest.mark.parametrize("test_name", ["integration"])
+def test_examples(test_name):
+    test_dir = CURRENT_DIR.joinpath("examples", test_name)
     expected_dir = test_dir.joinpath("output", "expected")
     actual_dir = test_dir.joinpath("output", "actual")
     dep_file_path = test_dir.joinpath("dependencies.yaml")
