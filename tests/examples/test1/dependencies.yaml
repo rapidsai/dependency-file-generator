@@ -1,0 +1,69 @@
+files:
+  all:
+    generate: [conda, requirements]
+    requirements_dir: output/actual
+    conda_dir: output/actual
+    matrix:
+      cuda: ["11.5", "11.6"]
+      arch: [x86_64, arm64]
+    includes:
+      - miscellaneous
+      - test
+  test:
+    generate: none
+    includes:
+      - test
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  conda_and_requirements:
+    common:
+      miscellaneous:
+        - black=22.3.0
+        - clang=11.1.0
+      test:
+        - pytest
+        - pytest-cov
+    specific:
+      - matrix:
+          cuda: "11.5"
+          arch: "arm64"
+        miscellaneous:
+          - some_arm11.5_dep
+      - matrix:
+          cuda: "11.5"
+        miscellaneous:
+          - cuda-python>=11.5,<11.7.1
+      - matrix:
+          cuda: "11.6"
+        miscellaneous:
+          - cuda-python>=11.6,<11.7.1
+      - matrix:
+          arch: x86_64
+          cuda: "11.5"
+        miscellaneous:
+          - somedep
+      - matrix:
+          arch: x86_64
+          cuda: "11.6"
+        miscellaneous:
+          - something_else
+  conda:
+    common:
+      miscellaneous:
+        - clang-tools=11.1.0
+        - spdlog>=1.8.5,<1.9
+    specific:
+      - matrix:
+          cuda: "11.5"
+        miscellaneous:
+          - cudatoolkit=11.5
+      - matrix:
+          cuda: "11.6"
+        miscellaneous:
+          - cudatoolkit=11.6
+  requirements:
+    common:
+      miscellaneous:
+        - some_common_req_misc_dep
