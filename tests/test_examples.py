@@ -18,8 +18,8 @@ def clean_actual_files():
             shutil.rmtree(root)
 
 
-def test1():
-    test_dir = os.path.join(CURRENT_DIR, "examples", "test1")
+def test_integration():
+    test_dir = os.path.join(CURRENT_DIR, "examples", "integration")
     expected_dir = os.path.join(test_dir, "output", "expected")
     actual_dir = os.path.join(test_dir, "output", "actual")
     dep_file_path = os.path.join(test_dir, "dependencies.yaml")
