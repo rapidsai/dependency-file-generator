@@ -18,6 +18,14 @@ def clean_actual_files():
             shutil.rmtree(root)
 
 
+def make_file_set(file_dir):
+    return {
+        os.path.relpath(f, file_dir)
+        for f in glob.glob(file_dir + "/**", recursive=True)
+        if os.path.isfile(f)
+    }
+
+
 def test_integration():
     test_dir = os.path.join(CURRENT_DIR, "examples", "integration")
     expected_dir = os.path.join(test_dir, "output", "expected")
@@ -26,18 +34,9 @@ def test_integration():
 
     dfg(dep_file_path)
 
-    expected_file_set = {
-        os.path.relpath(f, expected_dir)
-        for f in glob.glob(expected_dir + "/**", recursive=True)
-        if os.path.isfile(f)
-    }
-    actual_file_set = {
-        os.path.relpath(f, actual_dir)
-        for f in glob.glob(actual_dir + "/**", recursive=True)
-        if os.path.isfile(f)
-    }
+    expected_file_set = make_file_set(expected_dir)
+    actual_file_set = make_file_set(actual_dir)
 
-    assert len(expected_file_set) == len(actual_file_set)
     assert expected_file_set == actual_file_set
 
     for file in actual_file_set:
