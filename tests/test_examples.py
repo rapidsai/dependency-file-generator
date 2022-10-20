@@ -1,5 +1,6 @@
 import glob
 import os
+import pathlib
 import shutil
 
 import pytest
@@ -8,29 +9,29 @@ from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     main as dfg,
 )
 
-CURRENT_DIR = os.path.dirname(__file__)
+CURRENT_DIR = pathlib.Path(__file__).parent
 
 
 @pytest.fixture(scope="session", autouse=True)
 def clean_actual_files():
     for root, _, _ in os.walk("tests"):
-        if os.path.basename(root) == "actual":
+        if pathlib.Path(root).name == "actual":
             shutil.rmtree(root)
 
 
 def make_file_set(file_dir):
     return {
-        os.path.relpath(f, file_dir)
-        for f in glob.glob(file_dir + "/**", recursive=True)
-        if os.path.isfile(f)
+        pathlib.Path(f).relative_to(file_dir)
+        for f in glob.glob(str(file_dir) + "/**", recursive=True)
+        if pathlib.Path(f).is_file()
     }
 
 
 def test_integration():
-    test_dir = os.path.join(CURRENT_DIR, "examples", "integration")
-    expected_dir = os.path.join(test_dir, "output", "expected")
-    actual_dir = os.path.join(test_dir, "output", "actual")
-    dep_file_path = os.path.join(test_dir, "dependencies.yaml")
+    test_dir = CURRENT_DIR.joinpath("examples", "integration")
+    expected_dir = test_dir.joinpath("output", "expected")
+    actual_dir = test_dir.joinpath("output", "actual")
+    dep_file_path = test_dir.joinpath("dependencies.yaml")
 
     dfg(dep_file_path)
 
@@ -40,6 +41,6 @@ def test_integration():
     assert expected_file_set == actual_file_set
 
     for file in actual_file_set:
-        actual_file = open(os.path.join(actual_dir, file)).read()
-        expected_file = open(os.path.join(expected_dir, file)).read()
+        actual_file = open(actual_dir.joinpath(file)).read()
+        expected_file = open(expected_dir.joinpath(file)).read()
         assert actual_file == expected_file
