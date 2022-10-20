@@ -5,7 +5,6 @@ files:
     conda_dir: output/actual
     matrix:
       cuda: ["11.5", "11.6"]
-      arch: [x86_64, arm64]
     includes:
       - build
       - test
@@ -28,27 +27,12 @@ dependencies:
     specific:
       - matrix:
           cuda: "11.5"
-          arch: "arm64"
-        build:
-          - some_arm11.5_dep
-      - matrix:
-          cuda: "11.5"
         build:
           - cuda-python>=11.5,<11.7.1
       - matrix:
           cuda: "11.6"
         build:
           - cuda-python>=11.6,<11.7.1
-      - matrix:
-          arch: x86_64
-          cuda: "11.5"
-        build:
-          - somedep
-      - matrix:
-          arch: x86_64
-          cuda: "11.6"
-        build:
-          - something_else
   conda:
     common:
       build:
