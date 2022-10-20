@@ -4,13 +4,8 @@ channels:
 - rapidsai
 - conda-forge
 dependencies:
-- black=22.3.0
 - clang-tools=11.1.0
-- clang=11.1.0
-- cuda-python>=11.6,<11.7.1
-- cudatoolkit=11.6
-- pytest
-- pytest-cov
-- something_else
+- cudatoolkit=11.5
+- some_amd64_39_build_dep
 - spdlog>=1.8.5,<1.9
-name: all_cuda-116_arch-x86_64
+name: all_cuda-115_arch-x86_64_py-39
