@@ -27,7 +27,9 @@ def make_file_set(file_dir):
     }
 
 
-@pytest.mark.parametrize("test_name", ["integration", "conda-minimal"])
+@pytest.mark.parametrize(
+    "test_name", ["integration", "conda-minimal", "requirements-minimal"]
+)
 def test_examples(test_name):
     test_dir = CURRENT_DIR.joinpath("examples", test_name)
     expected_dir = test_dir.joinpath("output", "expected")
