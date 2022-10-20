@@ -7,7 +7,7 @@ files:
       cuda: ["11.5", "11.6"]
       arch: [x86_64, arm64]
     includes:
-      - miscellaneous
+      - build
       - test
   test:
     generate: none
@@ -19,7 +19,7 @@ channels:
 dependencies:
   conda_and_requirements:
     common:
-      miscellaneous:
+      build:
         - black=22.3.0
         - clang=11.1.0
       test:
@@ -29,41 +29,41 @@ dependencies:
       - matrix:
           cuda: "11.5"
           arch: "arm64"
-        miscellaneous:
+        build:
           - some_arm11.5_dep
       - matrix:
           cuda: "11.5"
-        miscellaneous:
+        build:
           - cuda-python>=11.5,<11.7.1
       - matrix:
           cuda: "11.6"
-        miscellaneous:
+        build:
           - cuda-python>=11.6,<11.7.1
       - matrix:
           arch: x86_64
           cuda: "11.5"
-        miscellaneous:
+        build:
           - somedep
       - matrix:
           arch: x86_64
           cuda: "11.6"
-        miscellaneous:
+        build:
           - something_else
   conda:
     common:
-      miscellaneous:
+      build:
         - clang-tools=11.1.0
         - spdlog>=1.8.5,<1.9
     specific:
       - matrix:
           cuda: "11.5"
-        miscellaneous:
+        build:
           - cudatoolkit=11.5
       - matrix:
           cuda: "11.6"
-        miscellaneous:
+        build:
           - cudatoolkit=11.6
   requirements:
     common:
-      miscellaneous:
+      build:
         - some_common_req_misc_dep
