@@ -1,5 +1,5 @@
 files:
-  all:
+  build:
     generate: conda
     conda_dir: output/actual
     matrix:
