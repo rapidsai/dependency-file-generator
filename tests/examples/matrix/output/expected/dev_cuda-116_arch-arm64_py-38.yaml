@@ -5,6 +5,6 @@ channels:
 - conda-forge
 dependencies:
 - clang-tools=11.1.0
-- cudatoolkit=11.5
+- cudatoolkit=11.6
 - spdlog>=1.8.5,<1.9
-name: all_cuda-115_arch-arm64_py-39
+name: dev_cuda-116_arch-arm64_py-38

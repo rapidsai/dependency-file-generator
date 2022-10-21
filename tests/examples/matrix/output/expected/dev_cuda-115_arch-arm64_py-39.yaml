@@ -6,6 +6,5 @@ channels:
 dependencies:
 - clang-tools=11.1.0
 - cudatoolkit=11.5
-- some_amd64_39_build_dep
 - spdlog>=1.8.5,<1.9
-name: all_cuda-115_arch-x86_64_py-39
+name: dev_cuda-115_arch-arm64_py-39

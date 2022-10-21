@@ -4,9 +4,8 @@ channels:
 - rapidsai
 - conda-forge
 dependencies:
-- clang-tools=11.1.0
-- cudatoolkit=11.5
-- some_115_38_build_dep
+- clang=11.1.0
+- cuda-python>=11.6,<11.7.1
+- cudatoolkit=11.6
 - spdlog>=1.8.5,<1.9
-- super_specific_dep
-name: all_cuda-115_arch-arm64_py-38
+name: build_cuda-116_arch-x86_64
