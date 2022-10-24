@@ -4,7 +4,7 @@ import yaml
 
 from ._version import __version__ as version
 from .constants import GeneratorTypes, default_dependency_file_path
-from .rapids_dependency_file_generator import main as dfg
+from .rapids_dependency_file_generator import make_dependency_files
 
 
 def generate_file_obj(config_file, file_key, file_type, matrix):
@@ -69,4 +69,4 @@ def main():
     validate_args(args)
     matrix = generate_matrix(args.matrix) if args.matrix else {}
     file = generate_file_obj(args.config, args.file_key, args.generate, matrix)
-    dfg(args.config, file)
+    make_dependency_files(args.config, file)

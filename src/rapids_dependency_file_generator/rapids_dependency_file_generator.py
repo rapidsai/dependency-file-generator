@@ -114,7 +114,7 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     return True
 
 
-def main(config_file_path, files=None):
+def make_dependency_files(config_file_path, files=None):
     with open(config_file_path) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
 
