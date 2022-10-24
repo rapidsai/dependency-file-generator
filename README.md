@@ -281,3 +281,4 @@ To create new `example` tests do the following:
 - Run `rapids-dependency-file-generator --config tests/examples/<new_folder_name>/dependencies.yaml` to generate the initial output files
 - Manually inspect the generated files for correctness
 - Copy the contents of `output/actual` to `output/expected`, so it will be committed to the repository and used as a baseline for future changes
+- Add the new folder name to [test_examples.py](./tests/test_examples.py)
