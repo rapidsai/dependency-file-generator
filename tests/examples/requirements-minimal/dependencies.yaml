@@ -1,6 +1,6 @@
 files:
   all:
-    generate: requirements
+    output: requirements
     requirements_dir: output/actual
     matrix:
       cuda: ["11.5", "11.6"]
@@ -11,7 +11,7 @@ channels:
   - rapidsai
   - conda-forge
 dependencies:
-  conda_and_requirements:
+  - output_types: [conda, requirements]
     common:
       build:
         - clang=11.1.0
@@ -24,7 +24,7 @@ dependencies:
           cuda: "11.6"
         build:
           - cuda-python>=11.6,<11.7.1
-  requirements:
+  - output_types: requirements
     common:
       build:
         - spdlog>=1.8.5,<1.9

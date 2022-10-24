@@ -1,6 +1,6 @@
 files:
   dev:
-    generate: conda
+    output: conda
     conda_dir: output/actual
     matrix:
       cuda: ["11.5", "11.6"]
@@ -13,7 +13,7 @@ channels:
   - rapidsai
   - conda-forge
 dependencies:
-  conda:
+  - output_types: [conda]
     common:
       build:
         - clang-tools=11.1.0
