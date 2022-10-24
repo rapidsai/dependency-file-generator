@@ -3,7 +3,7 @@ import argparse
 import yaml
 
 from ._version import __version__ as version
-from .constants import GeneratorTypes, default_dependency_file_path
+from .constants import OutputTypes, default_dependency_file_path
 from .rapids_dependency_file_generator import make_dependency_files
 
 
@@ -13,12 +13,12 @@ def generate_file_obj(config_file, file_key, file_type, matrix):
     with open(config_file) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
     parsed_config["files"][file_key]["matrix"] = matrix
-    parsed_config["files"][file_key]["generate"] = file_type
+    parsed_config["files"][file_key]["output"] = file_type
     return {file_key: parsed_config["files"][file_key]}
 
 
 def validate_args(args):
-    dependent_arg_keys = ["file_key", "generate", "matrix"]
+    dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = []
     for i in range(len(dependent_arg_keys)):
         dependent_arg_values.append(getattr(args, dependent_arg_keys[i]))
@@ -53,9 +53,9 @@ def main():
         help="The file key from `dependencies.yaml` to generate",
     )
     codependent_args.add_argument(
-        "--generate",
-        help="The file type to generate",
-        choices=[str(x) for x in [GeneratorTypes.CONDA, GeneratorTypes.REQUIREMENTS]],
+        "--output",
+        help="The output file type to generate",
+        choices=[str(x) for x in [OutputTypes.CONDA, OutputTypes.REQUIREMENTS]],
     )
     codependent_args.add_argument(
         "--matrix",
@@ -68,5 +68,5 @@ def main():
     args = parser.parse_args()
     validate_args(args)
     matrix = generate_matrix(args.matrix) if args.matrix else {}
-    file = generate_file_obj(args.config, args.file_key, args.generate, matrix)
+    file = generate_file_obj(args.config, args.file_key, args.output, matrix)
     make_dependency_files(args.config, file)

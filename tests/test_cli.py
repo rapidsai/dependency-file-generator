@@ -6,7 +6,7 @@ from rapids_dependency_file_generator.cli import generate_file_obj, generate_mat
 mock_yaml = """
 files:
   test:
-    generate: none
+    output: none
     includes:
       - build
       - test
@@ -25,7 +25,7 @@ def test_generate_file_obj():
 
     assert file_obj == {
         "test": {
-            "generate": "conda",
+            "output": "conda",
             "matrix": {"cuda": ["11.5"], "arch": ["x86_64"]},
             "includes": ["build", "test"],
         }
