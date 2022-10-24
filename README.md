@@ -18,7 +18,7 @@ When installed, it makes the `rapids-dependency-file-generator` CLI command avai
 
 ## Installation
 
-`rapids-dependency-file-generator` is available on PyPI. To install, run:
+`rapids-dependency-file-generator` is available on [PyPI](https://pypi.org/project/rapids-dependency-file-generator/). To install, run:
 
 ```sh
 pip install rapids-dependency-file-generator
@@ -45,7 +45,7 @@ The `dependencies.yaml` file has three relevant top-level keys: `files`, `channe
 The top-level `files` key is responsible for determining the following:
 
 - which types of dependency files should be generated (i.e. conda `environment.yaml` files and/or `requirements.txt` files)
-- where the generated files should be written to
+- where the generated files should be written to (relative to the `dependencies.yaml` file)
 - which variant files should be generated (based on the provided matrix)
 - which of the dependency lists from the top-level `dependencies` key should be included in the generated files
 
@@ -54,7 +54,7 @@ Here is an example of what the `files` key might look like:
 ```yaml
 files:
   all: # used as the prefix for the generated dependency file names
-    generate: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "none" or a list of non-"none" values
+    output: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "none" or a list of non-"none" values
     conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
     matrix: # contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
@@ -65,7 +65,7 @@ files:
       - test
       - runtime
   build: # multiple `files` children keys can be specified
-    generate: requirements
+    output: requirements
     conda_dir: conda/environments
     requirements_dir: python/cudf
     matrix:
@@ -86,17 +86,17 @@ The result of the above configuration is that the following dependency files wou
 
 The `all*.yaml` and `requirements_all*.txt` files would include the contents of the `build`, `test`, and `runtime` dependency lists from the top-level `dependency` key. The `requirements_build*.txt` file would only include the contents of the `build` dependency list from the top-level `dependency` key.
 
-The value of `generate` can also be `none` as shown below.
+The value of `output` can also be `none` as shown below.
 
 ```yaml
 files:
   test:
-    generate: none
+    output: none
     includes:
       - test
 ```
 
-When `generate: none` is used, the `conda_dir`, `requirements_dir` and `matrix` keys can be ommitted. The use case for `generate: none` is described in the [_Additional CLI Notes_](#additional-cli-notes) section below.
+When `output: none` is used, the `conda_dir`, `requirements_dir` and `matrix` keys can be ommitted. The use case for `output: none` is described in the [_Additional CLI Notes_](#additional-cli-notes) section below.
 
 ### `channels` Key
 
@@ -114,14 +114,11 @@ In the absence of a `channels` key, some sensible defaults for RAPIDS will be us
 
 ### `dependencies` Key
 
-The top-level `dependencies` key is where the bifurcated dependency lists should be specified. Directly beneath the `dependencies` key are 3 unique keys:
+The top-level `dependencies` key is where the bifurcated dependency lists should be specified.
 
-- `conda_and_requirements` - contains dependency lists that are the same for both conda `environment.yaml` files and `requirements.txt` files
-- `conda` - contains dependency lists that are specific to conda `environment.yaml` files
-- `requirements` - contains dependency lists that are specific to `requirements.txt` files
+Underneath the `dependencies` key is a list of objects. Each object has the following children keys:
 
-Each of the above keys has the following children keys:
-
+- `output_types` - determines which output types the dependency lists in the list item are applicable too
 - `common` - contains dependency lists that are the same across all matrix variations
 - `specific` - contains dependency lists that are specific to a particular matrix combination
 
@@ -135,7 +132,7 @@ An example of the above structure is exemplified below:
 
 ```yaml
 dependencies:
-  conda_and_requirements: # common dependencies between conda environment.yaml & requirements.txt files
+  - output_types: [conda, requirements] # common dependencies between conda environment.yaml & requirements.txt files
     common: # common between all matrix variations
       build: # arbitrarily named dependency list
         - common_build_dep
@@ -148,7 +145,7 @@ dependencies:
           arch: x86_64
         build:
           - a_random_x86_115_specific_dep
-  conda: # dependencies specific to conda environment.yaml files
+  - output_types: [conda] # dependencies specific to conda environment.yaml files
     common:
       build:
         - cupy
@@ -163,7 +160,7 @@ dependencies:
           cuda: "11.6"
         build:
           - cudatoolkit=11.6
-  requirements: # dependencies specific to requirements.txt files
+  - output_types: [requirements] # dependencies specific to requirements.txt files
     specific:
       - matrix:
           cuda: "11.5"
@@ -184,25 +181,22 @@ Consider the following top-level `files` key configuration:
 ```yaml
 files:
   all:
-    generate: conda
+    output: conda
     conda_dir: conda/environments
     requirements_dir: python/cudf
     matrix:
       cuda: ["11.5", "11.6"]
-      arch: [x86_64, arm]
+      arch: [x86_64]
     includes:
       - build
       - test
 ```
 
-For the `11.5` and `x86_64` matrix combination, the following dependency lists would be merged if they exist:
+Since the `output` value is `conda`, `rapids-dependency-file-generator` will iterate through each entry in the top-level `dependencies` list and use any entry whose `output_types` key is `conda` or `[conda, ...]`.
 
-- `conda_and_requirements.common.build`
-- `conda_and_requirements.common.test`
-- `conda.common.build`
-- `conda.common.test`
+From those `dependencies` entries, it will look for any `.common.build` and `.common.test` dependency lists to merge.
 
-Additionally, any `build` and `test` lists from array entries under the `conda.specific` or `conda_and_requirements.specific` keys whose matrix value matches any of the definitions below would also be merged:
+Further, for the `11.5` and `x86_64` matrix combination, any `build` and `test` lists from entries under the `.specific` key whose matrix value matches any of the definitions below would also be merged:
 
 ```yaml
 specific:
@@ -239,12 +233,12 @@ Invoking `rapids-dependency-file-generator` without any arguments is meant to be
 
 However, there are CLI arguments that can augment the `files` configuration values before the files are generated.
 
-Consider the example when `generate: none` is used:
+Consider the example when `output: none` is used:
 
 ```yaml
 files:
   test:
-    generate: none
+    output: none
     includes:
       - test
 ```
@@ -256,7 +250,7 @@ ENV_NAME="cudf_test"
 
 rapids-dependency-file-generator \
   --file_key "test" \
-  --generate "conda" \
+  --output "conda" \
   --matrix "cuda=11.5;arch=$(arch)" > env.yaml
 mamba env create --file env.yaml
 mamba activate "$ENV_NAME"
@@ -266,7 +260,7 @@ mamba activate "$ENV_NAME"
 
 The `--file_key` argument is passed the `test` key name from the `files` configuration. Additional flags are used to generate a single dependency file. When the CLI is used in this fashion, it will print to `stdout` instead of writing the resulting contents to the filesystem.
 
-The `--file_key`, `--generate`, and `--matrix` flags must be used together.
+The `--file_key`, `--output`, and `--matrix` flags must be used together.
 
 Running `rapids-dependency-file-generator -h` will show the most up-to-date CLI arguments.
 
