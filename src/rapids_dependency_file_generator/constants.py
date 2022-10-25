@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class GeneratorTypes(Enum):
+class OutputTypes(Enum):
     CONDA = "conda"
     REQUIREMENTS = "requirements"
     NONE = "none"
@@ -9,8 +9,6 @@ class GeneratorTypes(Enum):
     def __str__(self):
         return self.value
 
-
-conda_and_requirements_key = f"{GeneratorTypes.CONDA}_and_{GeneratorTypes.REQUIREMENTS}"
 
 cli_name = "rapids-dependency-file-generator"
 

@@ -1,6 +1,6 @@
 files:
   all:
-    generate: [conda, requirements]
+    output: [conda, requirements]
     requirements_dir: output/actual
     conda_dir: output/actual
     matrix:
@@ -9,14 +9,14 @@ files:
       - build
       - test
   test:
-    generate: none
+    output: none
     includes:
       - test
 channels:
   - rapidsai
   - conda-forge
 dependencies:
-  conda_and_requirements:
+  - output_types: [conda, requirements]
     common:
       build:
         - black=22.3.0
@@ -33,7 +33,7 @@ dependencies:
           cuda: "11.6"
         build:
           - cuda-python>=11.6,<11.7.1
-  conda:
+  - output_types: conda
     common:
       build:
         - clang-tools=11.1.0
@@ -47,7 +47,7 @@ dependencies:
           cuda: "11.6"
         build:
           - cudatoolkit=11.6
-  requirements:
+  - output_types: requirements
     common:
       build:
         - some_common_req_misc_dep
