@@ -96,7 +96,7 @@ files:
       - test
 ```
 
-When `output: none` is used, the `conda_dir`, `requirements_dir` and `matrix` keys can be ommitted. The use case for `output: none` is described in the [_Additional CLI Notes_](#additional-cli-notes) section below.
+When `output: none` is used, the `conda_dir`, `requirements_dir` and `matrix` keys can be omitted. The use case for `output: none` is described in the [_Additional CLI Notes_](#additional-cli-notes) section below.
 
 ### `channels` Key
 
