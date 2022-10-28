@@ -7,29 +7,7 @@ from .constants import OutputTypes, default_dependency_file_path
 from .rapids_dependency_file_generator import make_dependency_files
 
 
-def validate_args(args):
-    dependent_arg_keys = ["file_key", "output", "matrix"]
-    dependent_arg_values = []
-    for i in range(len(dependent_arg_keys)):
-        dependent_arg_values.append(getattr(args, dependent_arg_keys[i]))
-    if any(dependent_arg_values) and not all(dependent_arg_values):
-        raise ValueError(
-            "The following arguments must be used together:"
-            + "".join([f"\n  --{x}" for x in dependent_arg_keys])
-        )
-
-
-def generate_matrix(matrix_arg):
-    if not matrix_arg:
-        return {}
-    matrix = {}
-    for matrix_column in matrix_arg.split(";"):
-        kv_pair = matrix_column.split("=")
-        matrix[kv_pair[0]] = [kv_pair[1]]
-    return matrix
-
-
-def main(argv=None):
+def validate_args(argv):
     parser = argparse.ArgumentParser(
         description=f"Generates dependency files for RAPIDS libraries (version: {version})"
     )
@@ -58,7 +36,31 @@ def main(argv=None):
     )
 
     args = parser.parse_args(argv)
-    validate_args(args)
+    dependent_arg_keys = ["file_key", "output", "matrix"]
+    dependent_arg_values = []
+    for i in range(len(dependent_arg_keys)):
+        dependent_arg_values.append(getattr(args, dependent_arg_keys[i]))
+    if any(dependent_arg_values) and not all(dependent_arg_values):
+        raise ValueError(
+            "The following arguments must be used together:"
+            + "".join([f"\n  --{x}" for x in dependent_arg_keys])
+        )
+
+    return args
+
+
+def generate_matrix(matrix_arg):
+    if not matrix_arg:
+        return {}
+    matrix = {}
+    for matrix_column in matrix_arg.split(";"):
+        kv_pair = matrix_column.split("=")
+        matrix[kv_pair[0]] = [kv_pair[1]]
+    return matrix
+
+
+def main(argv=None):
+    args = validate_args(argv)
 
     with open(args.config) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
