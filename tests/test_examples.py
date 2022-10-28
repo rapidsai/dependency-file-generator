@@ -5,9 +5,7 @@ import shutil
 
 import pytest
 
-from rapids_dependency_file_generator.rapids_dependency_file_generator import (
-    make_dependency_files,
-)
+from rapids_dependency_file_generator.cli import main
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 
@@ -36,7 +34,7 @@ def test_examples(test_name):
     actual_dir = test_dir.joinpath("output", "actual")
     dep_file_path = test_dir.joinpath("dependencies.yaml")
 
-    make_dependency_files(dep_file_path)
+    main(["--config", str(dep_file_path)])
 
     expected_file_set = make_file_set(expected_dir)
     actual_file_set = make_file_set(actual_dir)

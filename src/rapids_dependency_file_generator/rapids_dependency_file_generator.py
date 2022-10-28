@@ -127,14 +127,11 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     return True
 
 
-def make_dependency_files(config_file_path, files=None):
-    with open(config_file_path) as f:
-        parsed_config = yaml.load(f, Loader=yaml.FullLoader)
+def make_dependency_files(parsed_config, config_file_path, to_stdout):
 
     channels = parsed_config.get("channels", default_channels) or default_channels
     dependency_entries = parsed_config["dependencies"]
-    to_stdout = True if files else False
-    files = files or parsed_config["files"]
+    files = parsed_config["files"]
     for file_name, file_config in files.items():
         includes = file_config["includes"]
         file_types_to_generate = get_file_output(file_config["output"])
