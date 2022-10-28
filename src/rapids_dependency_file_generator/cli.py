@@ -7,16 +7,6 @@ from .constants import OutputTypes, default_dependency_file_path
 from .rapids_dependency_file_generator import make_dependency_files
 
 
-def generate_file_obj(config_file, file_key, file_type, matrix):
-    if not (config_file and file_key and file_type and matrix):
-        return {}
-    with open(config_file) as f:
-        parsed_config = yaml.load(f, Loader=yaml.FullLoader)
-    parsed_config["files"][file_key]["matrix"] = matrix
-    parsed_config["files"][file_key]["output"] = file_type
-    return {file_key: parsed_config["files"][file_key]}
-
-
 def validate_args(args):
     dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = []
@@ -30,6 +20,8 @@ def validate_args(args):
 
 
 def generate_matrix(matrix_arg):
+    if not matrix_arg:
+        return {}
     matrix = {}
     for matrix_column in matrix_arg.split(";"):
         kv_pair = matrix_column.split("=")
@@ -37,7 +29,7 @@ def generate_matrix(matrix_arg):
     return matrix
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(
         description=f"Generates dependency files for RAPIDS libraries (version: {version})"
     )
@@ -65,8 +57,23 @@ def main():
         ),
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     validate_args(args)
-    matrix = generate_matrix(args.matrix) if args.matrix else {}
-    file = generate_file_obj(args.config, args.file_key, args.output, matrix)
-    make_dependency_files(args.config, file)
+
+    with open(args.config) as f:
+        parsed_config = yaml.load(f, Loader=yaml.FullLoader)
+
+    matrix = generate_matrix(args.matrix)
+    to_stdout = all([args.file_key, args.output, matrix])
+
+    if to_stdout:
+        includes = parsed_config["files"][args.file_key]["includes"]
+        parsed_config["files"] = {
+            args.file_key: {
+                "matrix": matrix,
+                "output": args.output,
+                "includes": includes,
+            }
+        }
+
+    make_dependency_files(parsed_config, args.config, to_stdout)
