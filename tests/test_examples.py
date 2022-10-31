@@ -26,7 +26,14 @@ def make_file_set(file_dir):
 
 
 @pytest.mark.parametrize(
-    "test_name", ["integration", "conda-minimal", "requirements-minimal", "matrix"]
+    "test_name",
+    [
+        "integration",
+        "conda-minimal",
+        "requirements-minimal",
+        "matrix",
+        "specific-fallback",
+    ],
 )
 def test_examples(test_name):
     test_dir = CURRENT_DIR.joinpath("examples", test_name)
@@ -45,3 +52,12 @@ def test_examples(test_name):
         actual_file = open(actual_dir.joinpath(file)).read()
         expected_file = open(expected_dir.joinpath(file)).read()
         assert actual_file == expected_file
+
+
+@pytest.mark.parametrize("test_name", ["no-specific-match"])
+def test_error_examples(test_name):
+    test_dir = CURRENT_DIR.joinpath("examples", test_name)
+    dep_file_path = test_dir.joinpath("dependencies.yaml")
+
+    with pytest.raises(ValueError):
+        main(["--config", str(dep_file_path)])

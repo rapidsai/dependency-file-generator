@@ -121,6 +121,9 @@ def get_output_path(file_type, config_file_path, file_config):
 
 
 def should_use_specific_entry(matrix_combo, specific_entry_matrix):
+    if not specific_entry_matrix:
+        return True
+
     for specific_key, specific_value in specific_entry_matrix.items():
         if matrix_combo.get(specific_key) != specific_value:
             return False
