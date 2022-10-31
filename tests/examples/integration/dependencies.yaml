@@ -16,38 +16,43 @@ channels:
   - rapidsai
   - conda-forge
 dependencies:
-  - output_types: [conda, requirements]
+  build:
     common:
-      build:
-        - black=22.3.0
-        - clang=11.1.0
-      test:
-        - pytest
-        - pytest-cov
+      - output_types: [conda, requirements]
+        packages:
+          - black=22.3.0
+          - clang=11.1.0
+      - output_types: conda
+        packages:
+          - clang-tools=11.1.0
+          - spdlog>=1.8.5,<1.9
+      - output_types: requirements
+        packages:
+          - some_common_req_misc_dep
     specific:
-      - matrix:
-          cuda: "11.5"
-        build:
-          - cuda-python>=11.5,<11.7.1
-      - matrix:
-          cuda: "11.6"
-        build:
-          - cuda-python>=11.6,<11.7.1
-  - output_types: conda
+      - output_types: [conda, requirements]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cuda-python>=11.5,<11.7.1
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cuda-python>=11.6,<11.7.1
+      - output_types: conda
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6
+  test:
     common:
-      build:
-        - clang-tools=11.1.0
-        - spdlog>=1.8.5,<1.9
-    specific:
-      - matrix:
-          cuda: "11.5"
-        build:
-          - cudatoolkit=11.5
-      - matrix:
-          cuda: "11.6"
-        build:
-          - cudatoolkit=11.6
-  - output_types: requirements
-    common:
-      build:
-        - some_common_req_misc_dep
+      - output_types: [conda, requirements]
+        packages:
+          - pytest
+          - pytest-cov
