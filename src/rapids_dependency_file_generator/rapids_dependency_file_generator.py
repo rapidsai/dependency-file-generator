@@ -157,19 +157,16 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                             continue
                         specific_matrices = specific_entry["matrices"]
 
-                        foundMatricesMatch = False
                         for specific_matrices_entry in specific_matrices:
                             if not should_use_specific_entry(
                                 matrix_combo, specific_matrices_entry["matrix"]
                             ):
                                 continue
-                            foundMatricesMatch = True
                             dependencies.extend(
                                 specific_matrices_entry["packages"] or []
                             )
                             break
-
-                        if not foundMatricesMatch:
+                        else:
                             raise ValueError(
                                 f"No matching matrix found in '{include}' for: {matrix_combo}"
                             )
