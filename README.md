@@ -161,23 +161,6 @@ dependencies:
           - pip: # supports `pip` key for conda environment.yaml files
               - some_random_dep
     specific: # dependencies specific to a particular matrix combination
-      - output_types: [conda, requirements]
-        matrices:
-          - matrix: # dependencies specific to x86_64 and 11.5
-              cuda: "11.5"
-              arch: x86_64
-            packages:
-              - a_random_x86_115_specific_dep
-      - output_types: requirements # dependencies specific to requirements.txt files
-        matrices:
-          - matrix:
-              cuda: "11.5"
-            packages:
-              - another_random_dep=11.5.0
-          - matrix:
-              cuda: "11.6"
-            packages:
-              - another_random_dep=11.6.0
       - output_types: conda # dependencies specific to conda environment.yaml files
         matrices:
           - matrix:
@@ -191,6 +174,25 @@ dependencies:
           - matrix: # an empty matrix entry serves as a fallback if there are no other matrix matches
             packages:
               - cudatoolkit
+      - output_types: [conda, requirements]
+        matrices:
+          - matrix: # dependencies specific to x86_64 and 11.5
+              cuda: "11.5"
+              arch: x86_64
+            packages:
+              - a_random_x86_115_specific_dep
+          - matrix: # an empty matrix/package entry to prevent error from being thrown for non 11.5 and x86_64 matches
+            packages:
+      - output_types: requirements # dependencies specific to requirements.txt files
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - another_random_dep=11.5.0
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - another_random_dep=11.6.0
   test:
     common:
       - output_types: [conda, requirements]
