@@ -29,19 +29,31 @@ dependencies:
               cuda: "11.6"
             packages:
               - cudatoolkit=11.6
+      - output_types: [conda]
+        matrices:
           - matrix:
               arch: x86_64
               py: "3.9"
             packages:
               - some_amd64_39_build_dep
           - matrix:
-              cuda: "11.5"
-              py: "3.8"
             packages:
-              - some_115_38_build_dep
+      - output_types: [conda]
+        matrices:
           - matrix:
               arch: arm64
               cuda: "11.5"
               py: "3.8"
             packages:
               - super_specific_dep
+          - matrix:
+            packages:
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+              py: "3.8"
+            packages:
+              - some_115_38_build_dep
+          - matrix:
+            packages:

@@ -15,9 +15,6 @@ dependencies:
       - output_types: conda
         matrices:
           - matrix:
-            packages:
-              - cudatoolkit
-          - matrix:
               cuda: "11.5"
             packages:
               - cudatoolkit=11.5
@@ -25,3 +22,6 @@ dependencies:
               cuda: "11.6"
             packages:
               - cudatoolkit=11.6
+          - matrix:
+            packages:
+              - cudatoolkit
