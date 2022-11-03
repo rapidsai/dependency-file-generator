@@ -7,6 +7,7 @@ dependencies:
 - clang=11.1.0
 - cuda-python>=11.5,<11.7.1
 - cudatoolkit=11.5
+- pip
 - spdlog>=1.8.5,<1.9
 - pip:
   - git+https://github.com/python-streamz/streamz.git@master
