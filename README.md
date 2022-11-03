@@ -129,7 +129,7 @@ The values of each of these keys are described in detail below.
 
 The `common` key contains a list of objects with the following keys:
 
-- `output_types` - a list of output types (e.g. "conda" for `environment.yaml` files or "requirements" for `requirements.txt` files) for which the packages in the `packages` key should be applied to
+- `output_types` - a list of output types (e.g. "conda" for `environment.yaml` files or "requirements" for `requirements.txt` files) for the packages in the `packages` key
 - `packages` - a list of packages to be included in the generated output file
 
 #### `specific` Key
@@ -141,7 +141,10 @@ The `specific` key contains a list of objects with the following keys:
 
 ##### `matrices` Key
 
-Each list item under the `matrices` key contains a `matrix` key and a `packages` key. The `matrix` key is used to define which matrix combinations from `files.[*].matrix` these dependency lists should apply to. This is elaborated on in [How Dependency Lists Are Merged](#how-dependency-lists-are-merged). The `packages` key is a list of packages to be included in the generated output file
+Each list item under the `matrices` key contains a `matrix` key and a `packages` key.
+The `matrix` key is used to define which matrix combinations from `files.[*].matrix` will use the associated packages.
+The `packages` key is a list of packages to be included in the generated output file for a matching matrix.
+This is elaborated on in [How Dependency Lists Are Merged](#how-dependency-lists-are-merged).
 
 An example of the above structure is exemplified below:
 
@@ -251,7 +254,9 @@ specific:
           - some_dep2
 ```
 
-Every `matrices` list must match exactly one entry (the first match will be used). If no matches are found for a particular matrix combination, an error message will be thrown. In instances where an error should not be thrown, an empty `matrix` and `packages` list item can be used:
+Every `matrices` list must have a match for a given input matrix (only the first matching matrix in the list of `matrices` will be used).
+If no matches are found for a particular matrix combination, an error will be thrown.
+In instances where an error should not be thrown, an empty `matrix` and `packages` list item can be used:
 
 ```yaml
 - output_types: conda
@@ -266,7 +271,7 @@ Every `matrices` list must match exactly one entry (the first match will be used
       packages:
 ```
 
-Merged dependency lists are also deduped.
+Merged dependency lists are sorted and deduped.
 
 ## Additional CLI Notes
 

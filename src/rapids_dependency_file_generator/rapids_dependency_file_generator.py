@@ -171,7 +171,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
 
                         if not foundMatricesMatch:
                             raise ValueError(
-                                f"No specific match found in '{include}' for: {matrix_combo}"
+                                f"No matching matrix found in '{include}' for: {matrix_combo}"
                             )
 
                 # Dedupe deps and print / write to filesystem
