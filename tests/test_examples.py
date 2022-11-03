@@ -33,6 +33,7 @@ def make_file_set(file_dir):
         "requirements-minimal",
         "matrix",
         "specific-fallback",
+        "specific-fallback-first",
     ],
 )
 def test_examples(test_name):
