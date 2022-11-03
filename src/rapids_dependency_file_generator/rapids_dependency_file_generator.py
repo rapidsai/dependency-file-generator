@@ -164,7 +164,10 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                             ):
                                 continue
                             foundMatricesMatch = True
-                            dependencies.extend(specific_matrices_entry["packages"])
+                            dependencies.extend(
+                                specific_matrices_entry["packages"] or []
+                            )
+                            break
 
                         if not foundMatricesMatch:
                             raise ValueError(
