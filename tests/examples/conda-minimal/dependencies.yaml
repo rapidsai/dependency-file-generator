@@ -19,6 +19,7 @@ dependencies:
           - spdlog>=1.8.5,<1.9
       - output_types: conda
         packages:
+          - pip
           - pip:
               - git+https://github.com/python-streamz/streamz.git@master
     specific:
