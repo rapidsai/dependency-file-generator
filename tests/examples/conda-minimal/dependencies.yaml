@@ -17,6 +17,10 @@ dependencies:
         packages:
           - clang=11.1.0
           - spdlog>=1.8.5,<1.9
+      - output_types: conda
+        packages:
+          - pip:
+              - git+https://github.com/python-streamz/streamz.git@master
     specific:
       - output_types: [conda, requirements]
         matrices:

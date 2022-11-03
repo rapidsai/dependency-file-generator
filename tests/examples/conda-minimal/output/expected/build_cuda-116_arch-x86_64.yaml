@@ -8,4 +8,6 @@ dependencies:
 - cuda-python>=11.6,<11.7.1
 - cudatoolkit=11.6
 - spdlog>=1.8.5,<1.9
+- pip:
+  - git+https://github.com/python-streamz/streamz.git@master
 name: build_cuda-116_arch-x86_64
