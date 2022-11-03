@@ -177,17 +177,17 @@ dependencies:
               - another_random_dep=11.6.0
       - output_types: conda # dependencies specific to conda environment.yaml files
         matrices:
-          - matrix: # if no matrix value is specified, the list item will apply to ALL matrix variations
-            build:
-              - cudatoolkit
           - matrix:
               cuda: "11.5"
-            build:
+            packages:
               - cudatoolkit=11.5
           - matrix:
               cuda: "11.6"
-            build:
+            packages:
               - cudatoolkit=11.6
+          - matrix: # an empty matrix entry serves as a fallback if there are no other matrix matches
+            packages:
+              - cudatoolkit
   test:
     common:
       - output_types: [conda, requirements]
@@ -249,6 +249,21 @@ specific:
         packages:
           - some_dep1
           - some_dep2
+```
+
+Every `matrices` list must match exactly one entry (the first match will be used). If no matches are found for a particular matrix combination, an error message will be thrown. In instances where an error should not be thrown, an empty `matrix` and `packages` list item can be used:
+
+```yaml
+- output_types: conda
+  matrices:
+    - matrix:
+        cuda: "11.5"
+        arch: x86_64
+        py: "3.8"
+      packages:
+        - a_very_specific_115_x86_38_dep
+    - matrix: # an empty matrix entry serves as a fallback if there are no other matrix matches
+      packages:
 ```
 
 Merged dependency lists are also deduped.
