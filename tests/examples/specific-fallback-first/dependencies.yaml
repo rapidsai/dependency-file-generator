@@ -1,0 +1,27 @@
+files:
+  all:
+    output: conda
+    conda_dir: output/actual
+    matrix:
+      cuda: ["11.5", "11.8"]
+    includes:
+      - cudatoolkit
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  cudatoolkit:
+    specific:
+      - output_types: conda
+        matrices:
+          - matrix:
+            packages:
+              - cudatoolkit
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6

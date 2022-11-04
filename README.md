@@ -116,60 +116,88 @@ In the absence of a `channels` key, some sensible defaults for RAPIDS will be us
 
 The top-level `dependencies` key is where the bifurcated dependency lists should be specified.
 
-Underneath the `dependencies` key is a list of objects. Each object has the following children keys:
+Underneath the `dependencies` key are sets of key-value pairs. For each pair, the key can be arbitarily named, but should match an item from the `includes` list of any `files` entry.
 
-- `output_types` - determines which output types the dependency lists in the list item are applicable too
+The value of each key-value pair can have the following children keys:
+
 - `common` - contains dependency lists that are the same across all matrix variations
 - `specific` - contains dependency lists that are specific to a particular matrix combination
 
-The structure of these two keys varies slightly.
+The values of each of these keys are described in detail below.
 
-The `common` key has children which are simple key-value pairs, where the key is an arbitrary name for the dependency list (i.e. `build`, `test`, `libcuml_build`, `cuml_build`, etc.) and the value is a list of dependencies.
+#### `common` Key
 
-The `specific` key's value is an array of objects. Each object contains a `matrix` key and some arbitrarily named dependency lists (similar to the dependency lists under `common`). The `matrix` key is used to define which matrix combinations from `files.[*].matrix` these dependency lists should apply to. This is elaborated on in [How Dependency Lists Are Merged](#how-dependency-lists-are-merged)
+The `common` key contains a list of objects with the following keys:
+
+- `output_types` - a list of output types (e.g. "conda" for `environment.yaml` files or "requirements" for `requirements.txt` files) for the packages in the `packages` key
+- `packages` - a list of packages to be included in the generated output file
+
+#### `specific` Key
+
+The `specific` key contains a list of objects with the following keys:
+
+- `output_types` - _same as `output_types` for the `common` key above_
+- `matrices` - a list of objects (described below) which define packages that are specific to a particular matrix combination
+
+##### `matrices` Key
+
+Each list item under the `matrices` key contains a `matrix` key and a `packages` key.
+The `matrix` key is used to define which matrix combinations from `files.[*].matrix` will use the associated packages.
+The `packages` key is a list of packages to be included in the generated output file for a matching matrix.
+This is elaborated on in [How Dependency Lists Are Merged](#how-dependency-lists-are-merged).
 
 An example of the above structure is exemplified below:
 
 ```yaml
 dependencies:
-  - output_types: [conda, requirements] # common dependencies between conda environment.yaml & requirements.txt files
-    common: # common between all matrix variations
-      build: # arbitrarily named dependency list
-        - common_build_dep
-      test: # arbitrarily named dependency list
-        - pytest
-    specific:
-      # dependencies specific to x86_64 and 11.5
-      - matrix:
-          cuda: "11.5"
-          arch: x86_64
-        build:
-          - a_random_x86_115_specific_dep
-  - output_types: [conda] # dependencies specific to conda environment.yaml files
+  build: # dependency list name
+    common: # dependencies common among all matrix variations
+      - output_types: [conda, requirements] # the output types this list item should apply to
+        packages:
+          - common_build_dep
+      - output_types: conda
+        packages:
+          - cupy
+          - pip: # supports `pip` key for conda environment.yaml files
+              - some_random_dep
+    specific: # dependencies specific to a particular matrix combination
+      - output_types: conda # dependencies specific to conda environment.yaml files
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6
+          - matrix: # an empty matrix entry serves as a fallback if there are no other matrix matches
+            packages:
+              - cudatoolkit
+      - output_types: [conda, requirements]
+        matrices:
+          - matrix: # dependencies specific to x86_64 and 11.5
+              cuda: "11.5"
+              arch: x86_64
+            packages:
+              - a_random_x86_115_specific_dep
+          - matrix: # an empty matrix/package entry to prevent error from being thrown for non 11.5 and x86_64 matches
+            packages:
+      - output_types: requirements # dependencies specific to requirements.txt files
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - another_random_dep=11.5.0
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - another_random_dep=11.6.0
+  test:
     common:
-      build:
-        - cupy
-        - pip: # supports `pip` key for conda environment.yaml files
-            - some_random_dep
-    specific:
-      - matrix:
-          cuda: "11.5"
-        build:
-          - cudatoolkit=11.5
-      - matrix:
-          cuda: "11.6"
-        build:
-          - cudatoolkit=11.6
-  - output_types: [requirements] # dependencies specific to requirements.txt files
-    specific:
-      - matrix:
-          cuda: "11.5"
-        build:
-          - another_random_dep=11.5.0
-      - matrix:
-          cuda: "11.6"
-        build:
-          - another_random_dep=11.6.0
+      - output_types: [conda, requirements]
+        packages:
+          - pytest
 ```
 
 ## How Dependency Lists Are Merged
@@ -192,40 +220,60 @@ files:
       - test
 ```
 
-Since the `output` value is `conda`, `rapids-dependency-file-generator` will iterate through each entry in the top-level `dependencies` list and use any entry whose `output_types` key is `conda` or `[conda, ...]`.
+In this example, `rapids-dependency-file-generator` will generate two conda environment files: `conda/environments/all_cuda-115_arch-x86_64.yaml` and `conda/environments/all_cuda-116_arch-x86_64.yaml`.
 
-From those `dependencies` entries, it will look for any `.common.build` and `.common.test` dependency lists to merge.
+Since the `output` value is `conda`, `rapids-dependency-file-generator` will iterate through any `dependencies.build.common` and `dependencies.test.common` list entries and use the `packages` of any entry whose `output_types` key is `conda` or `[conda, ...]`.
 
-Further, for the `11.5` and `x86_64` matrix combination, any `build` and `test` lists from entries under the `.specific` key whose matrix value matches any of the definitions below would also be merged:
+Further, for the `11.5` and `x86_64` matrix combination, any `build.specific` and `test.specific` list items whose output includes `conda` and whose `matrices` list items matches any of the definitions below would also be merged:
 
 ```yaml
 specific:
-  - matrix:
-      cuda: "11.5"
-      arch: "x86_64"
-    build:
-      - some_dep1
-    test:
-      - some_dep2
+  - output_types: conda
+    matrices:
+      - matrix:
+          cuda: "11.5"
+        packages:
+          - some_dep1
+          - some_dep2
 # or
 specific:
-  - matrix:
-      cuda: "11.5"
-    build:
-      - some_dep1
-    test:
-      - some_dep2
+  - output_types: conda
+    matrices:
+      - matrix:
+          cuda: "11.5"
+          arch: "x86_64"
+        packages:
+          - some_dep1
+          - some_dep2
 # or
 specific:
-  - matrix:
-      arch: "x86_64"
-    build:
-      - some_dep1
-    test:
-      - some_dep2
+  - output_types: conda
+    matrices:
+      - matrix:
+          arch: "x86_64"
+        packages:
+          - some_dep1
+          - some_dep2
 ```
 
-Merged dependency lists are also deduped.
+Every `matrices` list must have a match for a given input matrix (only the first matching matrix in the list of `matrices` will be used).
+If no matches are found for a particular matrix combination, an error will be thrown.
+In instances where an error should not be thrown, an empty `matrix` and `packages` list item can be used:
+
+```yaml
+- output_types: conda
+  matrices:
+    - matrix:
+        cuda: "11.5"
+        arch: x86_64
+        py: "3.8"
+      packages:
+        - a_very_specific_115_x86_38_dep
+    - matrix: # an empty matrix entry serves as a fallback if there are no other matrix matches
+      packages:
+```
+
+Merged dependency lists are sorted and deduped.
 
 ## Additional CLI Notes
 

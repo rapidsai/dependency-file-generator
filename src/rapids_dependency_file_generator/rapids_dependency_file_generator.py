@@ -121,6 +121,9 @@ def get_output_path(file_type, config_file_path, file_config):
 
 
 def should_use_specific_entry(matrix_combo, specific_entry_matrix):
+    if not specific_entry_matrix:
+        return True
+
     for specific_key, specific_value in specific_entry_matrix.items():
         if matrix_combo.get(specific_key) != specific_value:
             return False
@@ -130,7 +133,6 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
 def make_dependency_files(parsed_config, config_file_path, to_stdout):
 
     channels = parsed_config.get("channels", default_channels) or default_channels
-    dependency_entries = parsed_config["dependencies"]
     files = parsed_config["files"]
     for file_name, file_config in files.items():
         includes = file_config["includes"]
@@ -139,24 +141,34 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         for file_type in file_types_to_generate:
             for matrix_combo in grid(file_config["matrix"]):
                 dependencies = []
-                for dependency_entry in dependency_entries:
-                    if file_type not in get_entry_output_types(
-                        dependency_entry["output_types"]
-                    ):
-                        continue
 
-                    for include in includes:
-                        dependencies.extend(
-                            dependency_entry.get("common", {}).get(include, [])
-                        )
+                for include in includes:
+                    dependency_entry = parsed_config["dependencies"][include]
+                    common_entries = dependency_entry.get("common", [])
+                    specific_entries = dependency_entry.get("specific", [])
 
-                    for specific_entry in dependency_entry.get("specific", []):
-                        if not should_use_specific_entry(
-                            matrix_combo, specific_entry["matrix"]
-                        ):
+                    for common_entry in common_entries:
+                        if file_type not in common_entry["output_types"]:
                             continue
-                        for include in includes:
-                            dependencies.extend(specific_entry.get(include, []))
+                        dependencies.extend(common_entry["packages"])
+
+                    for specific_entry in specific_entries:
+                        if file_type not in specific_entry["output_types"]:
+                            continue
+                        specific_matrices = specific_entry["matrices"]
+
+                        for specific_matrices_entry in specific_matrices:
+                            if should_use_specific_entry(
+                                matrix_combo, specific_matrices_entry["matrix"]
+                            ):
+                                dependencies.extend(
+                                    specific_matrices_entry["packages"] or []
+                                )
+                                break
+                        else:
+                            raise ValueError(
+                                f"No matching matrix found in '{include}' for: {matrix_combo}"
+                            )
 
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_name, matrix_combo)

@@ -8,38 +8,52 @@ files:
       py: ["3.8", "3.9"]
     includes:
       - build
-      - test
 channels:
   - rapidsai
   - conda-forge
 dependencies:
-  - output_types: [conda]
+  build:
     common:
-      build:
-        - clang-tools=11.1.0
-        - spdlog>=1.8.5,<1.9
+      - output_types: [conda]
+        packages:
+          - clang-tools=11.1.0
+          - spdlog>=1.8.5,<1.9
     specific:
-      - matrix:
-          cuda: "11.5"
-        build:
-          - cudatoolkit=11.5
-      - matrix:
-          cuda: "11.6"
-        build:
-          - cudatoolkit=11.6
-      - matrix:
-          arch: x86_64
-          py: "3.9"
-        build:
-          - some_amd64_39_build_dep
-      - matrix:
-          cuda: "11.5"
-          py: "3.8"
-        test:
-          - some_115_38_build_dep
-      - matrix:
-          arch: arm64
-          cuda: "11.5"
-          py: "3.8"
-        test:
-          - super_specific_dep
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              arch: x86_64
+              py: "3.9"
+            packages:
+              - some_amd64_39_build_dep
+          - matrix:
+            packages:
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              arch: arm64
+              cuda: "11.5"
+              py: "3.8"
+            packages:
+              - super_specific_dep
+          - matrix:
+            packages:
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+              py: "3.8"
+            packages:
+              - some_115_38_build_dep
+          - matrix:
+            packages:
