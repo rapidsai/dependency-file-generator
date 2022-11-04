@@ -39,7 +39,7 @@ def validate_args(argv):
     dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = []
     for key in dependent_arg_keys:
-        dependent_arg_values.append(getattr(args, key))
+        dependent_arg_values.append(getattr(args, key) is None)
     if any(dependent_arg_values) and not all(dependent_arg_values):
         raise ValueError(
             "The following arguments must be used together:"
@@ -66,7 +66,7 @@ def main(argv=None):
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
 
     matrix = generate_matrix(args.matrix)
-    to_stdout = all([args.file_key, args.output, matrix])
+    to_stdout = all([args.file_key, args.output, args.matrix is not None])
 
     if to_stdout:
         includes = parsed_config["files"][args.file_key]["includes"]
