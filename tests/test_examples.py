@@ -28,12 +28,13 @@ def make_file_set(file_dir):
 @pytest.mark.parametrize(
     "test_name",
     [
-        "integration",
         "conda-minimal",
-        "requirements-minimal",
+        "integration",
         "matrix",
-        "specific-fallback",
+        "no-matrix",
+        "requirements-minimal",
         "specific-fallback-first",
+        "specific-fallback",
     ],
 )
 def test_examples(test_name):

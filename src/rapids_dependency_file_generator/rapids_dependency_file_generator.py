@@ -100,15 +100,18 @@ def get_entry_output_types(output_types):
 
 
 def get_filename(file_type, file_prefix, matrix_combo):
-    prefix = ""
+    file_type_prefix = ""
     file_ext = ""
     if file_type == str(OutputTypes.CONDA):
         file_ext = ".yaml"
     if file_type == str(OutputTypes.REQUIREMENTS):
         file_ext = ".txt"
-        prefix = "requirements_"
+        file_type_prefix = "requirements"
     suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
-    return f"{prefix}{file_prefix}_{suffix}".replace(".", "") + file_ext
+    filename = "_".join(
+        x for x in [file_type_prefix, file_prefix, suffix] if x
+    ).replace(".", "")
+    return filename + file_ext
 
 
 def get_output_path(file_type, config_file_path, file_config):
@@ -139,7 +142,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         file_types_to_generate = get_file_output(file_config["output"])
 
         for file_type in file_types_to_generate:
-            for matrix_combo in grid(file_config["matrix"]):
+            for matrix_combo in grid(file_config.get("matrix", {})):
                 dependencies = []
 
                 for include in includes:
