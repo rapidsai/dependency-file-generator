@@ -106,10 +106,10 @@ def get_filename(file_type, file_prefix, matrix_combo):
         file_ext = ".yaml"
     if file_type == str(OutputTypes.REQUIREMENTS):
         file_ext = ".txt"
-        file_type_prefix = "requirements_"
+        file_type_prefix = "requirements"
     suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
     filename = "_".join(
-        x for x in [file_type_prefix + file_prefix, suffix] if x
+        x for x in [file_type_prefix, file_prefix, suffix] if x
     ).replace(".", "")
     return filename + file_ext
 
