@@ -57,7 +57,7 @@ files:
     output: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "none" or a list of non-"none" values
     conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
-    matrix: # contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
+    matrix: # (optional) contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
       cuda: ["11.5", "11.6"] # which CUDA version variant files to generate.
       arch: [x86_64] # which architecture version variant files to generate. This value should be the result of running the `arch` command on a given machine.
     includes: # a list of keys from the `dependencies` section which should be included in the generated files
@@ -308,7 +308,7 @@ mamba activate "$ENV_NAME"
 
 The `--file_key` argument is passed the `test` key name from the `files` configuration. Additional flags are used to generate a single dependency file. When the CLI is used in this fashion, it will print to `stdout` instead of writing the resulting contents to the filesystem.
 
-The `--file_key`, `--output`, and `--matrix` flags must be used together.
+The `--file_key`, `--output`, and `--matrix` flags must be used together. `--matrix` may be an empty string if the file that should be generated does not depend on any specific matrix variations.
 
 Running `rapids-dependency-file-generator -h` will show the most up-to-date CLI arguments.
 
