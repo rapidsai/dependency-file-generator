@@ -14,7 +14,7 @@ def validate_args(argv):
     parser.add_argument(
         "--config",
         default=default_dependency_file_path,
-        help="path to YAML config file",
+        help="Path to YAML config file",
     )
 
     codependent_args = parser.add_argument_group("optional, but codependent")
@@ -30,8 +30,8 @@ def validate_args(argv):
     codependent_args.add_argument(
         "--matrix",
         help=(
-            "string representing which matrix combination should be generated, "
-            'such as `--matrix "cuda=11.5;arch=x86_64"`'
+            "String representing which matrix combination should be generated, "
+            'such as `--matrix "cuda=11.5;arch=x86_64"`. May also be an empty string'
         ),
     )
 
