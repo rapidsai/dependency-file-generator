@@ -37,7 +37,7 @@ def validate_args(argv):
 
     args = parser.parse_args(argv)
     dependent_arg_keys = ["file_key", "output", "matrix"]
-    dependent_arg_values = [getattr(args, x) is None for x in dependent_arg_keys]
+    dependent_arg_values = [getattr(args, key) is None for key in dependent_arg_keys]
     if any(dependent_arg_values) and not all(dependent_arg_values):
         raise ValueError(
             "The following arguments must be used together:"
