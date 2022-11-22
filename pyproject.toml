@@ -32,4 +32,4 @@ packages = { "find" = { where = ["src"] } }
 version = {attr = "rapids_dependency_file_generator._version.__version__"}
 
 [tool.isort]
-profile = black
+profile = "black"
