@@ -30,3 +30,6 @@ packages = { "find" = { where = ["src"] } }
 
 [tool.setuptools.dynamic]
 version = {attr = "rapids_dependency_file_generator._version.__version__"}
+
+[tool.isort]
+profile = black
