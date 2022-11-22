@@ -12,16 +12,14 @@ on:
       - ".github/workflows/release.yaml"
 
 jobs:
-  build-test:
-    uses: ./.github/workflows/build-test.yaml
   release:
-    needs: build-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: ./.github/workflows/build-test.yaml
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
