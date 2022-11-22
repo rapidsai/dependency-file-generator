@@ -1,3 +1,32 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "rapids-dependency-file-generator"
+dynamic = [
+    "version",
+]
+authors = [
+    { name = "RAPIDS Development Team", email = "pypi@rapids.ai" }
+]
+urls = { homepage = "https://github.com/rapidsai/dependency-file-generator" }
+description = "Tool for generating RAPIDS environment files"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "PyYAML",
+]
+
+[project.scripts]
+rapids-dependency-file-generator = "rapids_dependency_file_generator.cli:main"
+
+[tool.setuptools]
+packages = { "find" = { where = ["src"] } }
+
+[tool.setuptools.dynamic]
+version = {attr = "rapids_dependency_file_generator._version.__version__"}
