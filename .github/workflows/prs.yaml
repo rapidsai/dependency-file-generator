@@ -9,6 +9,4 @@ concurrency:
 
 jobs:
   build-test:
-    uses: ./.github/workflows/build-test-publish.yaml
-    with:
-      RELEASE: false
+    uses: ./.github/workflows/build-test.yaml
