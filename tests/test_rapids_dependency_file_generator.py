@@ -6,7 +6,7 @@ import yaml
 from rapids_dependency_file_generator.constants import OutputTypes, cli_name
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
-    get_file_output,
+    get_requested_output_types,
     make_dependency_file,
     should_use_specific_entry,
 )
@@ -86,33 +86,35 @@ def test_should_use_specific_entry():
     assert result is True
 
 
-def test_get_file_output():
-    result = get_file_output(str(OutputTypes.NONE))
+def test_get_requested_output_types():
+    result = get_requested_output_types(str(OutputTypes.NONE))
     assert result == []
 
-    result = get_file_output([str(OutputTypes.NONE)])
+    result = get_requested_output_types([str(OutputTypes.NONE)])
     assert result == []
 
-    result = get_file_output(str(OutputTypes.CONDA))
+    result = get_requested_output_types(str(OutputTypes.CONDA))
     assert result == [str(OutputTypes.CONDA)]
 
-    result = get_file_output([str(OutputTypes.CONDA)])
+    result = get_requested_output_types([str(OutputTypes.CONDA)])
     assert result == [str(OutputTypes.CONDA)]
 
-    result = get_file_output(str(OutputTypes.REQUIREMENTS))
+    result = get_requested_output_types(str(OutputTypes.REQUIREMENTS))
     assert result == [str(OutputTypes.REQUIREMENTS)]
 
-    result = get_file_output([str(OutputTypes.REQUIREMENTS)])
+    result = get_requested_output_types([str(OutputTypes.REQUIREMENTS)])
     assert result == [str(OutputTypes.REQUIREMENTS)]
 
-    result = get_file_output([str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)])
+    result = get_requested_output_types(
+        [str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)]
+    )
     assert result == [str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)]
 
     with pytest.raises(ValueError):
-        get_file_output("invalid_value")
+        get_requested_output_types("invalid_value")
 
     with pytest.raises(ValueError):
-        get_file_output(["invalid_value"])
+        get_requested_output_types(["invalid_value"])
 
     with pytest.raises(ValueError):
-        get_file_output([str(OutputTypes.NONE), str(OutputTypes.CONDA)])
+        get_requested_output_types([str(OutputTypes.NONE), str(OutputTypes.CONDA)])
