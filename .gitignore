@@ -2,5 +2,7 @@ __pycache__
 .pytest_cache
 *.egg-info
 dist
+build
 tests/**/actual
 .vscode
+*.swp
