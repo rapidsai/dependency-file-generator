@@ -6,3 +6,4 @@ plugins:
   - "@semantic-release/github"
   - - "@semantic-release/exec"
     - prepareCmd: ./ci/update-version.sh ${nextRelease.version}
+      publishCmd: ./ci/pypi-publish.sh

@@ -12,16 +12,14 @@ on:
       - ".github/workflows/release.yaml"
 
 jobs:
-  build-test:
-    uses: ./.github/workflows/build-test.yaml
   release:
-    needs: build-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: ./.github/actions/build-test
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -29,6 +27,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
         run: |
           npm install @semantic-release/exec@6 -D
           npx semantic-release@19
