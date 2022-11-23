@@ -277,6 +277,12 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         Whether the output should be written to stdout. If False, it will be
         written to a file computed based on the output file type and
         config_file_path.
+
+    Raises
+    -------
+    ValueError
+        If the file is malformed. There are numerous different error cases
+        which are described by the error messages.
     """
 
     channels = parsed_config.get("channels", default_channels) or default_channels
@@ -305,10 +311,10 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                         if file_type not in specific_entry["output_types"]:
                             continue
 
+                        found = False
                         for specific_matrices_entry in specific_entry["matrices"]:
                             # Raise an error if multiple specific entries match
                             # a requested matrix combination.
-                            found = False
                             if should_use_specific_entry(
                                 matrix_combo, specific_matrices_entry["matrix"]
                             ):
@@ -325,7 +331,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                                     dependencies.extend(
                                         specific_matrices_entry["packages"]
                                     )
-                        else:
+                        if not found:
                             raise ValueError(
                                 f"No matching matrix found in '{include}' for: {matrix_combo}"
                             )
