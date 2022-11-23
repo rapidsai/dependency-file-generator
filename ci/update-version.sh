@@ -1,5 +1,5 @@
 #!/bin/bash
-# Simple script to update the version string in `_version.py`
+# Updates the version string in `_version.py`
 set -ue
 
 NEXT_VERSION=$1
