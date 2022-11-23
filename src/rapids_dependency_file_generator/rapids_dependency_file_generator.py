@@ -249,13 +249,6 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
         True if the `specific_entry_matrix` is compatible with the current
         `matrix_combo` and False otherwise.
     """
-    # An empty `specific_entry_matrix` is valid and can be used to specify a
-    # fallback for a `matrix_combo` for which no specific entry exists. In that
-    # case we save the fallback result and only use it at the end if nothing
-    # more specific is found.
-    if not specific_entry_matrix:
-        return True
-
     return all(
         matrix_combo.get(specific_key) == specific_value
         for specific_key, specific_value in specific_entry_matrix.items()
@@ -313,54 +306,44 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                         if file_type not in specific_entry["output_types"]:
                             continue
 
+                        found = False
+                        fallback_entry = None
                         for specific_matrices_entry in specific_entry["matrices"]:
+                            # An empty `specific_matrices_entry["matrix"]` is
+                            # valid and can be used to specify a fallback_entry for a
+                            # `matrix_combo` for which no specific entry
+                            # exists. In that case we save the fallback_entry result
+                            # and only use it at the end if nothing more
+                            # specific is found.
+                            if not specific_matrices_entry["matrix"]:
+                                fallback_entry = specific_matrices_entry
+                                continue
+
                             if should_use_specific_entry(
                                 matrix_combo, specific_matrices_entry["matrix"]
                             ):
+                                # Raise an error if multiple specific entries
+                                # (not including the fallback_entry) match a
+                                # requested matrix combination.
+                                if found:
+                                    raise ValueError(
+                                        f"Found multiple matches for matrix {matrix_combo}"
+                                    )
+                                found = True
+                                # A package list may be empty as a way to
+                                # indicate that for some matrix elements no
+                                # packages should be installed.
                                 dependencies.extend(
                                     specific_matrices_entry["packages"] or []
                                 )
-                                break
-                        else:
-                            raise ValueError(
-                                f"No matching matrix found in '{include}' for: {matrix_combo}"
-                            )
-                        # found = False
-                        # fallback = None
-                        # for specific_matrices_entry in specific_entry["matrices"]:
-                        #     # An empty `specific_entry_matrix` is valid and can
-                        #     # be used to specify a fallback for a
-                        #     # `matrix_combo` for which no specific entry
-                        #     # exists. In that case we save the fallback result
-                        #     # and only use it at the end if nothing more
-                        #     # specific is found.
-                        #     if not (specific_entry_matrix := specific_matrices_entry["matrix"]):
-                        #         fallback = specific_entry_matrix
-                        #         continue
-                        #
-                        #     # Raise an error if multiple specific entries match
-                        #     # a requested matrix combination.
-                        #     if should_use_specific_entry(matrix_combo, specific_entry_matrix):
-                        #         if found:
-                        #             raise ValueError(
-                        #                 f"Multiple specific entries matched the matrix {matrix_combo}"
-                        #             )
-                        #         found = True
-                        #
-                        #         # A package list may be empty as a way to
-                        #         # indicate that for some matrix elements no
-                        #         # packages should be installed.
-                        #         if specific_matrices_entry["packages"]:
-                        #             dependencies.extend(specific_matrices_entry["packages"])
-                        #
-                        # if not found:
-                        #     if fallback:
-                        #         if fallback["packages"]:
-                        #             dependencies.extend(specific_entry_matrix)
-                        #     else:
-                        #         raise ValueError(
-                        #             f"No matching matrix found in '{include}' for: {matrix_combo}"
-                        #         )
+
+                        if not found:
+                            if fallback_entry:
+                                dependencies.extend(fallback_entry["packages"] or [])
+                            else:
+                                raise ValueError(
+                                    f"No matching matrix found in '{include}' for: {matrix_combo}"
+                                )
 
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_name, matrix_combo)

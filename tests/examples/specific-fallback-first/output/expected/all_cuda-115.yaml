@@ -4,5 +4,5 @@ channels:
 - rapidsai
 - conda-forge
 dependencies:
-- cudatoolkit
+- cudatoolkit=11.5
 name: all_cuda-115
