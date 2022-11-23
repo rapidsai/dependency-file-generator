@@ -5,5 +5,5 @@ plugins:
   - "@semantic-release/release-notes-generator"
   - "@semantic-release/github"
   - - "@semantic-release/exec"
-    - prepareCmd: ./ci/update-version.sh ${nextRelease.version}
+    - verifyReleaseCmd: ./ci/update-version.sh ${nextRelease.version} && ./ci/build-test.sh
       publishCmd: ./ci/pypi-publish.sh

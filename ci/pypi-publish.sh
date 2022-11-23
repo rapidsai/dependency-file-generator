@@ -1,5 +1,5 @@
 #!/bin/bash
-# Simple script to upload packages to PyPI
+# Uploads packages to PyPI
 set -ue
 
 twine upload \
