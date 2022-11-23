@@ -249,7 +249,8 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
         True if the `specific_entry_matrix` is compatible with the current
         `matrix_combo` and False otherwise.
     """
-    # TODO: Is the branch reachable?
+    # An empty `specific_entry_matrix` is valid and can be used to specify a
+    # fallback for a `matrix_combo` for which no specific entry exists.
     if not specific_entry_matrix:
         return True
 
@@ -296,34 +297,34 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                     dependency_entry = parsed_config["dependencies"][include]
 
                     for common_entry in dependency_entry.get("common", []):
-                        # TODO: I think our spec is a little overspecified.
-                        # What is the benefit of having output types specified
-                        # for both the `files` and the `dependencies`? Can't it
-                        # just be the responsibility of the `files` to include
-                        # the correct `dependencies` lists that are appropriate
-                        # for that type?
                         if file_type not in common_entry["output_types"]:
                             continue
-                        # TODO: In the specific entries case we check whether
-                        # this is None. In practice I can't imagine anyone
-                        # needing that, but we should be consistent and either
-                        # handle it in both cases or neither.
                         dependencies.extend(common_entry["packages"])
 
                     for specific_entry in dependency_entry.get("specific", []):
-                        # TODO: Same question as above. I think we should be
-                        # able to remove this altogether as above.
                         if file_type not in specific_entry["output_types"]:
                             continue
 
                         for specific_matrices_entry in specific_entry["matrices"]:
+                            # Raise an error if multiple specific entries match
+                            # a requested matrix combination.
+                            found = False
                             if should_use_specific_entry(
                                 matrix_combo, specific_matrices_entry["matrix"]
                             ):
-                                dependencies.extend(
-                                    specific_matrices_entry["packages"] or []
-                                )
-                                break
+                                if found:
+                                    raise ValueError(
+                                        "Multiple specific entries matched the matrix {matrix_combo}"
+                                    )
+                                found = True
+
+                                # A package list may be empty as a way to
+                                # indicate that for some matrix elements no
+                                # packages should be installed.
+                                if specific_matrices_entry["packages"]:
+                                    dependencies.extend(
+                                        specific_matrices_entry["packages"]
+                                    )
                         else:
                             raise ValueError(
                                 f"No matching matrix found in '{include}' for: {matrix_combo}"
