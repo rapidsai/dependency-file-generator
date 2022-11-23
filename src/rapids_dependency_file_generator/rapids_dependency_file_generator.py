@@ -249,7 +249,7 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
         True if the `specific_entry_matrix` is compatible with the current
         `matrix_combo` and False otherwise.
     """
-    # TODO: Is the branch even reachable?
+    # TODO: Is the branch reachable?
     if not specific_entry_matrix:
         return True
 
