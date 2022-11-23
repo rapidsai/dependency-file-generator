@@ -6,7 +6,6 @@ import yaml
 from rapids_dependency_file_generator.constants import OutputTypes, cli_name
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
-    get_entry_output_types,
     get_file_output,
     make_dependency_file,
     should_use_specific_entry,
@@ -117,31 +116,3 @@ def test_get_file_output():
 
     with pytest.raises(ValueError):
         get_file_output([str(OutputTypes.NONE), str(OutputTypes.CONDA)])
-
-
-def test_get_entry_output_types():
-    result = get_entry_output_types(str(OutputTypes.CONDA))
-    assert result == [str(OutputTypes.CONDA)]
-
-    result = get_entry_output_types([str(OutputTypes.CONDA)])
-    assert result == [str(OutputTypes.CONDA)]
-
-    result = get_entry_output_types(str(OutputTypes.REQUIREMENTS))
-    assert result == [str(OutputTypes.REQUIREMENTS)]
-
-    result = get_entry_output_types([str(OutputTypes.REQUIREMENTS)])
-    assert result == [str(OutputTypes.REQUIREMENTS)]
-
-    result = get_entry_output_types(
-        [str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)]
-    )
-    assert result == [str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)]
-
-    with pytest.raises(ValueError):
-        get_entry_output_types("invalid_value")
-
-    with pytest.raises(ValueError):
-        get_entry_output_types(["invalid_value"])
-
-    with pytest.raises(ValueError):
-        get_entry_output_types([str(OutputTypes.NONE), str(OutputTypes.CONDA)])
