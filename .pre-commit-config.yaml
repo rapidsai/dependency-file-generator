@@ -30,4 +30,3 @@ repos:
       - id: flake8
         args:
         - --show-source
-        - --config=setup.cfg
