@@ -1,0 +1,10 @@
+branches:
+  - main
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - - "@semantic-release/github"
+    - addReleases: top
+  - - "@semantic-release/exec"
+    - verifyReleaseCmd: ./ci/update-version.sh ${nextRelease.version} && ./ci/build-test.sh
+      publishCmd: ./ci/pypi-publish.sh
