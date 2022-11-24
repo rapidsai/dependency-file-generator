@@ -3,6 +3,7 @@ from enum import Enum
 
 class OutputTypes(Enum):
     CONDA = "conda"
+    CONDA_META = "conda_meta"
     REQUIREMENTS = "requirements"
     NONE = "none"
 
@@ -21,5 +22,6 @@ default_channels = [
 ]
 
 default_conda_dir = "conda/environments"
+default_conda_meta_dir = "conda/recipes/"
 default_requirements_dir = "python"
 default_dependency_file_path = "dependencies.yaml"
