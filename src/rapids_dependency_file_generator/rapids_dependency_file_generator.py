@@ -114,11 +114,7 @@ def make_dependency_file(
             }
         )
     if file_type == str(OutputTypes.CONDA_META):
-        file_contents += yaml.dump(
-            {
-                "dependencies": dependencies,
-            }
-        )
+        file_contents += yaml.dump(dependencies)
     if file_type == str(OutputTypes.REQUIREMENTS):
         file_contents += "\n".join(dependencies) + "\n"
     return file_contents
@@ -283,6 +279,56 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     )
 
 
+def get_deps(dependency_entry, file_type, matrix_combo, include):
+    dependencies = []
+    for common_entry in dependency_entry.get("common", []):
+        if file_type not in common_entry["output_types"]:
+            continue
+        dependencies.extend(common_entry["packages"])
+
+    for specific_entry in dependency_entry.get("specific", []):
+        if file_type not in specific_entry["output_types"]:
+            continue
+
+        found = False
+        fallback_entry = None
+        for specific_matrices_entry in specific_entry["matrices"]:
+            # An empty `specific_matrices_entry["matrix"]` is
+            # valid and can be used to specify a fallback_entry for a
+            # `matrix_combo` for which no specific entry
+            # exists. In that case we save the fallback_entry result
+            # and only use it at the end if nothing more
+            # specific is found.
+            if not specific_matrices_entry["matrix"]:
+                fallback_entry = specific_matrices_entry
+                continue
+
+            if should_use_specific_entry(
+                matrix_combo, specific_matrices_entry["matrix"]
+            ):
+                # Raise an error if multiple specific entries
+                # (not including the fallback_entry) match a
+                # requested matrix combination.
+                if found:
+                    raise ValueError(
+                        f"Found multiple matches for matrix {matrix_combo}"
+                    )
+                found = True
+                # A package list may be empty as a way to
+                # indicate that for some matrix elements no
+                # packages should be installed.
+                dependencies.extend(specific_matrices_entry["packages"] or [])
+
+        if not found:
+            if fallback_entry:
+                dependencies.extend(fallback_entry["packages"] or [])
+            else:
+                raise ValueError(
+                    f"No matching matrix found in '{include}' for: {matrix_combo}"
+                )
+    return dependencies
+
+
 def make_dependency_files(parsed_config, config_file_path, to_stdout):
     """Generate dependency files.
 
@@ -322,6 +368,9 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         alphabetize the keys under requirements though.
     """
     channels = parsed_config.get("channels", default_channels) or default_channels
+
+    # First parse the dependencies lists into a more easily consumable format.
+
     files = parsed_config["files"]
     for file_name, file_config in files.items():
         includes = file_config["includes"]
@@ -332,65 +381,45 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         for file_type in file_types_to_generate:
             for matrix_combo in grid(file_config.get("matrix", {})):
                 print(f"Matrix combo: {matrix_combo}")
-                dependencies = []
 
                 # Collect all includes from each dependency list corresponding
                 # to this (file_name, file_type, matrix_combo) tuple. The
                 # current tuple corresponds to a single file to be written.
-                for include in includes:
-                    dependency_entry = parsed_config["dependencies"][include]
-
-                    for common_entry in dependency_entry.get("common", []):
-                        if file_type not in common_entry["output_types"]:
-                            continue
-                        dependencies.extend(common_entry["packages"])
-
-                    for specific_entry in dependency_entry.get("specific", []):
-                        if file_type not in specific_entry["output_types"]:
-                            continue
-
-                        found = False
-                        fallback_entry = None
-                        for specific_matrices_entry in specific_entry["matrices"]:
-                            # An empty `specific_matrices_entry["matrix"]` is
-                            # valid and can be used to specify a fallback_entry for a
-                            # `matrix_combo` for which no specific entry
-                            # exists. In that case we save the fallback_entry result
-                            # and only use it at the end if nothing more
-                            # specific is found.
-                            if not specific_matrices_entry["matrix"]:
-                                fallback_entry = specific_matrices_entry
-                                continue
-
-                            if should_use_specific_entry(
-                                matrix_combo, specific_matrices_entry["matrix"]
-                            ):
-                                # Raise an error if multiple specific entries
-                                # (not including the fallback_entry) match a
-                                # requested matrix combination.
-                                if found:
-                                    raise ValueError(
-                                        f"Found multiple matches for matrix {matrix_combo}"
-                                    )
-                                found = True
-                                # A package list may be empty as a way to
-                                # indicate that for some matrix elements no
-                                # packages should be installed.
-                                dependencies.extend(
-                                    specific_matrices_entry["packages"] or []
+                if isinstance(includes, list):
+                    assert file_type != str(OutputTypes.CONDA_META)
+                    dependencies = []
+                    for include in includes:
+                        dependencies.extend(
+                            get_deps(
+                                parsed_config["dependencies"][include],
+                                file_type,
+                                matrix_combo,
+                                include,
+                            )
+                        )
+                    dependencies = dedupe(dependencies)
+                elif isinstance(includes, dict):
+                    assert file_type == str(OutputTypes.CONDA_META)
+                    dependencies = {}
+                    for section, section_includes in includes.items():
+                        dependencies[section] = []
+                        for include in section_includes:
+                            dependencies[section].extend(
+                                get_deps(
+                                    parsed_config["dependencies"][include],
+                                    file_type,
+                                    matrix_combo,
+                                    include,
                                 )
-
-                        if not found:
-                            if fallback_entry:
-                                dependencies.extend(fallback_entry["packages"] or [])
-                            else:
-                                raise ValueError(
-                                    f"No matching matrix found in '{include}' for: {matrix_combo}"
-                                )
+                            )
+                        dependencies[section] = dedupe(dependencies[section])
+                else:
+                    raise ValueError(
+                        f"Unexpected type {type(includes)} for includes list"
+                    )
 
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_name, matrix_combo)
-                deduped_deps = dedupe(dependencies)
 
                 output_dir = (
                     "."
@@ -405,7 +434,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                     config_file_path,
                     output_dir,
                     channels,
-                    deduped_deps,
+                    dependencies,
                 )
 
                 if to_stdout:
