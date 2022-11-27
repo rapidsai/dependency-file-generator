@@ -34,6 +34,9 @@ def dedupe(dependencies):
     """
     deduped = sorted({dep for dep in dependencies if not isinstance(dep, dict)})
     dict_deps = defaultdict(list)
+    # This kind of loop is to support nested dependency dicts such as a pip:
+    # section. If multiple includes lists contain that, those must be
+    # internally deduped as well.
     for dep in filter(lambda dep: isinstance(dep, dict), dependencies):
         for key, values in dep.items():
             dict_deps[key].extend(values)
