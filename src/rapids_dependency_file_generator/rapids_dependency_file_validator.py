@@ -1,5 +1,6 @@
 """Logic for validating dependency files."""
 
+import sys
 import textwrap
 
 import jsonschema
@@ -149,6 +150,6 @@ def validate_dependencies(dependencies):
     validator = jsonschema.Draft7Validator(SCHEMA)
     if not validator.is_valid(dependencies):
         for i, error in enumerate(validator.iter_errors(dependencies), start=1):
-            print(f"Error #{i}:")
-            print(textwrap.indent(str(error), "\t"))
+            print(f"Error #{i}:", file=sys.stderr)
+            print(textwrap.indent(str(error), "\t"), file=sys.stderr)
         raise RuntimeError("The provided dependencies data is invalid.")
