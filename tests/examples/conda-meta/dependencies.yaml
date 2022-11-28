@@ -1,0 +1,73 @@
+files:
+  build:
+    output: conda
+    conda_dir: output/actual
+    matrix:
+      cuda: ["11.5", "11.6"]
+      arch: [x86_64]
+    includes:
+      - build
+  pkg:
+    output: conda_meta
+    conda_dir: output/actual
+    conda_meta_dir: output/actual
+    #matrix: # TODO: May need to implement this differently?
+    #  cuda: ["11.5", "11.6"]
+    #  arch: [x86_64]
+    includes:
+      host:
+        - build_meta
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - clang=11.1.0
+          - spdlog>=1.8.5,<1.9
+      - output_types: conda
+        packages:
+          - pip
+          - pip:
+              - git+https://github.com/python-streamz/streamz.git@master
+    specific:
+      - output_types: [conda, requirements]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cuda-python>=11.5,<11.7.1
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cuda-python>=11.6,<11.7.1
+      - output_types: conda
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6
+  build_meta:
+    common:
+      - output_types: conda_meta
+        packages:
+          - clang=11.1.0
+          - spdlog>=1.8.5,<1.9
+      - output_types: conda_meta
+        packages:
+          - pip
+          - pip:
+              - git+https://github.com/python-streamz/streamz.git@master
+    specific:
+      - output_types: conda_meta
+        matrices:
+          - matrix:
+            packages:
+              - cuda-python>=11.6,<11.7.1
+              - cudatoolkit=11.6

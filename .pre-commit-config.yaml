@@ -8,6 +8,12 @@ repos:
       - id: check-executables-have-shebangs
       - id: check-json
       - id: check-yaml
+        # meta.yaml files don't actually have to be valid YAML.
+        # They support additional syntax for things like variables.
+        exclude: |
+          (?x)^(
+            .*meta.yaml
+          )
       - id: debug-statements
       - id: requirements-txt-fixer
   - repo: https://github.com/asottile/pyupgrade
