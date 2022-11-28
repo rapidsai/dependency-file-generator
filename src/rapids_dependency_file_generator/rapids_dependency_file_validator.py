@@ -1,7 +1,8 @@
 """Logic for validating dependency files."""
 
+import textwrap
+
 import jsonschema
-import yaml
 
 SCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -132,8 +133,22 @@ SCHEMA = {
 }
 
 
-fn = "/home/nfs/vyasr/local/dependency-file-generator/tests/examples/no-specific-match/dependencies.yaml"
-with open(fn) as f:
-    dependency_data = yaml.load(f, Loader=yaml.FullLoader)
+def validate_dependencies(dependencies):
+    """Valid a dictionary against the dependencies.yaml spec.
 
-jsonschema.validate(dependency_data, schema=SCHEMA)
+    Parameters
+    ----------
+    dependencies : dict
+        The parsed dependencies.yaml file.
+
+    Raises
+    ------
+    jsonschema.exceptions.ValidationError
+        If the dependencies do not conform to the schema
+    """
+    validator = jsonschema.Draft7Validator(SCHEMA)
+    if not validator.is_valid(dependencies):
+        for i, error in enumerate(validator.iter_errors(dependencies), start=1):
+            print(f"Error #{i}:")
+            print(textwrap.indent(str(error), "\t"))
+        raise RuntimeError("The provided dependencies data is invalid.")

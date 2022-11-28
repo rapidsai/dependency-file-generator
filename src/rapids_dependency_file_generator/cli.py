@@ -5,6 +5,7 @@ import yaml
 from ._version import __version__ as version
 from .constants import OutputTypes, default_dependency_file_path
 from .rapids_dependency_file_generator import make_dependency_files
+from .rapids_dependency_file_validator import validate_dependencies
 
 
 def validate_args(argv):
@@ -15,6 +16,11 @@ def validate_args(argv):
         "--config",
         default=default_dependency_file_path,
         help="Path to YAML config file",
+    )
+    parser.add_argument(
+        "--validate",
+        default=True,
+        help="Validate the config file in full before generating anything.",
     )
 
     codependent_args = parser.add_argument_group("optional, but codependent")
@@ -62,6 +68,9 @@ def main(argv=None):
 
     with open(args.config) as f:
         parsed_config = yaml.load(f, Loader=yaml.FullLoader)
+
+    if args.validate:
+        validate_dependencies(parsed_config)
 
     matrix = generate_matrix(args.matrix)
     to_stdout = all([args.file_key, args.output, args.matrix is not None])
