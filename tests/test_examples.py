@@ -28,6 +28,7 @@ def make_file_set(file_dir):
 @pytest.mark.parametrize(
     "test_name",
     [
+        "conda-meta",
         "conda-minimal",
         "integration",
         "matrix",
