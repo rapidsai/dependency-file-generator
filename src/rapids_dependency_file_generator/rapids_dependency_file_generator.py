@@ -283,6 +283,8 @@ def get_deps(dependency_entry, file_type, matrix_combo, include):
         dependencies.extend(common_entry["packages"])
 
     for specific_entry in dependency_entry.get("specific", []):
+        if file_type == str(OutputTypes.CONDA_META):
+            raise ValueError("Specific dependencies are not supported with conda_meta")
         if file_type not in _ensure_list(specific_entry["output_types"]):
             continue
 
