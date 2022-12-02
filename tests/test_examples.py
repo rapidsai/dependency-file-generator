@@ -44,17 +44,6 @@ def test_examples(test_name):
     actual_dir = test_dir.joinpath("output", "actual")
     dep_file_path = test_dir.joinpath("dependencies.yaml")
 
-    if test_name == "conda-meta":
-        # Manually copy the expected into actual dir for now since meta.yaml
-        # files must already exist for the rapids-dependency-file-generator.
-        shutil.copytree(
-            expected_dir.joinpath("pkg"),
-            actual_dir.joinpath("pkg"),
-            ignore=lambda _, files: list(
-                filter(lambda f: os.path.basename(f) != "meta.yaml", files)
-            ),
-        )
-
     main(["--config", str(dep_file_path)])
 
     expected_file_set = make_file_set(expected_dir)

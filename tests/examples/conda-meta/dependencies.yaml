@@ -7,16 +7,14 @@ files:
       arch: [x86_64]
     includes:
       - build
-  pkg:
+  host:
     output: conda_meta
-    conda_dir: output/actual
     conda_meta_dir: output/actual
     #matrix: # TODO: May need to implement this differently?
     #  cuda: ["11.5", "11.6"]
     #  arch: [x86_64]
     includes:
-      host:
-        - build_meta
+      - build_meta
 channels:
   - rapidsai
   - conda-forge

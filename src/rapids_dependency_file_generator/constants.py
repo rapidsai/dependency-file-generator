@@ -22,6 +22,8 @@ default_channels = [
 ]
 
 default_conda_dir = "conda/environments"
+# TODO: Should we remove a default? This is going to need to be different for
+# every package anyway.
 default_conda_meta_dir = "conda/recipes/"
 default_requirements_dir = "python"
 default_dependency_file_path = "dependencies.yaml"
