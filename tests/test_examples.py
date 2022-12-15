@@ -3,11 +3,15 @@ import os
 import pathlib
 import shutil
 
+import jsonschema
 import pytest
+import yaml
 
 from rapids_dependency_file_generator.cli import main
 
 CURRENT_DIR = pathlib.Path(__file__).parent
+
+EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/**/dependencies.yaml"))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -25,23 +29,18 @@ def make_file_set(file_dir):
     }
 
 
-@pytest.mark.parametrize(
-    "test_name",
-    [
-        "conda-minimal",
-        "integration",
-        "matrix",
-        "no-matrix",
-        "requirements-minimal",
-        "specific-fallback-first",
-        "specific-fallback",
-    ],
+@pytest.fixture(
+    params=[example_file.parent for example_file in EXAMPLE_FILES],
+    ids=[example_file.parent.stem for example_file in EXAMPLE_FILES],
 )
-def test_examples(test_name):
-    test_dir = CURRENT_DIR.joinpath("examples", test_name)
-    expected_dir = test_dir.joinpath("output", "expected")
-    actual_dir = test_dir.joinpath("output", "actual")
-    dep_file_path = test_dir.joinpath("dependencies.yaml")
+def example_dir(request):
+    return request.param
+
+
+def test_examples(example_dir):
+    expected_dir = example_dir.joinpath("output", "expected")
+    actual_dir = example_dir.joinpath("output", "actual")
+    dep_file_path = example_dir.joinpath("dependencies.yaml")
 
     main(["--config", str(dep_file_path)])
 
@@ -63,3 +62,9 @@ def test_error_examples(test_name):
 
     with pytest.raises(ValueError):
         main(["--config", str(dep_file_path)])
+
+
+def test_examples_are_valid(schema, example_dir):
+    dep_file_path = example_dir / "dependencies.yaml"
+    instance = yaml.load(dep_file_path.read_text(), Loader=yaml.SafeLoader)
+    jsonschema.validate(instance, schema=schema)
