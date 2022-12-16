@@ -19,7 +19,7 @@ def validate_args(argv):
     )
     parser.add_argument(
         "--validate",
-        default=True,
+        action=argparse.BooleanOptionalAction,
         help="Validate the config file in full before generating anything.",
     )
 
