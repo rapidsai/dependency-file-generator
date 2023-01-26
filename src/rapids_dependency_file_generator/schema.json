@@ -3,7 +3,7 @@
     "$id": "https://raw.githubusercontent.com/rapidsai/dependency-file-generator/v1.0.0/src/rapids_dependency_file_generator/schema.json",
     "type": "object",
     "title": "RAPIDS Package Dependency Specification Format",
-    "description": "Consolidated specification of RAPIDS project dependencies.",
+    "description": "Consolidated specification of RAPIDS project dependencies",
     "properties": {
         "files": {
             "type": "object",
