@@ -11,9 +11,9 @@
                 ".*": {
                     "type": "object",
                     "properties": {
-                        "output": {"$ref": "#/$defs/Outputs"},
+                        "output": {"$ref": "#/$defs/outputs"},
                         "includes": {"type": "array", "items": {"type": "string"}},
-                        "matrix": {"$ref": "#/$defs/Matrix"},
+                        "matrix": {"$ref": "#/$defs/matrix"},
                         "requirements_dir": {"type": "string"},
                         "conda_dir": {"type": "string"}
                     },
@@ -33,8 +33,8 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "output_types": {"$ref": "#/$defs/Outputs"},
-                                    "packages": {"$ref": "#/$defs/Packages"}
+                                    "output_types": {"$ref": "#/$defs/outputs"},
+                                    "packages": {"$ref": "#/$defs/packages"}
                                 },
                                 "required": ["output_types", "packages"],
                                 "additionalProperties": false
@@ -45,8 +45,8 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "output_types": {"$ref": "#/$defs/Outputs"},
-                                    "matrices": {"$ref": "#/$defs/Matrices"}
+                                    "output_types": {"$ref": "#/$defs/outputs"},
+                                    "matrices": {"$ref": "#/$defs/matrices"}
                                 },
                                 "required": ["output_types", "matrices"],
                                 "additionalProperties": false
@@ -58,28 +58,28 @@
                 }
             }
         },
-        "channels": {"$ref": "#/$defs/Channels"}
+        "channels": {"$ref": "#/$defs/channels"}
     },
     "required": ["files", "dependencies"],
     "additionalProperties": false,
     "$defs": {
-        "Channel": {
+        "channel": {
             "type": "string",
             "format": "iri-reference"
         },
-        "ChannelList": {
+        "channel-list": {
             "type": "array",
             "items": {
-                "$ref": "#/$defs/Channel"
+                "$ref": "#/$defs/channel"
             }
         },
-        "Channels": {
+        "channels": {
             "$oneOf": [
-                {"$ref": "#/$defs/Channel"},
-                {"$ref": "#/$defs/ChannelList"}
+                {"$ref": "#/$defs/channel"},
+                {"$ref": "#/$defs/channel-list"}
             ]
         },
-        "Matrix": {
+        "matrix": {
             "type": "object",
             "patternProperties": {
                 ".*": {
@@ -88,7 +88,7 @@
                 }
             }
         },
-        "MatrixMatcher": {
+        "matrix-matcher": {
             "type": "object",
             "properties": {
                 "matrix": {
@@ -103,55 +103,55 @@
                     ]
                 },
                 "packages": {"oneOf": [
-                    {"$ref": "#/$defs/Requirements"},
+                    {"$ref": "#/$defs/requirements"},
                     {"type": "null"}
                 ]}
             },
             "requiredProperties": ["matrix", "packages"],
             "additionalProperties": false
         },
-        "Matrices": {
+        "matrices": {
             "type": "array",
-            "items": {"$ref": "#/$defs/MatrixMatcher"}
+            "items": {"$ref": "#/$defs/matrix-matcher"}
         },
-        "OutputTypes": {
+        "output-types": {
             "enum": ["conda", "requirements"]
         },
-        "OutputList": {
+        "output-types-array": {
             "type": "array",
-            "item": {"$ref": "#/$defs/OutputTypes"}
+            "item": {"$ref": "#/$defs/output-types"}
         },
-        "Outputs": {
+        "outputs": {
             "oneOf": [
-                {"$ref": "#/$defs/OutputTypes"},
-                {"$ref": "#/$defs/OutputList"},
+                {"$ref": "#/$defs/output-types"},
+                {"$ref": "#/$defs/output-types-array"},
                 {"const": "none"}
             ]
         },
-        "Packages": {
+        "packages": {
             "type": "array",
             "items": {
                 "oneOf": [
-                    {"$ref": "#/$defs/Requirement"},
-                    {"$ref": "#/$defs/PipRequirements"}
+                    {"$ref": "#/$defs/requirement"},
+                    {"$ref": "#/$defs/pip-requirements"}
                 ]
             }
         },
-        "Requirement": {
+        "requirement": {
             "type": "string"
         },
-        "Requirements": {
+        "requirements": {
             "type": "array",
             "items": {
-                    "$ref": "#/$defs/Requirement"
+                    "$ref": "#/$defs/requirement"
                 },
             "minItems": 1
 
         },
-        "PipRequirements": {
+        "pip-requirements": {
             "type": "object",
             "properties": {
-                "pip": {"$ref": "#/$defs/Requirements"}
+                "pip": {"$ref": "#/$defs/requirements"}
             },
             "additionalProperties": false,
             "required": ["pip"]
