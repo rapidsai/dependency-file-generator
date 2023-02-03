@@ -36,6 +36,6 @@ repos:
         - id: check-metaschema
           files: ^src/rapids_dependency_file_generator/schema.json$
         - id: check-jsonschema
-          files: ^tests/examples/.*/dependencies.yaml$
+          files: ^tests/examples/([^/]*)/dependencies.yaml$
           args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
         - id: check-github-workflows

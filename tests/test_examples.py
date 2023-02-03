@@ -6,12 +6,14 @@ import shutil
 import jsonschema
 import pytest
 import yaml
+from jsonschema.exceptions import ValidationError
 
 from rapids_dependency_file_generator.cli import main
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 
-EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/**/dependencies.yaml"))
+EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/*/dependencies.yaml"))
+INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -34,6 +36,14 @@ def make_file_set(file_dir):
     ids=[example_file.parent.stem for example_file in EXAMPLE_FILES],
 )
 def example_dir(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=[example_file.parent for example_file in INVALID_EXAMPLE_FILES],
+    ids=[example_file.parent.stem for example_file in INVALID_EXAMPLE_FILES],
+)
+def invalid_example_dir(request):
     return request.param
 
 
@@ -68,3 +78,10 @@ def test_examples_are_valid(schema, example_dir):
     dep_file_path = example_dir / "dependencies.yaml"
     instance = yaml.load(dep_file_path.read_text(), Loader=yaml.SafeLoader)
     jsonschema.validate(instance, schema=schema)
+
+
+def test_invalid_examples_are_invalid(schema, invalid_example_dir):
+    dep_file_path = invalid_example_dir / "dependencies.yaml"
+    instance = yaml.load(dep_file_path.read_text(), Loader=yaml.SafeLoader)
+    with pytest.raises(ValidationError):
+        jsonschema.validate(instance, schema=schema)
