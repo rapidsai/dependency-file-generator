@@ -30,3 +30,12 @@ repos:
       - id: flake8
         args:
         - --show-source
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.21.0
+    hooks:
+        - id: check-metaschema
+          files: ^src/rapids_dependency_file_generator/schema.json$
+        - id: check-jsonschema
+          files: ^tests/examples/([^/]*)/dependencies.yaml$
+          args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
+        - id: check-github-workflows
