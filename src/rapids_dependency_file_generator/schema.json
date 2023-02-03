@@ -20,7 +20,8 @@
                     "additionalProperties": false,
                     "required": ["output", "includes"]
                 }
-            }
+            },
+            "minProperties": 1
         },
         "dependencies": {
             "type": "object",
