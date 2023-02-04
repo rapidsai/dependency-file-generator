@@ -12,7 +12,11 @@ from rapids_dependency_file_generator.cli import main
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 
-EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/*/dependencies.yaml"))
+EXAMPLE_FILES = [
+    pth
+    for pth in CURRENT_DIR.glob("examples/*/dependencies.yaml")
+    if "no-specific-match" not in str(pth.absolute())
+]
 INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
 
 
