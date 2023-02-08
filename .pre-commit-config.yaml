@@ -17,7 +17,7 @@ repos:
         args:
           - --py38-plus
   - repo: https://github.com/PyCQA/isort
-    rev: '5.10.1'
+    rev: '5.12.0'
     hooks:
       - id: isort
   - repo: https://github.com/psf/black
@@ -30,3 +30,12 @@ repos:
       - id: flake8
         args:
         - --show-source
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.21.0
+    hooks:
+        - id: check-metaschema
+          files: ^src/rapids_dependency_file_generator/schema.json$
+        - id: check-jsonschema
+          files: ^tests/examples/([^/]*)/dependencies.yaml$
+          args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
+        - id: check-github-workflows

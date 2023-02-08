@@ -1,0 +1,161 @@
+ {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/rapidsai/dependency-file-generator/v1.0.0/src/rapids_dependency_file_generator/schema.json",
+    "type": "object",
+    "title": "RAPIDS Package Dependency Specification Format",
+    "description": "Consolidated specification of RAPIDS project dependencies",
+    "properties": {
+        "files": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "object",
+                    "properties": {
+                        "output": {"$ref": "#/$defs/outputs"},
+                        "includes": {"type": "array", "items": {"type": "string"}},
+                        "matrix": {"$ref": "#/$defs/matrix"},
+                        "requirements_dir": {"type": "string"},
+                        "conda_dir": {"type": "string"}
+                    },
+                    "additionalProperties": false,
+                    "required": ["output", "includes"]
+                }
+            },
+            "minProperties": 1
+        },
+        "dependencies": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "object",
+                    "properties": {
+                        "common": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "output_types": {"$ref": "#/$defs/outputs"},
+                                    "packages": {"$ref": "#/$defs/packages"}
+                                },
+                                "required": ["output_types", "packages"],
+                                "additionalProperties": false
+                            }
+                        },
+                        "specific": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "output_types": {"$ref": "#/$defs/outputs"},
+                                    "matrices": {"$ref": "#/$defs/matrices"}
+                                },
+                                "required": ["output_types", "matrices"],
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "minProperties": 1,
+                    "additionalProperties": false
+                }
+            }
+        },
+        "channels": {"$ref": "#/$defs/channels"}
+    },
+    "required": ["files", "dependencies"],
+    "additionalProperties": false,
+    "$defs": {
+        "channel": {
+            "type": "string",
+            "format": "iri-reference"
+        },
+        "channel-list": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/channel"
+            }
+        },
+        "channels": {
+            "$oneOf": [
+                {"$ref": "#/$defs/channel"},
+                {"$ref": "#/$defs/channel-list"}
+            ]
+        },
+        "matrix": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            }
+        },
+        "matrix-matcher": {
+            "type": "object",
+            "properties": {
+                "matrix": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {"type": "string"}
+                            }
+                        },
+                        {"type": "null"}
+                    ]
+                },
+                "packages": {"oneOf": [
+                    {"$ref": "#/$defs/requirements"},
+                    {"type": "null"}
+                ]}
+            },
+            "requiredProperties": ["matrix", "packages"],
+            "additionalProperties": false
+        },
+        "matrices": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/matrix-matcher"}
+        },
+        "output-types": {
+            "enum": ["conda", "requirements"]
+        },
+        "output-types-array": {
+            "type": "array",
+            "item": {"$ref": "#/$defs/output-types"}
+        },
+        "outputs": {
+            "oneOf": [
+                {"$ref": "#/$defs/output-types"},
+                {"$ref": "#/$defs/output-types-array"},
+                {"const": "none"}
+            ]
+        },
+        "packages": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {"$ref": "#/$defs/requirement"},
+                    {"$ref": "#/$defs/pip-requirements"}
+                ]
+            }
+        },
+        "requirement": {
+            "type": "string"
+        },
+        "requirements": {
+            "type": "array",
+            "items": {
+                    "$ref": "#/$defs/requirement"
+                },
+            "minItems": 1
+
+        },
+        "pip-requirements": {
+            "type": "object",
+            "properties": {
+                "pip": {"$ref": "#/$defs/requirements"}
+            },
+            "additionalProperties": false,
+            "required": ["pip"]
+        }
+    }
+}
