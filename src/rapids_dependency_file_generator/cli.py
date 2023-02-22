@@ -4,7 +4,10 @@ import yaml
 
 from ._version import __version__ as version
 from .constants import OutputTypes, default_dependency_file_path
-from .rapids_dependency_file_generator import make_dependency_files
+from .rapids_dependency_file_generator import (
+    delete_existing_files,
+    make_dependency_files,
+)
 from .rapids_dependency_file_validator import validate_dependencies
 
 
@@ -79,4 +82,5 @@ def main(argv=None):
             }
         }
 
+    delete_existing_files()
     make_dependency_files(parsed_config, args.config, to_stdout)
