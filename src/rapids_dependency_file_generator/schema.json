@@ -116,7 +116,7 @@
             "items": {"$ref": "#/$defs/matrix-matcher"}
         },
         "output-types": {
-            "enum": ["conda", "requirements", "pyproject_build"]
+            "enum": ["conda", "requirements", "pyproject_build", "pyproject_dependencies"]
         },
         "output-types-array": {
             "type": "array",

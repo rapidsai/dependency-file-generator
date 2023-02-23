@@ -110,11 +110,15 @@ def make_dependency_file(
         )
     if file_type == str(OutputTypes.REQUIREMENTS):
         file_contents += "\n".join(dependencies) + "\n"
-    if file_type == str(OutputTypes.PYPROJECT_BUILD):
+    if file_type in (
+        str(OutputTypes.PYPROJECT_BUILD),
+        str(OutputTypes.PYPROJECT_DEPENDENCIES),
+    ):
         # This file type needs to be modified in place instead of built from scratch.
         with open(os.path.join(output_dir, name)) as f:
             file_contents = tomlkit.load(f)
-        file_contents["build-system"]["requires"] = (
+
+        toml_deps = (
             tomlkit.array(dependencies)
             .multiline(True)
             .comment(
@@ -122,6 +126,10 @@ def make_dependency_file(
                 f"{relative_path_to_config_file} and run `{cli_name}`."
             )
         )
+        if file_type == str(OutputTypes.PYPROJECT_BUILD):
+            file_contents["build-system"]["requires"] = toml_deps
+        else:
+            file_contents["project"]["dependencies"] = toml_deps
 
     return file_contents
 
@@ -198,7 +206,10 @@ def get_filename(file_type, file_prefix, matrix_combo):
     if file_type == str(OutputTypes.REQUIREMENTS):
         file_ext = ".txt"
         file_type_prefix = "requirements"
-    if file_type == str(OutputTypes.PYPROJECT_BUILD):
+    if file_type in (
+        str(OutputTypes.PYPROJECT_BUILD),
+        str(OutputTypes.PYPROJECT_DEPENDENCIES),
+    ):
         file_ext = ".toml"
         # Always hardcoded for this output type.
         file_prefix = "pyproject"
@@ -237,7 +248,10 @@ def get_output_dir(file_type, config_file_path, file_config):
         path.append(file_config.get("conda_dir", default_conda_dir))
     if file_type == str(OutputTypes.REQUIREMENTS):
         path.append(file_config.get("requirements_dir", default_requirements_dir))
-    if file_type == str(OutputTypes.PYPROJECT_BUILD):
+    if file_type in (
+        str(OutputTypes.PYPROJECT_BUILD),
+        str(OutputTypes.PYPROJECT_DEPENDENCIES),
+    ):
         path.append(file_config.get("pyproject_dir", default_pyproject_dir))
     return os.path.join(*path)
 
@@ -390,7 +404,10 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
                     with open(file_path, "w") as f:
-                        if file_type == str(OutputTypes.PYPROJECT_BUILD):
+                        if file_type in (
+                            str(OutputTypes.PYPROJECT_BUILD),
+                            str(OutputTypes.PYPROJECT_DEPENDENCIES),
+                        ):
                             tomlkit.dump(contents, f)
                         else:
                             f.write(contents)

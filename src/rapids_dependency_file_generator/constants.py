@@ -5,6 +5,7 @@ class OutputTypes(Enum):
     CONDA = "conda"
     REQUIREMENTS = "requirements"
     PYPROJECT_BUILD = "pyproject_build"
+    PYPROJECT_DEPENDENCIES = "pyproject_dependencies"
     NONE = "none"
 
     def __str__(self):
