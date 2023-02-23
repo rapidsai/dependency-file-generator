@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import yaml
 
@@ -19,6 +20,17 @@ def validate_args(argv):
         "--config",
         default=default_dependency_file_path,
         help="Path to YAML config file",
+    )
+    parser.add_argument(
+        "--clean",
+        nargs="?",
+        default=None,
+        const="",
+        help=(
+            "Delete any files previously created by dfg before running. An optional "
+            "path to clean may be provided, otherwise the current working directory "
+            "is used as the root from which to clean."
+        ),
     )
 
     codependent_args = parser.add_argument_group("optional, but codependent")
@@ -47,6 +59,11 @@ def validate_args(argv):
             "The following arguments must be used together:"
             + "".join([f"\n  --{x}" for x in dependent_arg_keys])
         )
+
+    # If --clean was passed without arguments, default to cleaning from the root of the
+    # tree where the config file is.
+    if args.clean == "":
+        args.clean = os.path.dirname(os.path.abspath(args.config))
 
     return args
 
@@ -82,5 +99,6 @@ def main(argv=None):
             }
         }
 
-    delete_existing_files()
+    if args.clean:
+        delete_existing_files(args.clean)
     make_dependency_files(parsed_config, args.config, to_stdout)
