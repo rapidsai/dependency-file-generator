@@ -6,5 +6,11 @@ plugins:
   - - "@semantic-release/github"
     - addReleases: top
   - - "@semantic-release/exec"
-    - verifyReleaseCmd: ./ci/update-version.sh ${nextRelease.version} && ./ci/build-test.sh
+    - verifyReleaseCmd: ./ci/build-test.sh
+      prepareCmd: ./ci/update-versions.sh ${nextRelease.version}
       publishCmd: ./ci/pypi-publish.sh
+  - - "@semantic-release/git"
+    - assets:
+        - src/rapids_dependency_file_generator/_version.py
+        - src/rapids_dependency_file_generator/schema.json
+        - package.json
