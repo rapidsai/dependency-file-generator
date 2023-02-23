@@ -68,7 +68,7 @@ def grid(gridspec):
 
 
 def make_dependency_file(
-    file_type, name, config_file, output_dir, conda_channels, dependencies
+    file_type, name, config_file, output_dir, conda_channels, dependencies, file_name
 ):
     """Generate the contents of the dependency file.
 
@@ -113,6 +113,7 @@ def make_dependency_file(
     if file_type in (
         str(OutputTypes.PYPROJECT_BUILD),
         str(OutputTypes.PYPROJECT_DEPENDENCIES),
+        str(OutputTypes.PYPROJECT_OPTIONAL_DEPENDENCIES),
     ):
         # This file type needs to be modified in place instead of built from scratch.
         with open(os.path.join(output_dir, name)) as f:
@@ -128,8 +129,11 @@ def make_dependency_file(
         )
         if file_type == str(OutputTypes.PYPROJECT_BUILD):
             file_contents["build-system"]["requires"] = toml_deps
-        else:
+        elif file_type == str(OutputTypes.PYPROJECT_DEPENDENCIES):
             file_contents["project"]["dependencies"] = toml_deps
+        else:
+            # TODO: May want to make sure the optional-dependencies table exists
+            file_contents["project"]["optional-dependencies"][file_name] = toml_deps
 
     return file_contents
 
@@ -209,6 +213,7 @@ def get_filename(file_type, file_prefix, matrix_combo):
     if file_type in (
         str(OutputTypes.PYPROJECT_BUILD),
         str(OutputTypes.PYPROJECT_DEPENDENCIES),
+        str(OutputTypes.PYPROJECT_OPTIONAL_DEPENDENCIES),
     ):
         file_ext = ".toml"
         # Always hardcoded for this output type.
@@ -251,6 +256,7 @@ def get_output_dir(file_type, config_file_path, file_config):
     if file_type in (
         str(OutputTypes.PYPROJECT_BUILD),
         str(OutputTypes.PYPROJECT_DEPENDENCIES),
+        str(OutputTypes.PYPROJECT_OPTIONAL_DEPENDENCIES),
     ):
         path.append(file_config.get("pyproject_dir", default_pyproject_dir))
     return os.path.join(*path)
@@ -396,6 +402,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                     output_dir,
                     channels,
                     deduped_deps,
+                    file_name,
                 )
 
                 if to_stdout:
@@ -407,6 +414,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                         if file_type in (
                             str(OutputTypes.PYPROJECT_BUILD),
                             str(OutputTypes.PYPROJECT_DEPENDENCIES),
+                            str(OutputTypes.PYPROJECT_OPTIONAL_DEPENDENCIES),
                         ):
                             tomlkit.dump(contents, f)
                         else:

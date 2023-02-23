@@ -6,6 +6,7 @@ class OutputTypes(Enum):
     REQUIREMENTS = "requirements"
     PYPROJECT_BUILD = "pyproject_build"
     PYPROJECT_DEPENDENCIES = "pyproject_dependencies"
+    PYPROJECT_OPTIONAL_DEPENDENCIES = "pyproject_optional_dependencies"
     NONE = "none"
 
     def __str__(self):
