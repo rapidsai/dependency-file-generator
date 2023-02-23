@@ -31,7 +31,7 @@ def delete_existing_files(root="."):
     """
     for dirpath, _, filenames in os.walk(root):
         for fn in filter(
-            lambda fn: fn.endswith("txt") or fn.endswith(".yaml"), filenames
+            lambda fn: fn.endswith(".txt") or fn.endswith(".yaml"), filenames
         ):
             with open(file_path := os.path.join(dirpath, fn)) as f:
                 if HEADER in f.read():
