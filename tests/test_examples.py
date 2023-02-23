@@ -1,7 +1,5 @@
 import glob
-import os
 import pathlib
-import shutil
 
 import jsonschema
 import pytest
@@ -18,13 +16,6 @@ EXAMPLE_FILES = [
     if "no-specific-match" not in str(pth.absolute())
 ]
 INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
-
-
-@pytest.fixture(scope="session", autouse=True)
-def clean_actual_files():
-    for root, _, _ in os.walk("tests"):
-        if pathlib.Path(root).name == "actual":
-            shutil.rmtree(root)
 
 
 def make_file_set(file_dir):
@@ -56,7 +47,14 @@ def test_examples(example_dir):
     actual_dir = example_dir.joinpath("output", "actual")
     dep_file_path = example_dir.joinpath("dependencies.yaml")
 
-    main(["--config", str(dep_file_path)])
+    main(
+        [
+            "--config",
+            str(dep_file_path),
+            "--clean",
+            str(example_dir.joinpath("output", "actual")),
+        ]
+    )
 
     expected_file_set = make_file_set(expected_dir)
     actual_file_set = make_file_set(actual_dir)
@@ -75,7 +73,14 @@ def test_error_examples(test_name):
     dep_file_path = test_dir.joinpath("dependencies.yaml")
 
     with pytest.raises(ValueError):
-        main(["--config", str(dep_file_path)])
+        main(
+            [
+                "--config",
+                str(dep_file_path),
+                "--clean",
+                str(test_dir.joinpath("output", "actual")),
+            ]
+        )
 
 
 def test_examples_are_valid(schema, example_dir):
