@@ -20,7 +20,7 @@ jobs:
           node-version: "lts/*"
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WRITE_TOKEN }}
           PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
         run: |
           npm install
