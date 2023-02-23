@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: ./.github/actions/setup-python
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -20,8 +21,8 @@ jobs:
           node-version: "lts/*"
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WRITE_TOKEN }}
           PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
         run: |
-          npm install @semantic-release/exec@6 -D
-          npx semantic-release@19
+          npm install
+          npx semantic-release
