@@ -23,5 +23,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
         run: |
-          npm install @semantic-release/exec@6 -D
-          npx semantic-release@19
+          npm install
+          npx semantic-release
