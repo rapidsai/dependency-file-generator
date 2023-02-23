@@ -6,3 +6,4 @@ build
 tests/**/actual
 .vscode
 *.swp
+node_modules
