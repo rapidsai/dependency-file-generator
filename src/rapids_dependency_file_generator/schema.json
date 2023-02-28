@@ -16,7 +16,8 @@
                         "includes": {"type": "array", "items": {"type": "string"}},
                         "matrix": {"$ref": "#/$defs/matrix"},
                         "requirements_dir": {"type": "string"},
-                        "conda_dir": {"type": "string"}
+                        "conda_dir": {"type": "string"},
+                        "pyproject_dir": {"type": "string"}
                     },
                     "additionalProperties": false,
                     "required": ["output", "includes"]
