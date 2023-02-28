@@ -20,13 +20,6 @@ EXAMPLE_FILES = [
 INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
 
 
-@pytest.fixture(scope="session", autouse=True)
-def clean_actual_files():
-    for root, _, _ in os.walk("tests"):
-        if pathlib.Path(root).name == "actual":
-            shutil.rmtree(root)
-
-
 def make_file_set(file_dir):
     return {
         pathlib.Path(f).relative_to(file_dir)
@@ -63,10 +56,17 @@ def test_examples(example_dir):
                 full_path = pathlib.PurePath(dirpath) / filename
                 relative_path = full_path.relative_to(expected_dir)
                 new_path = actual_dir / relative_path
-                new_path.parent.mkdir(parents=True)
+                new_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(full_path, new_path)
 
-    main(["--config", str(dep_file_path)])
+    main(
+        [
+            "--config",
+            str(dep_file_path),
+            "--clean",
+            str(example_dir.joinpath("output", "actual")),
+        ]
+    )
 
     expected_file_set = make_file_set(expected_dir)
     actual_file_set = make_file_set(actual_dir)
@@ -85,7 +85,14 @@ def test_error_examples(test_name):
     dep_file_path = test_dir.joinpath("dependencies.yaml")
 
     with pytest.raises(ValueError):
-        main(["--config", str(dep_file_path)])
+        main(
+            [
+                "--config",
+                str(dep_file_path),
+                "--clean",
+                str(test_dir.joinpath("output", "actual")),
+            ]
+        )
 
 
 def test_examples_are_valid(schema, example_dir):
