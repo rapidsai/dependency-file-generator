@@ -7,6 +7,30 @@ files:
       arch: [x86_64]
     includes:
       - build
+  py_build:
+    output: pyproject
+    pyproject_dir: output/actual
+    includes:
+      - python_build_dependencies
+    extras:
+      table: build-system
+      key: requires
+  py_run:
+    output: pyproject
+    pyproject_dir: output/actual
+    includes:
+      - python_run_dependencies
+    extras:
+      table: project
+      key: dependencies
+  py_optional_test:
+    output: pyproject
+    pyproject_dir: output/actual
+    includes:
+      - python_test_dependencies
+    extras:
+      table: project.optional-dependencies
+      key: test
 channels:
   - rapidsai
   - conda-forge
@@ -40,3 +64,20 @@ dependencies:
               cuda: "11.6"
             packages:
               - cudatoolkit=11.6
+  python_build_dependencies:
+    common:
+      - output_types: pyproject
+        packages:
+          - setuptools
+  python_run_dependencies:
+    common:
+      - output_types: pyproject
+        packages:
+          - numpy
+          - scipy
+  python_test_dependencies:
+    common:
+      - output_types: pyproject
+        packages:
+          - scikit-image
+          - scikit-learn

@@ -56,6 +56,16 @@ def test_examples(example_dir):
     actual_dir = example_dir.joinpath("output", "actual")
     dep_file_path = example_dir.joinpath("dependencies.yaml")
 
+    # Copy pyproject.toml files from expected to actual since they are modified in place
+    for dirpath, _, filenames in os.walk(expected_dir):
+        for filename in filenames:
+            if filename == "pyproject.toml":
+                full_path = pathlib.PurePath(dirpath) / filename
+                relative_path = full_path.relative_to(expected_dir)
+                new_path = actual_dir / relative_path
+                new_path.parent.mkdir(parents=True)
+                shutil.copyfile(full_path, new_path)
+
     main(["--config", str(dep_file_path)])
 
     expected_file_set = make_file_set(expected_dir)
