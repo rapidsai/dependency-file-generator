@@ -108,9 +108,9 @@ def make_dependency_file(
                 "dependencies": dependencies,
             }
         )
-    if file_type == str(OutputTypes.REQUIREMENTS):
+    elif file_type == str(OutputTypes.REQUIREMENTS):
         file_contents += "\n".join(dependencies) + "\n"
-    if file_type == str(OutputTypes.PYPROJECT):
+    elif file_type == str(OutputTypes.PYPROJECT):
         # This file type needs to be modified in place instead of built from scratch.
         with open(os.path.join(output_dir, name)) as f:
             file_contents = tomlkit.load(f)
@@ -212,10 +212,10 @@ def get_filename(file_type, file_prefix, matrix_combo):
     file_ext = ""
     if file_type == str(OutputTypes.CONDA):
         file_ext = ".yaml"
-    if file_type == str(OutputTypes.REQUIREMENTS):
+    elif file_type == str(OutputTypes.REQUIREMENTS):
         file_ext = ".txt"
         file_type_prefix = "requirements"
-    if file_type == str(OutputTypes.PYPROJECT):
+    elif file_type == str(OutputTypes.PYPROJECT):
         file_ext = ".toml"
         # Always hardcoded for this output type.
         file_prefix = "pyproject"
@@ -252,9 +252,9 @@ def get_output_dir(file_type, config_file_path, file_config):
     path = [os.path.dirname(config_file_path)]
     if file_type == str(OutputTypes.CONDA):
         path.append(file_config.get("conda_dir", default_conda_dir))
-    if file_type == str(OutputTypes.REQUIREMENTS):
+    elif file_type == str(OutputTypes.REQUIREMENTS):
         path.append(file_config.get("requirements_dir", default_requirements_dir))
-    if file_type == str(OutputTypes.PYPROJECT):
+    elif file_type == str(OutputTypes.PYPROJECT):
         path.append(file_config.get("pyproject_dir", default_pyproject_dir))
     return os.path.join(*path)
 
