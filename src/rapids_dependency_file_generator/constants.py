@@ -4,9 +4,7 @@ from enum import Enum
 class OutputTypes(Enum):
     CONDA = "conda"
     REQUIREMENTS = "requirements"
-    PYPROJECT_BUILD = "pyproject_build"
-    PYPROJECT_DEPENDENCIES = "pyproject_dependencies"
-    PYPROJECT_OPTIONAL_DEPENDENCIES = "pyproject_optional_dependencies"
+    PYPROJECT = "pyproject"
     NONE = "none"
 
     def __str__(self):
