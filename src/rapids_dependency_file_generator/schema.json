@@ -157,6 +157,14 @@
             },
             "additionalProperties": false,
             "required": ["pip"]
+        },
+        "extras": {
+            "type": "object",
+            "properties": {
+                "table": {"type": "string"},
+                "key": {"type": "string"}
+            },
+            "additionalProperties": false
         }
     }
 }
