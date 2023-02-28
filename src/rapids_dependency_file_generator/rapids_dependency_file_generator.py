@@ -68,7 +68,7 @@ def grid(gridspec):
 
 
 def make_dependency_file(
-    file_type, name, config_file, output_dir, conda_channels, dependencies, extras
+    file_type, name, config_file, output_dir, conda_channels, dependencies, extras=None
 ):
     """Generate the contents of the dependency file.
 
@@ -87,6 +87,8 @@ def make_dependency_file(
         CONDA.
     dependencies : list
         The dependencies to include in the file.
+    extras : dict
+        Any extra information provided for generating this dependency file.
 
     Returns
     -------
