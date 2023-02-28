@@ -98,6 +98,28 @@ files:
 
 When `output: none` is used, the `conda_dir`, `requirements_dir` and `matrix` keys can be omitted. The use case for `output: none` is described in the [_Additional CLI Notes_](#additional-cli-notes) section below.
 
+#### `extras`
+
+A given file may include an `extras` entry that may be used to provide inputs specific to a particular file type
+
+Here is an example:
+
+```yaml
+files:
+  build:
+    output: pyproject
+    includes: # a list of keys from the `dependencies` section which should be included in the generated files
+      - build
+    extras:
+      table: table_name
+      key: key_name
+```
+
+Currently the supported extras by file type are:
+- pyproject.toml
+  - table: The table in pyproject.toml where the dependencies should be written.
+  - key: The key corresponding to the dependency list in `table`.
+
 ### `channels` Key
 
 The top-level `channels` key specifies the channels that should be included in any generated conda `environment.yaml` files.
