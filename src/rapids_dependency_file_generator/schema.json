@@ -176,7 +176,7 @@
             },
             "else": {
                 "not": {
-                    "required": ["key"] 
+                    "required": ["key"]
                 }
             },
             "additionalProperties": false
