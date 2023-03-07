@@ -53,10 +53,11 @@ Here is an example of what the `files` key might look like:
 
 ```yaml
 files:
-  all: # used as the prefix for the generated dependency file names
-    output: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "none" or a list of non-"none" values
+  all: # used as the prefix for the generated dependency file names for conda or requirements files (has no effect on pyproject.toml files)
+    output: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "pyproject", "none" or a list of non-"none" values
     conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
+    pyproject_dir: python/cudf # where to put pyproject.toml files. optional, but recommended. defaults to "python"
     matrix: # (optional) contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
       cuda: ["11.5", "11.6"] # which CUDA version variant files to generate.
       arch: [x86_64] # which architecture version variant files to generate. This value should be the result of running the `arch` command on a given machine.
@@ -97,6 +98,28 @@ files:
 ```
 
 When `output: none` is used, the `conda_dir`, `requirements_dir` and `matrix` keys can be omitted. The use case for `output: none` is described in the [_Additional CLI Notes_](#additional-cli-notes) section below.
+
+#### `extras`
+
+A given file may include an `extras` entry that may be used to provide inputs specific to a particular file type
+
+Here is an example:
+
+```yaml
+files:
+  build:
+    output: pyproject
+    includes: # a list of keys from the `dependencies` section which should be included in the generated files
+      - build
+    extras:
+      table: table_name
+      key: key_name
+```
+
+Currently the supported extras by file type are:
+- pyproject.toml
+  - table: The table in pyproject.toml where the dependencies should be written. Acceptable values are "build-system", "project", and "project.optional-dependencies".
+  - key: The key corresponding to the dependency list in `table`. This may only be provided for the "project.optional-dependencies" table since the key name is fixed for "build-system" ("requires") and "project" ("dependencies"). Note that this implicitly prohibits including optional dependencies via an inline table under the "project" table.
 
 ### `channels` Key
 

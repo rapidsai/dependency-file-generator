@@ -1,5 +1,7 @@
 import glob
+import os
 import pathlib
+import shutil
 
 import jsonschema
 import pytest
@@ -10,11 +12,15 @@ from rapids_dependency_file_generator.cli import main
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 
+# Erroneous examples raise runtime errors from the generator.
+_erroneous_examples = ("no-specific-match", "pyproject_matrix")
+ERRONEOUS_EXAMPLE_FILES = [CURRENT_DIR / "examples" / ex for ex in _erroneous_examples]
 EXAMPLE_FILES = [
     pth
     for pth in CURRENT_DIR.glob("examples/*/dependencies.yaml")
-    if "no-specific-match" not in str(pth.absolute())
+    if all(ex not in str(pth.absolute()) for ex in _erroneous_examples)
 ]
+# Invalid examples raise validation errors upon schema validation.
 INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
 
 
@@ -47,6 +53,16 @@ def test_examples(example_dir):
     actual_dir = example_dir.joinpath("output", "actual")
     dep_file_path = example_dir.joinpath("dependencies.yaml")
 
+    # Copy pyproject.toml files from expected to actual since they are modified in place
+    for dirpath, _, filenames in os.walk(expected_dir):
+        for filename in filenames:
+            if filename == "pyproject.toml":
+                full_path = pathlib.Path(dirpath) / filename
+                relative_path = full_path.relative_to(expected_dir)
+                new_path = actual_dir / relative_path
+                new_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(full_path, new_path)
+
     main(
         [
             "--config",
@@ -67,7 +83,7 @@ def test_examples(example_dir):
         assert actual_file == expected_file
 
 
-@pytest.mark.parametrize("test_name", ["no-specific-match"])
+@pytest.mark.parametrize("test_name", ["no-specific-match", "pyproject_matrix"])
 def test_error_examples(test_name):
     test_dir = CURRENT_DIR.joinpath("examples", test_name)
     dep_file_path = test_dir.joinpath("dependencies.yaml")

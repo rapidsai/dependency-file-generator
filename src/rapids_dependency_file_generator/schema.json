@@ -12,10 +12,12 @@
                     "type": "object",
                     "properties": {
                         "output": {"$ref": "#/$defs/outputs"},
+                        "extras": {"$ref": "#/$defs/extras"},
                         "includes": {"type": "array", "items": {"type": "string"}},
                         "matrix": {"$ref": "#/$defs/matrix"},
                         "requirements_dir": {"type": "string"},
-                        "conda_dir": {"type": "string"}
+                        "conda_dir": {"type": "string"},
+                        "pyproject_dir": {"type": "string"}
                     },
                     "additionalProperties": false,
                     "required": ["output", "includes"]
@@ -116,7 +118,7 @@
             "items": {"$ref": "#/$defs/matrix-matcher"}
         },
         "output-types": {
-            "enum": ["conda", "requirements"]
+            "enum": ["conda", "requirements", "pyproject"]
         },
         "output-types-array": {
             "type": "array",
@@ -156,6 +158,28 @@
             },
             "additionalProperties": false,
             "required": ["pip"]
+        },
+        "extras": {
+            "type": "object",
+            "properties": {
+                "table": {
+                    "type": "string",
+                    "enum": ["build-system", "project", "project.optional-dependencies"]
+                },
+                "key": {"type": "string"}
+            },
+            "if": {
+                "properties": { "table": { "const": "project.optional-dependencies" } }
+            },
+            "then": {
+                "required": ["key"]
+            },
+            "else": {
+                "not": {
+                    "required": ["key"]
+                }
+            },
+            "additionalProperties": false
         }
     }
 }
