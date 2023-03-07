@@ -161,7 +161,10 @@ def make_dependency_file(
                 table[section] = tomlkit.table()
                 table = table[section]
 
-        table[extras["key"]] = toml_deps
+        key = extras.get(
+            "key", "requires" if extras["table"] == "build-system" else "dependencies"
+        )
+        table[key] = toml_deps
 
     return file_contents
 

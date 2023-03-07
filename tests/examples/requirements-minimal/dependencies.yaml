@@ -14,7 +14,6 @@ files:
       - python_build_dependencies
     extras:
       table: build-system
-      key: requires
   py_run:
     output: pyproject
     pyproject_dir: output/actual
@@ -22,7 +21,6 @@ files:
       - python_run_dependencies
     extras:
       table: project
-      key: dependencies
   py_optional_test:
     output: pyproject
     pyproject_dir: output/actual

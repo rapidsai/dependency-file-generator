@@ -12,7 +12,7 @@
                     "type": "object",
                     "properties": {
                         "output": {"$ref": "#/$defs/outputs"},
-                        "extras": {"type": "object"},
+                        "extras": {"$ref": "#/$defs/extras"},
                         "includes": {"type": "array", "items": {"type": "string"}},
                         "matrix": {"$ref": "#/$defs/matrix"},
                         "requirements_dir": {"type": "string"},
