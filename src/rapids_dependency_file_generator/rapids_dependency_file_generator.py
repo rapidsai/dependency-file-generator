@@ -240,7 +240,9 @@ def get_filename(file_type, file_prefix, matrix_combo):
         file_type_prefix = "requirements"
     elif file_type == str(OutputTypes.PYPROJECT):
         file_ext = ".toml"
-        # Always hardcoded for this output type.
+        # Unlike for files like requirements.txt or conda environment YAML files, which
+        # may be named with additional prefixes (e.g. all_cuda_*) pyproject.toml files
+        # need to have that exact name and are never prefixed.
         file_prefix = "pyproject"
     suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
     filename = "_".join(
