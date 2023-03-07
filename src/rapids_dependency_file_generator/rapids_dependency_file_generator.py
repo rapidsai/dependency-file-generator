@@ -251,7 +251,7 @@ def get_filename(file_type, file_key, matrix_combo):
         file_name_prefix = "pyproject"
     suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
     filename = "_".join(
-        x for x in [file_type_prefix, file_name_prefix, suffix] if x
+        filter(None, (file_type_prefix, file_name_prefix, suffix))
     ).replace(".", "")
     return filename + file_ext
 
