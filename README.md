@@ -118,8 +118,8 @@ files:
 
 Currently the supported extras by file type are:
 - pyproject.toml
-  - table: The table in pyproject.toml where the dependencies should be written.
-  - key: The key corresponding to the dependency list in `table`.
+  - table: The table in pyproject.toml where the dependencies should be written. Acceptable values are "build-system", "project", and "project.optional-dependencies".
+  - key: The key corresponding to the dependency list in `table`. This may only be provided for the "project.optional-dependencies" table since the key name is fixed for "build-system" ("requires") and "project" ("dependencies"). Note that this implicitly prohibits including optional dependencies via an inline table under the "project" table.
 
 ### `channels` Key
 
