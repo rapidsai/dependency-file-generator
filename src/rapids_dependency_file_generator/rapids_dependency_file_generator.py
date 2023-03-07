@@ -205,14 +205,15 @@ def get_requested_output_types(output):
     return output
 
 
-def get_filename(file_type, file_prefix, matrix_combo):
+def get_filename(file_type, file_key, matrix_combo):
     """Get the name of the file to which to write a generated dependency set.
 
     The file name will be composed of the following components, each determined
     by the `file_type`:
         - A file-type-based prefix e.g. "requirements" for requirements.txt files.
         - A name determined by the value of $FILENAME in the corresponding
-          [files.$FILENAME] section of dependencies.yaml.
+          [files.$FILENAME] section of dependencies.yaml. This name is used for some
+          output types (conda, requirements) and not others (pyproject).
         - A matrix description encoding the key-value pairs in `matrix_combo`.
         - A suitable extension for the file (e.g. ".yaml" for conda environment files.)
 
@@ -233,6 +234,7 @@ def get_filename(file_type, file_prefix, matrix_combo):
     """
     file_type_prefix = ""
     file_ext = ""
+    file_name_prefix = file_key
     if file_type == str(OutputTypes.CONDA):
         file_ext = ".yaml"
     elif file_type == str(OutputTypes.REQUIREMENTS):
@@ -243,10 +245,10 @@ def get_filename(file_type, file_prefix, matrix_combo):
         # Unlike for files like requirements.txt or conda environment YAML files, which
         # may be named with additional prefixes (e.g. all_cuda_*) pyproject.toml files
         # need to have that exact name and are never prefixed.
-        file_prefix = "pyproject"
+        file_name_prefix = "pyproject"
     suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
     filename = "_".join(
-        x for x in [file_type_prefix, file_prefix, suffix] if x
+        x for x in [file_type_prefix, file_name_prefix, suffix] if x
     ).replace(".", "")
     return filename + file_ext
 
@@ -350,7 +352,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         for f in files
     ):
         raise ValueError("to_stdout is not supported for pyproject.toml files.")
-    for file_name, file_config in files.items():
+    for file_key, file_config in files.items():
         includes = file_config["includes"]
 
         file_types_to_generate = get_requested_output_types(file_config["output"])
@@ -416,7 +418,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                                 )
 
                 # Dedupe deps and print / write to filesystem
-                full_file_name = get_filename(file_type, file_name, matrix_combo)
+                full_file_name = get_filename(file_type, file_key, matrix_combo)
                 deduped_deps = dedupe(dependencies)
 
                 output_dir = (
