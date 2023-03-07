@@ -362,6 +362,10 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         extras = file_config.get("extras", {})
 
         for file_type in file_types_to_generate:
+            if file_type == "pyproject" and "matrix" in file_config:
+                raise ValueError(
+                    "matrix entries are not supported for pyproject.toml files."
+                )
             for matrix_combo in grid(file_config.get("matrix", {})):
                 dependencies = []
 
