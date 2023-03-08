@@ -351,7 +351,8 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
     channels = parsed_config.get("channels", default_channels) or default_channels
     files = parsed_config["files"]
     if to_stdout and any(
-        OutputTypes.PYPROJECT in get_requested_output_types(f["output"]) for f in files
+        OutputTypes.PYPROJECT in get_requested_output_types(files[f]["output"])
+        for f in files
     ):
         raise ValueError("to_stdout is not supported for pyproject.toml files.")
     for file_key, file_config in files.items():
