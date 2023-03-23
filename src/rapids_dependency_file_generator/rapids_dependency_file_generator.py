@@ -55,6 +55,8 @@ def dedupe(dependencies):
     """
     deduped = sorted({dep for dep in dependencies if not isinstance(dep, dict)})
     dict_deps = defaultdict(list)
+    # The purpose of the outer loop is to support nested dependency lists such as the
+    # `pip:` list. If multiple are present, they must be internally deduped as well.
     for dep in filter(lambda dep: isinstance(dep, dict), dependencies):
         for key, values in dep.items():
             dict_deps[key].extend(values)
@@ -83,6 +85,10 @@ def grid(gridspec):
     Iterable[dict]
         Each yielded value is a dictionary containing one of the unique
         combinations of parameter values from `gridspec`.
+
+    Notes
+    -----
+    An empty `gridspec` dict will result in an empty dict as the single yielded value.
     """
     for values in itertools.product(*gridspec.values()):
         yield dict(zip(gridspec.keys(), values))
