@@ -17,6 +17,7 @@
                         "matrix": {"$ref": "#/$defs/matrix"},
                         "requirements_dir": {"type": "string"},
                         "conda_dir": {"type": "string"},
+                        "conda_meta_dir": {"type": "string"},
                         "pyproject_dir": {"type": "string"}
                     },
                     "additionalProperties": false,
@@ -118,7 +119,7 @@
             "items": {"$ref": "#/$defs/matrix-matcher"}
         },
         "output-types": {
-            "enum": ["conda", "requirements", "pyproject"]
+            "enum": ["conda", "conda_meta", "requirements", "pyproject"]
         },
         "output-types-array": {
             "type": "array",
@@ -162,11 +163,16 @@
         "extras": {
             "type": "object",
             "properties": {
+                "section": {
+                    "type": "string",
+                    "enum": ["build", "host", "run"]
+                },
                 "table": {
                     "type": "string",
                     "enum": ["build-system", "project", "project.optional-dependencies"]
                 },
-                "key": {"type": "string"}
+                "key": {"type": "string"},
+                "additionalProperties": false
             },
             "if": {
                 "properties": { "table": { "const": "project.optional-dependencies" } }
