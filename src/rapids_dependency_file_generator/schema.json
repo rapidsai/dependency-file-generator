@@ -174,17 +174,6 @@
                 "key": {"type": "string"},
                 "additionalProperties": false
             },
-            "if": {
-                "properties": { "table": { "const": "project.optional-dependencies" }, "required": ["table"] }
-            },
-            "then": {
-                "required": ["key"]
-            },
-            "else": {
-                "not": {
-                    "required": ["key"]
-                }
-            },
             "additionalProperties": false
         }
     }
