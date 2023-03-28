@@ -175,7 +175,7 @@
                 "additionalProperties": false
             },
             "if": {
-                "properties": { "table": { "const": "project.optional-dependencies" } }
+                "properties": { "table": { "const": "project.optional-dependencies" }, "required": ["table"] }
             },
             "then": {
                 "required": ["key"]

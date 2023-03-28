@@ -11,6 +11,7 @@ from .constants import (
     cli_name,
     default_channels,
     default_conda_dir,
+    default_conda_meta_dir,
     default_pyproject_dir,
     default_requirements_dir,
 )
@@ -137,6 +138,12 @@ def make_dependency_file(
                 "dependencies": dependencies,
             }
         )
+    elif file_type == str(OutputTypes.CONDA_META):
+        file_contents += yaml.dump(
+            {
+                "dependencies": dependencies,
+            }
+        )
     elif file_type == str(OutputTypes.REQUIREMENTS):
         file_contents += "\n".join(dependencies) + "\n"
     elif file_type == str(OutputTypes.PYPROJECT):
@@ -214,7 +221,7 @@ def get_requested_output_types(output):
     return output
 
 
-def get_filename(file_type, file_key, matrix_combo):
+def get_filename(file_type, file_key, matrix_combo, extras=None):
     """Get the name of the file to which to write a generated dependency set.
 
     The file name will be composed of the following components, each determined
@@ -235,6 +242,8 @@ def get_filename(file_type, file_key, matrix_combo):
     matrix_combo : dict
         A mapping of key-value pairs corresponding to the
         [files.$FILENAME.matrix] entry in dependencies.yaml.
+    extras : dict
+        Any extra information provided for generating this filename.
 
     Returns
     -------
@@ -246,6 +255,19 @@ def get_filename(file_type, file_key, matrix_combo):
     file_name_prefix = file_key
     if file_type == str(OutputTypes.CONDA):
         file_ext = ".yaml"
+    elif file_type == str(OutputTypes.CONDA_META):
+        file_ext = ".yaml"
+        file_name_prefix = "_".join(
+            filter(
+                None,
+                [
+                    "meta_dependencies",
+                    extras.get("output", ""),
+                    extras.get("section", ""),
+                ],
+            )
+        )
+        print(file_type_prefix)
     elif file_type == str(OutputTypes.REQUIREMENTS):
         file_ext = ".txt"
         file_type_prefix = "requirements"
@@ -288,6 +310,8 @@ def get_output_dir(file_type, config_file_path, file_config):
     path = [os.path.dirname(config_file_path)]
     if file_type == str(OutputTypes.CONDA):
         path.append(file_config.get("conda_dir", default_conda_dir))
+    elif file_type == str(OutputTypes.CONDA_META):
+        path.append(file_config.get("conda_meta_dir", default_conda_meta_dir))
     elif file_type == str(OutputTypes.REQUIREMENTS):
         path.append(file_config.get("requirements_dir", default_requirements_dir))
     elif file_type == str(OutputTypes.PYPROJECT):
@@ -388,6 +412,8 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                         dependencies.extend(common_entry["packages"])
 
                     for specific_entry in dependency_entry.get("specific", []):
+                        # if include == "build_cpp":
+                        #     breakpoint()
                         if file_type not in specific_entry["output_types"]:
                             continue
 
@@ -431,7 +457,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                                 )
 
                 # Dedupe deps and print / write to filesystem
-                full_file_name = get_filename(file_type, file_key, matrix_combo)
+                full_file_name = get_filename(file_type, file_key, matrix_combo, extras)
                 deduped_deps = dedupe(dependencies)
 
                 output_dir = (
@@ -452,6 +478,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                 if to_stdout:
                     print(contents)
                 else:
+                    # breakpoint()
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
                     with open(file_path, "w") as f:
