@@ -267,7 +267,6 @@ def get_filename(file_type, file_key, matrix_combo, extras=None):
                 ],
             )
         )
-        print(file_type_prefix)
     elif file_type == str(OutputTypes.REQUIREMENTS):
         file_ext = ".txt"
         file_type_prefix = "requirements"
@@ -412,8 +411,6 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                         dependencies.extend(common_entry["packages"])
 
                     for specific_entry in dependency_entry.get("specific", []):
-                        # if include == "build_cpp":
-                        #     breakpoint()
                         if file_type not in specific_entry["output_types"]:
                             continue
 
@@ -478,7 +475,6 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                 if to_stdout:
                     print(contents)
                 else:
-                    # breakpoint()
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
                     with open(file_path, "w") as f:
