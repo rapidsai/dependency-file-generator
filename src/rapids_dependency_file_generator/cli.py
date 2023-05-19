@@ -8,6 +8,7 @@ from .constants import OutputTypes, default_dependency_file_path
 from .rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
+    get_requested_output_types,
 )
 from .rapids_dependency_file_validator import validate_dependencies
 
@@ -17,6 +18,7 @@ def validate_args(argv):
         description=f"Generates dependency files for RAPIDS libraries (version: {version})"
     )
     parser.add_argument(
+        "-c",
         "--config",
         default=default_dependency_file_path,
         help="Path to YAML config file",
@@ -32,38 +34,55 @@ def validate_args(argv):
             "is used as the root from which to clean."
         ),
     )
-
-    codependent_args = parser.add_argument_group("optional, but codependent")
-    codependent_args.add_argument(
+    parser.add_argument(
+        "-f",
+        "--file-key",
         "--file_key",
-        help="The file key from `dependencies.yaml` to generate",
+        nargs="*",
+        dest="file_key",
+        action="extend",
+        default=[],
+        help="The file key(s) from `dependencies.yaml` to generate",
     )
-    codependent_args.add_argument(
+    parser.add_argument(
+        "-o",
         "--output",
-        help="The output file type to generate",
-        choices=[str(x) for x in [OutputTypes.CONDA, OutputTypes.REQUIREMENTS]],
+        nargs="*",
+        action="extend",
+        help="The output file type(s) to generate",
+        default=[],
+        choices=[str(x) for x in [OutputTypes.CONDA, OutputTypes.REQUIREMENTS, OutputTypes.PYPROJECT]],
     )
-    codependent_args.add_argument(
+    parser.add_argument(
+        "-m",
         "--matrix",
         help=(
             "String representing which matrix combination should be generated, "
             'such as `--matrix "cuda=11.5;arch=x86_64"`. May also be an empty string'
         ),
     )
+    parser.add_argument(
+        "--cuda-suffix",
+        default="-cu",
+        help="The package name CUDA version suffix (defaults to -cu)",
+    )
+    parser.add_argument(
+        "--stdout",
+        default=False,
+        action="store_true",
+        help="Print the results to stdout",
+    )
 
     args = parser.parse_args(argv)
-    dependent_arg_keys = ["file_key", "output", "matrix"]
-    dependent_arg_values = [getattr(args, key) is None for key in dependent_arg_keys]
-    if any(dependent_arg_values) and not all(dependent_arg_values):
-        raise ValueError(
-            "The following arguments must be used together:"
-            + "".join([f"\n  --{x}" for x in dependent_arg_keys])
-        )
 
     # If --clean was passed without arguments, default to cleaning from the root of the
     # tree where the config file is.
     if args.clean == "":
         args.clean = os.path.dirname(os.path.abspath(args.config))
+
+    # default to conda and pyproject
+    if len(args.output) == 0:
+        args.output = [str(OutputTypes.CONDA), str(OutputTypes.PYPROJECT)]
 
     return args
 
@@ -87,18 +106,32 @@ def main(argv=None):
     validate_dependencies(parsed_config)
 
     matrix = generate_matrix(args.matrix)
-    to_stdout = all([args.file_key, args.output, args.matrix is not None])
+    to_stdout = args.stdout or (
+        (len(args.file_key) > 0) or
+        (str(OutputTypes.REQUIREMENTS) in args.output)
+    )
 
-    if to_stdout:
-        includes = parsed_config["files"][args.file_key]["includes"]
+    if len(args.file_key) > 0:
         parsed_config["files"] = {
-            args.file_key: {
-                "matrix": matrix,
-                "output": args.output,
-                "includes": includes,
-            }
+            file_key: parsed_config["files"][file_key] \
+                for file_key in args.file_key
         }
+
+    if len(args.output) > 0:
+        files = {}
+        for file_key, file_config in parsed_config["files"].items():
+            outputs = get_requested_output_types(file_config["output"])
+            outputs = list(filter(lambda output: output in outputs, args.output))
+            if len(outputs) > 0:
+                file_config["output"] = outputs
+                files[file_key] = file_config
+        parsed_config["files"] = files
+
+    if len(matrix.keys()) > 0:
+        for file_key, file_config in parsed_config["files"].items():
+            file_config["matrix"] = matrix
 
     if args.clean:
         delete_existing_files(args.clean)
+
     make_dependency_files(parsed_config, args.config, to_stdout)
