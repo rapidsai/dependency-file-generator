@@ -3,11 +3,11 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-    "setuptools",
+    "cuda-python>=11.6,<11.7.1",
 ]
 
 [project]
-name = "test"
+name = "test-cu11"
 version = "0.0.0"
 dependencies = [
     "numpy",

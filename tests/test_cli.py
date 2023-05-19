@@ -13,16 +13,19 @@ def test_generate_matrix():
 
 def test_validate_args():
     # Missing output
-    with pytest.raises(Exception):
-        validate_args(["--matrix", "cuda=11.5;arch=x86_64", "--file_key", "all"])
+    validate_args(["--matrix", "cuda=11.5;arch=x86_64", "--file_key", "all"])
 
     # Missing matrix
-    with pytest.raises(Exception):
-        validate_args(["--output", "conda", "--file_key", "all"])
+    validate_args(["--output", "conda", "--file_key", "all"])
 
     # Missing file_key
-    with pytest.raises(Exception):
-        validate_args(["--output", "conda", "--matrix", "cuda=11.5;arch=x86_64"])
+    validate_args(["--output", "conda", "--matrix", "cuda=11.5;arch=x86_64"])
+
+    # Multiple outputs
+    validate_args(["-o", "conda", "--output", "requirements", "pyproject"])
+
+    # Multiple file keys
+    validate_args(["-f", "all", "--file-key", "all", "--file_key", "all", "all"])
 
     # Valid
     validate_args(

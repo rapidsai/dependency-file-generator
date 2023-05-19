@@ -94,8 +94,6 @@ def make_dependency_file(
     file_contents,
     file_type,
     name,
-    config_file,
-    output_dir,
     conda_channels,
     dependencies,
     extras=None,
@@ -471,16 +469,13 @@ def make_dependency_files(
                     results[output_file_path],
                     file_type,
                     full_file_name,
-                    config_file_path,
-                    output_dir,
                     channels,
                     dedupe(dependencies),
                     extras,
                 )
 
-    def write_output(data, path, f):
+    def write_output(data, output_dir, f):
 
-        output_dir = os.path.dirname(path)
         relpath_to_config_file = os.path.relpath(config_file_path, output_dir)
         header = textwrap.dedent(
             f"""\
@@ -502,8 +497,10 @@ def make_dependency_files(
             f.write(data)
 
     for path, data in results.items():
+        output_dir = os.path.dirname(path)
         if to_stdout:
-            write_output(data, path, sys.stdout)
+            write_output(data, output_dir, sys.stdout)
         else:
+            os.makedirs(output_dir, exist_ok=True)
             with open(path, "w") as f:
-                write_output(data, path, f)
+                write_output(data, output_dir, f)

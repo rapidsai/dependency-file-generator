@@ -13,7 +13,7 @@ from rapids_dependency_file_generator.cli import main
 CURRENT_DIR = pathlib.Path(__file__).parent
 
 # Erroneous examples raise runtime errors from the generator.
-_erroneous_examples = ("no-specific-match", "pyproject_matrix")
+_erroneous_examples = ["no-specific-match"]
 ERRONEOUS_EXAMPLE_FILES = [CURRENT_DIR / "examples" / ex for ex in _erroneous_examples]
 EXAMPLE_FILES = [
     pth
@@ -22,7 +22,6 @@ EXAMPLE_FILES = [
 ]
 # Invalid examples raise validation errors upon schema validation.
 INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
-
 
 def make_file_set(file_dir):
     return {
@@ -69,6 +68,7 @@ def test_examples(example_dir):
             str(dep_file_path),
             "--clean",
             str(example_dir.joinpath("output", "actual")),
+            "--output", "conda", "requirements", "pyproject",
         ]
     )
 
@@ -83,7 +83,8 @@ def test_examples(example_dir):
         assert actual_file == expected_file
 
 
-@pytest.mark.parametrize("test_name", ["no-specific-match", "pyproject_matrix"])
+# @pytest.mark.parametrize("test_name", ["no-specific-match", "pyproject_matrix"])
+@pytest.mark.parametrize("test_name", ["no-specific-match"])
 def test_error_examples(test_name):
     test_dir = CURRENT_DIR.joinpath("examples", test_name)
     dep_file_path = test_dir.joinpath("dependencies.yaml")

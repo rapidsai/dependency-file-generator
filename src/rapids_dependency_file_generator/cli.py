@@ -87,6 +87,8 @@ def validate_args(argv):
     if args.clean == "":
         args.clean = os.path.dirname(os.path.abspath(args.config))
 
+    args.file_key = list(sorted(list(set(sorted(args.file_key)))))
+
     # default to conda and pyproject
     if len(args.output) == 0:
         args.output = [str(OutputTypes.CONDA), str(OutputTypes.PYPROJECT)]
