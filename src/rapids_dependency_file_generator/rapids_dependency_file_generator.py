@@ -1,7 +1,7 @@
-import re
-import sys
 import itertools
 import os
+import re
+import sys
 import textwrap
 from collections import defaultdict
 
@@ -91,7 +91,14 @@ def grid(gridspec):
 
 
 def make_dependency_file(
-    file_contents, file_type, name, config_file, output_dir, conda_channels, dependencies, extras=None
+    file_contents,
+    file_type,
+    name,
+    config_file,
+    output_dir,
+    conda_channels,
+    dependencies,
+    extras=None,
 ):
     """Generate the contents of the dependency file.
 
@@ -328,14 +335,16 @@ def name_with_cuda_suffix(name, cuda_version=None, cuda_suffix="-cu"):
     """
     # Find and remove existing `-cuXX` suffix if present
     suff = re.search("(" + cuda_suffix + "[0-9]{2})$", name)
-    name = name[0:suff.span(0)[0] if suff else len(name)]
+    name = name[0 : suff.span(0)[0] if suff else len(name)]
     # Append `-cuXX` suffix to `[package.name]`
     if cuda_version is not None:
         name += cuda_suffix + cuda_version.split(".")[0]
     return name
 
 
-def make_dependency_files(parsed_config, config_file_path, to_stdout, cuda_suffix="-cu"):
+def make_dependency_files(
+    parsed_config, config_file_path, to_stdout, cuda_suffix="-cu"
+):
     """Generate dependency files.
 
     This function iterates over data parsed from a YAML file conforming to the
@@ -427,7 +436,9 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout, cuda_suffi
 
                         if not found:
                             if fallback_entry is not None:
-                                dependencies.extend(fallback_entry.get("packages", []) or [])
+                                dependencies.extend(
+                                    fallback_entry.get("packages", []) or []
+                                )
                             else:
                                 raise ValueError(
                                     f"No matching matrix found in '{include}' for: {matrix_combo}"
@@ -448,12 +459,12 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout, cuda_suffi
                         with open(output_file_path) as f:
                             results[output_file_path] = tomlkit.load(f)
                             # Append `-cuXX` to `[package.name]`
-                            results[output_file_path]["project"]["name"] = (
-                                name_with_cuda_suffix(
-                                    results[output_file_path]["project"]["name"],
-                                    matrix_combo.get("cuda", None),
-                                    cuda_suffix
-                                )
+                            results[output_file_path]["project"][
+                                "name"
+                            ] = name_with_cuda_suffix(
+                                results[output_file_path]["project"]["name"],
+                                matrix_combo.get("cuda", None),
+                                cuda_suffix,
                             )
 
                 results[output_file_path] = make_dependency_file(
@@ -480,11 +491,10 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout, cuda_suffi
 
         if isinstance(data, dict):
             header = header.strip()
-            first_2_lines =  "\n".join(data.as_string().split("\n")[0:2])
+            first_2_lines = "\n".join(data.as_string().split("\n")[0:2])
             if first_2_lines != header:
                 data.body[0:0] = [
-                    (None, tomlkit.comment(line[2:]))
-                    for line in header.split("\n")
+                    (None, tomlkit.comment(line[2:])) for line in header.split("\n")
                 ]
             tomlkit.dump(data, f)
         else:

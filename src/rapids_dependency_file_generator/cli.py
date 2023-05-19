@@ -7,8 +7,8 @@ from ._version import __version__ as version
 from .constants import OutputTypes, default_dependency_file_path
 from .rapids_dependency_file_generator import (
     delete_existing_files,
-    make_dependency_files,
     get_requested_output_types,
+    make_dependency_files,
 )
 from .rapids_dependency_file_validator import validate_dependencies
 
@@ -51,7 +51,14 @@ def validate_args(argv):
         action="extend",
         help="The output file type(s) to generate",
         default=[],
-        choices=[str(x) for x in [OutputTypes.CONDA, OutputTypes.REQUIREMENTS, OutputTypes.PYPROJECT]],
+        choices=[
+            str(x)
+            for x in [
+                OutputTypes.CONDA,
+                OutputTypes.REQUIREMENTS,
+                OutputTypes.PYPROJECT,
+            ]
+        ],
     )
     parser.add_argument(
         "-m",
@@ -107,14 +114,12 @@ def main(argv=None):
 
     matrix = generate_matrix(args.matrix)
     to_stdout = args.stdout or (
-        (len(args.file_key) > 0) or
-        (str(OutputTypes.REQUIREMENTS) in args.output)
+        (len(args.file_key) > 0) or (str(OutputTypes.REQUIREMENTS) in args.output)
     )
 
     if len(args.file_key) > 0:
         parsed_config["files"] = {
-            file_key: parsed_config["files"][file_key] \
-                for file_key in args.file_key
+            file_key: parsed_config["files"][file_key] for file_key in args.file_key
         }
 
     if len(args.output) > 0:
