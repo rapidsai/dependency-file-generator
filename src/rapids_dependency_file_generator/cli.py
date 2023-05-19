@@ -113,9 +113,6 @@ def main(argv=None):
     validate_dependencies(parsed_config)
 
     matrix = generate_matrix(args.matrix)
-    to_stdout = args.stdout or (
-        (len(args.file_key) > 0) or (str(OutputTypes.REQUIREMENTS) in args.output)
-    )
 
     if len(args.file_key) > 0:
         parsed_config["files"] = {
@@ -141,4 +138,4 @@ def main(argv=None):
     if args.clean:
         delete_existing_files(args.clean)
 
-    make_dependency_files(parsed_config, args.config, to_stdout)
+    make_dependency_files(parsed_config, args.config, args.stdout)
