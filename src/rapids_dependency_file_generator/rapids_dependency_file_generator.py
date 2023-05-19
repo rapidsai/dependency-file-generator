@@ -375,7 +375,7 @@ def make_dependency_files(
 
     channels = parsed_config.get("channels", default_channels) or default_channels
     files = parsed_config["files"]
-    results = dict()
+    results = {}
 
     for file_key, file_config in files.items():
         includes = file_config["includes"]
