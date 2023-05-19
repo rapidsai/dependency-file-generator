@@ -119,7 +119,9 @@ def main(argv=None):
 
     if len(args.file_key) > 0:
         parsed_config["files"] = {
-            file_key: parsed_config["files"][file_key] for file_key in args.file_key
+            file_key: parsed_config["files"][file_key]
+                for file_key in args.file_key
+                    if parsed_config["files"].get(file_key, None) is not None
         }
 
     if len(args.output) > 0:
