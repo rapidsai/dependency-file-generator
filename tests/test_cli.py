@@ -1,5 +1,3 @@
-import pytest
-
 from rapids_dependency_file_generator.cli import generate_matrix, validate_args
 
 

@@ -23,6 +23,7 @@ EXAMPLE_FILES = [
 # Invalid examples raise validation errors upon schema validation.
 INVALID_EXAMPLE_FILES = list(CURRENT_DIR.glob("examples/invalid/*/dependencies.yaml"))
 
+
 def make_file_set(file_dir):
     return {
         pathlib.Path(f).relative_to(file_dir)
@@ -68,7 +69,10 @@ def test_examples(example_dir):
             str(dep_file_path),
             "--clean",
             str(example_dir.joinpath("output", "actual")),
-            "--output", "conda", "requirements", "pyproject",
+            "--output",
+            "conda",
+            "requirements",
+            "pyproject",
         ]
     )
 

@@ -1,9 +1,7 @@
-from unittest import mock
-
 import pytest
 import yaml
 
-from rapids_dependency_file_generator.constants import OutputTypes, cli_name
+from rapids_dependency_file_generator.constants import OutputTypes
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
     get_requested_output_types,
