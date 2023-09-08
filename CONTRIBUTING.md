@@ -10,10 +10,18 @@ Releases for `dependency-file-generator` are handled by [semantic-release][seman
 
 The table below (from [semantic-release][semantic-release] docs) shows the types of changes that correspond to each release type.
 
-| Commit message                                                                                                                                                                                   | Release type                                                                                                        |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `fix(pencil): stop graphite breaking when too much pressure applied`                                                                                                                             | ~~Patch~~ Fix Release                                                                                               |
-| `feat(pencil): add 'graphiteWidth' option`                                                                                                                                                       | ~~Minor~~ Feature Release                                                                                           |
-| `perf(pencil): remove graphiteWidth option`<br><br>`BREAKING CHANGE: The graphiteWidth option has been removed.`<br>`The default graphite width of 10mm is always used for performance reasons.` | ~~Major~~ Breaking Release <br /> (Note that the `BREAKING CHANGE: ` token must be in the body of the pull-request) |
+| Commit message                                                                                                                                                                                   | Release type                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `fix(pencil): stop graphite breaking when too much pressure applied`                                                                                                                             | Patch Release                                                                                   |
+| `feat(pencil): add 'graphiteWidth' option`                                                                                                                                                       | Minor Release                                                                                   |
+| `perf(pencil): remove graphiteWidth option`<br><br>`BREAKING CHANGE: The graphiteWidth option has been removed.`<br>`The default graphite width of 10mm is always used for performance reasons.` | Major <br /> (Note that the `BREAKING CHANGE: ` string must be in the body of the pull-request) |
+
+If a change type not listed in the table above is used, it will not trigger a release. For example:
+
+- `docs: fix README type`
+- `ci: update GHAs workflow`
+- `chore: some miscellaneous work`
+
+The source of truth for these rules is [semantic-release/commit-analyzer](https://github.com/semantic-release/commit-analyzer). The `angular` preset is used by default, which is documented [here](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular).
 
 [semantic-release]: https://github.com/semantic-release/semantic-release
