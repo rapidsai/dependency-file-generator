@@ -22,4 +22,6 @@ If a change type not listed in the table above is used, it will not trigger a re
 - `ci: update GHAs workflow`
 - `chore: some miscellaneous work`
 
+The source of truth for these rules is [semantic-release/commit-analyzer](https://github.com/semantic-release/commit-analyzer). The `angular` preset is used by default, which is documented [here](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular).
+
 [semantic-release]: https://github.com/semantic-release/semantic-release
