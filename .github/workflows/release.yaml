@@ -35,5 +35,7 @@ jobs:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
           gh workflow run push.yml \
-          --repo github.com/rapidsai/ci-imgs \
+          --field upstream_job="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          --field upstream_repository=dependency-file-generator \
+          --repo rapidsai/ci-imgs \
           --ref main
