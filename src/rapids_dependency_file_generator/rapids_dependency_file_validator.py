@@ -1,14 +1,16 @@
 """Logic for validating dependency files."""
 
+import importlib.resources
 import json
 import sys
 import textwrap
 
 import jsonschema
-import pkg_resources
 from jsonschema.exceptions import best_match
 
-SCHEMA = json.loads(pkg_resources.resource_string(__name__, "schema.json"))
+SCHEMA = json.loads(
+    importlib.resources.files(__package__).joinpath("schema.json").read_bytes()
+)
 
 
 def validate_dependencies(dependencies):
