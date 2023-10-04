@@ -1,6 +1,6 @@
 """Logic for validating dependency files."""
 
-import importlib
+import importlib.resources
 import json
 import sys
 import textwrap
