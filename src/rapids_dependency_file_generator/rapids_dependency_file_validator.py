@@ -9,7 +9,7 @@ import jsonschema
 from jsonschema.exceptions import best_match
 
 SCHEMA = json.loads(
-    importlib.resources.files(__name__).joinpath("schema.json").read_bytes()
+    importlib.resources.files(__package__).joinpath("schema.json").read_bytes()
 )
 
 
