@@ -36,8 +36,11 @@ def delete_existing_files(root="."):
             lambda fn: fn.endswith(".txt") or fn.endswith(".yaml"), filenames
         ):
             with open(file_path := os.path.join(dirpath, fn)) as f:
-                if HEADER in f.read():
-                    os.remove(file_path)
+                try:
+                    if HEADER in f.read():
+                        os.remove(file_path)
+                except UnicodeDecodeError:
+                    pass
 
 
 def dedupe(dependencies):
