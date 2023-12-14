@@ -30,7 +30,7 @@ jobs:
         with:
           repository: '${{ fromJSON(steps.pr-info.outputs.PR_INFO).headRepositoryOwner.login }}/${{ fromJSON(steps.pr-info.outputs.PR_INFO).headRepository.name }}'
           ref: '${{ fromJSON(steps.pr-info.outputs.PR_INFO).headRefName }}'
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
       - run: python -m pip install pre-commit
       - run: pre-commit run --all-files --show-diff-on-failure --color=always
       - uses: EndBug/add-and-commit@v9
