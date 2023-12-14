@@ -8,6 +8,7 @@ plugins:
   - - "@semantic-release/exec"
     - verifyReleaseCmd: ./ci/update-versions.sh ${nextRelease.version} && ./ci/build-test.sh
       publishCmd: ./ci/pypi-publish.sh
+      successCmd: ./ci/semantic-release-success.sh
   - - "@semantic-release/git"
     - assets:
         - src/rapids_dependency_file_generator/_version.py
