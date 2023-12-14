@@ -324,7 +324,7 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     """
     return all(
         specific_key in matrix_combo
-        and fnmatch.fnmatch(matrix_combo.get(specific_key), specific_value)
+        and fnmatch.fnmatch(matrix_combo[specific_key], specific_value)
         for specific_key, specific_value in specific_entry_matrix.items()
     )
 
