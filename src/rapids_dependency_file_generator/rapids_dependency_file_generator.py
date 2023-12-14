@@ -1,3 +1,4 @@
+import fnmatch
 import itertools
 import os
 import textwrap
@@ -300,10 +301,11 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
     [matrices] list. This function validates the [matrices.matrix] value
     against the provided `matrix_combo` to check if they are compatible.
 
-    A `specific_entry_matrix` is compatible with a `matrix_combo` if and only if
-    `specific_entry_matrix[key] == matrix_combo[key]` for every key defined in
-    `specific_entry_matrix`. A `matrix_combo` may contain additional keys not
-    specified by `specific_entry_matrix`.
+    A `specific_entry_matrix` is compatible with a `matrix_combo` if and only
+    if `specific_entry_matrix[key]` matches the glob pattern
+    `matrix_combo[key]` for every key defined in `specific_entry_matrix`. A
+    `matrix_combo` may contain additional keys not specified by
+    `specific_entry_matrix`.
 
     Parameters
     ----------
@@ -321,7 +323,8 @@ def should_use_specific_entry(matrix_combo, specific_entry_matrix):
         `matrix_combo` and False otherwise.
     """
     return all(
-        matrix_combo.get(specific_key) == specific_value
+        specific_key in matrix_combo
+        and fnmatch.fnmatch(matrix_combo[specific_key], specific_value)
         for specific_key, specific_value in specific_entry_matrix.items()
     )
 

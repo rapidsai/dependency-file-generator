@@ -1,0 +1,30 @@
+files:
+  dev:
+    output: conda
+    conda_dir: output/actual
+    matrix:
+      cuda: ["10.0", "11.8", "12.0"]
+    includes:
+      - build
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    common:
+      - output_types: [conda]
+        packages:
+          - clang-tools=11.1.0
+    specific:
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              cuda: "11.*"
+            packages:
+              - cudatoolkit=11.*
+          - matrix:
+              cuda: "12.*"
+            packages:
+              - cuda-version=12.*
+          - matrix:
+            packages:
