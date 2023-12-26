@@ -14,7 +14,7 @@ channels:
 dependencies:
   build:
     specific:
-      - output_types: [conda, requirements]
+      - output_types: [conda, pyproject, requirements]
         matrices:
           - matrix:
               cuda: "11.5"
