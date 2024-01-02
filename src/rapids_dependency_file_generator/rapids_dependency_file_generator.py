@@ -442,7 +442,7 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                 contents = make_dependency_file(
                     file_type=file_type,
                     name=full_file_name,
-                    confige_file=config_file_path,
+                    config_file=config_file_path,
                     output_dir=output_dir,
                     conda_channels=channels,
                     dependencies=deduped_deps,
