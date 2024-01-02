@@ -46,7 +46,7 @@ def test_make_dependency_file(mock_relpath):
         output_dir="output_path",
         conda_channels=["rapidsai", "nvidia"],
         dependencies=["dep1", "dep2"],
-        extras=None
+        extras=None,
     )
     assert env == header + yaml.dump(
         {
@@ -63,7 +63,7 @@ def test_make_dependency_file(mock_relpath):
         output_dir="output_path",
         conda_channels=["rapidsai", "nvidia"],
         dependencies=["dep1", "dep2"],
-        extras=None
+        extras=None,
     )
     assert env == header + "dep1\ndep2\n"
 
