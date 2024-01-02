@@ -93,7 +93,7 @@ def grid(gridspec):
 
 
 def make_dependency_file(
-    file_type, name, config_file, output_dir, conda_channels, dependencies, extras=None
+    *, file_type, name, config_file, output_dir, conda_channels, dependencies, extras
 ):
     """Generate the contents of the dependency file.
 
@@ -440,13 +440,13 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                     else get_output_dir(file_type, config_file_path, file_config)
                 )
                 contents = make_dependency_file(
-                    file_type,
-                    full_file_name,
-                    config_file_path,
-                    output_dir,
-                    channels,
-                    deduped_deps,
-                    extras,
+                    file_type=file_type,
+                    name=full_file_name,
+                    confige_file=config_file_path,
+                    output_dir=output_dir,
+                    conda_channels=channels,
+                    dependencies=deduped_deps,
+                    extras=extras,
                 )
 
                 if to_stdout:
