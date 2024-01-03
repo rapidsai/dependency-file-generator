@@ -40,12 +40,13 @@ def test_make_dependency_file(mock_relpath):
 # To make changes, edit {relpath} and run `{cli_name}`.
 """
     env = make_dependency_file(
-        "conda",
-        "tmp_env.yaml",
-        "config_file",
-        "output_path",
-        ["rapidsai", "nvidia"],
-        ["dep1", "dep2"],
+        file_type="conda",
+        name="tmp_env.yaml",
+        config_file="config_file",
+        output_dir="output_path",
+        conda_channels=["rapidsai", "nvidia"],
+        dependencies=["dep1", "dep2"],
+        extras=None,
     )
     assert env == header + yaml.dump(
         {
@@ -56,12 +57,13 @@ def test_make_dependency_file(mock_relpath):
     )
 
     env = make_dependency_file(
-        "requirements",
-        "tmp_env.txt",
-        "config_file",
-        "output_path",
-        ["rapidsai", "nvidia"],
-        ["dep1", "dep2"],
+        file_type="requirements",
+        name="tmp_env.txt",
+        config_file="config_file",
+        output_dir="output_path",
+        conda_channels=["rapidsai", "nvidia"],
+        dependencies=["dep1", "dep2"],
+        extras=None,
     )
     assert env == header + "dep1\ndep2\n"
 
