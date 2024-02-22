@@ -63,14 +63,18 @@ def test_examples(example_dir):
                 new_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(full_path, new_path)
 
-    main(
-        [
-            "--config",
-            str(dep_file_path),
-            "--clean",
-            str(example_dir.joinpath("output", "actual")),
-        ]
-    )
+    cli_args = [
+        "--config",
+        str(dep_file_path),
+        "--clean",
+        str(example_dir.joinpath("output", "actual")),
+    ]
+
+    # Prepend channels for the prepend_channels tests
+    if example_dir.name in ("prepend-channels"):
+        cli_args = ["--prepend-channels", "my_channel;my_other_channel"] + cli_args
+
+    main(cli_args)
 
     expected_file_set = make_file_set(expected_dir)
     actual_file_set = make_file_set(actual_dir)
