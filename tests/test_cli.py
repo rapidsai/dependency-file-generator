@@ -24,6 +24,21 @@ def test_validate_args():
     with pytest.raises(Exception):
         validate_args(["--output", "conda", "--matrix", "cuda=11.5;arch=x86_64"])
 
+    # Prepending channels with an output type that is not conda
+    with pytest.raises(Exception):
+        validate_args(
+            [
+                "--output",
+                "requirements",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file_key",
+                "all",
+                "--prepend-channels",
+                "my_channel;my_other_channel",
+            ]
+        )
+
     # Valid
     validate_args(
         [
@@ -33,5 +48,27 @@ def test_validate_args():
             "cuda=11.5;arch=x86_64",
             "--file_key",
             "all",
+        ]
+    )
+
+    # Valid, with prepended channels
+    validate_args(
+        [
+            "--prepend-channels",
+            "my_channel;my_other_channel",
+        ]
+    )
+
+    # Valid, with output/matrix/file_key and prepended channels
+    validate_args(
+        [
+            "--output",
+            "conda",
+            "--matrix",
+            "cuda=11.5;arch=x86_64",
+            "--file_key",
+            "all",
+            "--prepend-channels",
+            "my_channel;my_other_channel",
         ]
     )

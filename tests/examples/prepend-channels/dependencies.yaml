@@ -1,0 +1,45 @@
+files:
+  build:
+    output: conda
+    conda_dir: output/actual
+    matrix:
+      cuda: ["11.5", "11.6"]
+      arch: [x86_64]
+    includes:
+      - build
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - clang=11.1.0
+          - spdlog>=1.8.5,<1.9
+      - output_types: conda
+        packages:
+          - pip
+          - pip:
+              - git+https://github.com/python-streamz/streamz.git@master
+    specific:
+      - output_types: [conda, requirements]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cuda-python>=11.5,<11.7.1
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cuda-python>=11.6,<11.7.1
+      - output_types: conda
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6

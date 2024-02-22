@@ -4,7 +4,7 @@ import os
 import yaml
 
 from ._version import __version__ as version
-from .constants import OutputTypes, default_dependency_file_path
+from .constants import OutputTypes, default_channels, default_dependency_file_path
 from .rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
@@ -51,6 +51,16 @@ def validate_args(argv):
         ),
     )
 
+    parser.add_argument(
+        "--prepend-channels",
+        help=(
+            "A string representing a list of conda channels to prepend to the list of "
+            "channels. Channels should be separated by a semicolon, such as "
+            '`--prepend-channels "my_channel;my_other_channel"`. This option is '
+            f"only valid with --output {OutputTypes.CONDA} or no --output"
+        ),
+    )
+
     args = parser.parse_args(argv)
     dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = [getattr(args, key) is None for key in dependent_arg_keys]
@@ -58,6 +68,11 @@ def validate_args(argv):
         raise ValueError(
             "The following arguments must be used together:"
             + "".join([f"\n  --{x}" for x in dependent_arg_keys])
+        )
+
+    if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
+        raise ValueError(
+            f"--prepend-channels is only valid with --output {OutputTypes.CONDA}"
         )
 
     # If --clean was passed without arguments, default to cleaning from the root of the
@@ -99,6 +114,13 @@ def main(argv=None):
             }
         }
 
+    if args.prepend_channels:
+        prepend_channels = args.prepend_channels.split(";")
+        parsed_config["channels"] = prepend_channels + parsed_config.get(
+            "channels", default_channels
+        )
+
     if args.clean:
         delete_existing_files(args.clean)
+
     make_dependency_files(parsed_config, args.config, to_stdout)
