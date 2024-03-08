@@ -165,9 +165,29 @@ def make_dependency_file(
                 table[section] = tomlkit.table()
                 table = table[section]
 
-        key = extras.get(
-            "key", "requires" if extras["table"] == "build-system" else "dependencies"
-        )
+        if extras["table"] == "build-system":
+            key = "requires"
+            if key in extras:
+                raise ValueError(
+                    "The 'key' field is not allowed for the 'pyproject' file type when "
+                    "'table' is 'build-system'."
+                )
+        elif extras["table"] == "project":
+            key = "dependencies"
+            if key in extras:
+                raise ValueError(
+                    "The 'key' field is not allowed for the 'pyproject' file type when "
+                    "'table' is 'project'."
+                )
+        else:
+            try:
+                key = extras["key"]
+            except KeyError:
+                raise ValueError(
+                    "The 'key' field is required for the 'pyproject' file type when "
+                    "'table' is not one of 'build-system' or 'project'."
+                )
+
         table[key] = toml_deps
 
     return file_contents

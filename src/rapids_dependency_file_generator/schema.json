@@ -162,22 +162,8 @@
         "extras": {
             "type": "object",
             "properties": {
-                "table": {
-                    "type": "string",
-                    "enum": ["build-system", "project", "project.optional-dependencies"]
-                },
-                "key": {"type": "string"}
-            },
-            "if": {
-                "properties": { "table": { "const": "project.optional-dependencies" } }
-            },
-            "then": {
-                "required": ["key"]
-            },
-            "else": {
-                "not": {
-                    "required": ["key"]
-                }
+                "table": { "type": "string", "required": true },
+                "key": {"type": "string", "required": false }
             },
             "additionalProperties": false
         }
