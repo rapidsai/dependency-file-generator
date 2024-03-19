@@ -1,7 +1,6 @@
 import fnmatch
 import itertools
 import os
-import sys
 import textwrap
 from collections import defaultdict
 
@@ -164,7 +163,7 @@ def make_dependency_file(
 
         # This file type needs to be modified in place instead of built from scratch.
         with open(os.path.join(output_dir, name)) as f:
-            file_contents = tomlkit.load(f)
+            file_contents_toml = tomlkit.load(f)
 
         toml_deps = tomlkit.array()
         for dep in dependencies:
@@ -172,7 +171,7 @@ def make_dependency_file(
         toml_deps.add_line(indent="")
 
         # Recursively descend into subtables like "[x.y.z]", creating tables as needed.
-        table = file_contents
+        table = file_contents_toml
         for section in extras["table"].split("."):
             try:
                 table = table[section]
@@ -186,6 +185,8 @@ def make_dependency_file(
                 table = table[section]
 
         table[key] = toml_deps
+
+        file_contents = tomlkit.dumps(file_contents_toml)
 
     return file_contents
 
@@ -464,15 +465,9 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                 )
 
                 if to_stdout:
-                    if file_type == str(OutputTypes.PYPROJECT):
-                        tomlkit.dump(contents, sys.stdout)
-                    else:
-                        print(contents)
+                    print(contents)
                 else:
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
                     with open(file_path, "w") as f:
-                        if file_type == str(OutputTypes.PYPROJECT):
-                            tomlkit.dump(contents, f)
-                        else:
-                            f.write(contents)
+                        f.write(contents)
