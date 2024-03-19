@@ -1,6 +1,7 @@
 import fnmatch
 import itertools
 import os
+import sys
 import textwrap
 from collections import defaultdict
 
@@ -463,7 +464,10 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
                 )
 
                 if to_stdout:
-                    print(contents)
+                    if file_type == str(OutputTypes.PYPROJECT):
+                        tomlkit.dump(contents, sys.stdout)
+                    else:
+                        print(contents)
                 else:
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
