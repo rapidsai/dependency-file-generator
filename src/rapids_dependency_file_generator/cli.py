@@ -41,7 +41,14 @@ def validate_args(argv):
     codependent_args.add_argument(
         "--output",
         help="The output file type to generate",
-        choices=[str(x) for x in [OutputTypes.CONDA, OutputTypes.PYPROJECT, OutputTypes.REQUIREMENTS]],
+        choices=[
+            str(x)
+            for x in [
+                OutputTypes.CONDA,
+                OutputTypes.PYPROJECT,
+                OutputTypes.REQUIREMENTS,
+            ]
+        ],
     )
     codependent_args.add_argument(
         "--matrix",
