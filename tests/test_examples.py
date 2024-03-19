@@ -13,7 +13,7 @@ from rapids_dependency_file_generator.cli import main
 CURRENT_DIR = pathlib.Path(__file__).parent
 
 # Erroneous examples raise runtime errors from the generator.
-_erroneous_examples = ("no-specific-match", "pyproject_matrix", "pyproject_bad_key")
+_erroneous_examples = ["no-specific-match", "pyproject_bad_key"]
 EXAMPLE_FILES = [
     pth
     for pth in CURRENT_DIR.glob("examples/*/dependencies.yaml")
