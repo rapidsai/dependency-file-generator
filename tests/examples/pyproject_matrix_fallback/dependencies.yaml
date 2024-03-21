@@ -1,0 +1,25 @@
+files:
+  py_build:
+    output: pyproject
+    pyproject_dir: output/actual
+    matrix:
+      cuda: ["11.6"]
+    includes:
+      - build
+    extras:
+      table: build-system
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    specific:
+      - output_types: [conda, pyproject, requirements]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cuda-python>=11.5,<11.7.1
+          - matrix:
+            packages:
+              - cuda-python>=11.6,<11.7.1
