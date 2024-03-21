@@ -379,11 +379,6 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
 
     channels = parsed_config.get("channels", default_channels) or default_channels
     files = parsed_config["files"]
-    if to_stdout and any(
-        OutputTypes.PYPROJECT in get_requested_output_types(files[f]["output"])
-        for f in files
-    ):
-        raise ValueError("to_stdout is not supported for pyproject.toml files.")
     for file_key, file_config in files.items():
         includes = file_config["includes"]
 
@@ -392,7 +387,15 @@ def make_dependency_files(parsed_config, config_file_path, to_stdout):
         extras = file_config.get("extras", {})
 
         for file_type in file_types_to_generate:
-            for matrix_combo in grid(file_config.get("matrix", {})):
+            calculated_grid = list(grid(file_config.get("matrix", {})))
+            if (
+                OutputTypes.PYPROJECT.value in file_types_to_generate
+                and len(calculated_grid) > 1
+            ):
+                raise ValueError(
+                    "Pyproject outputs can't have more than one matrix output"
+                )
+            for matrix_combo in calculated_grid:
                 dependencies = []
 
                 # Collect all includes from each dependency list corresponding
