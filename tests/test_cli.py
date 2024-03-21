@@ -51,6 +51,18 @@ def test_validate_args():
         ]
     )
 
+    # Valid
+    validate_args(
+        [
+            "--output",
+            "pyproject",
+            "--matrix",
+            "cuda=11.5;arch=x86_64",
+            "--file_key",
+            "all",
+        ]
+    )
+
     # Valid, with prepended channels
     validate_args(
         [

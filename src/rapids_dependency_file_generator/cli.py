@@ -41,7 +41,14 @@ def validate_args(argv):
     codependent_args.add_argument(
         "--output",
         help="The output file type to generate",
-        choices=[str(x) for x in [OutputTypes.CONDA, OutputTypes.REQUIREMENTS]],
+        choices=[
+            str(x)
+            for x in [
+                OutputTypes.CONDA,
+                OutputTypes.PYPROJECT,
+                OutputTypes.REQUIREMENTS,
+            ]
+        ],
     )
     codependent_args.add_argument(
         "--matrix",
@@ -105,12 +112,11 @@ def main(argv=None):
     to_stdout = all([args.file_key, args.output, args.matrix is not None])
 
     if to_stdout:
-        includes = parsed_config["files"][args.file_key]["includes"]
         parsed_config["files"] = {
             args.file_key: {
+                **parsed_config["files"][args.file_key],
                 "matrix": matrix,
                 "output": args.output,
-                "includes": includes,
             }
         }
 

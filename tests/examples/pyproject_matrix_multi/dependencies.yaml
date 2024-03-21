@@ -3,7 +3,7 @@ files:
     output: pyproject
     pyproject_dir: output/actual
     matrix:
-      cuda: ["11.6"]
+      cuda: ["11.5", "11.6"]
     includes:
       - build
     extras:
