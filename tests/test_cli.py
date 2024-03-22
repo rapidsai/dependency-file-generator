@@ -14,11 +14,11 @@ def test_generate_matrix():
 def test_validate_args():
     # Missing output
     with pytest.raises(Exception):
-        validate_args(["--matrix", "cuda=11.5;arch=x86_64", "--file_key", "all"])
+        validate_args(["--matrix", "cuda=11.5;arch=x86_64", "--file-key", "all"])
 
     # Missing matrix
     with pytest.raises(Exception):
-        validate_args(["--output", "conda", "--file_key", "all"])
+        validate_args(["--output", "conda", "--file-key", "all"])
 
     # Missing file_key
     with pytest.raises(Exception):
@@ -32,7 +32,7 @@ def test_validate_args():
                 "requirements",
                 "--matrix",
                 "cuda=11.5;arch=x86_64",
-                "--file_key",
+                "--file-key",
                 "all",
                 "--prepend-channels",
                 "my_channel;my_other_channel",
@@ -46,7 +46,7 @@ def test_validate_args():
             "conda",
             "--matrix",
             "cuda=11.5;arch=x86_64",
-            "--file_key",
+            "--file-key",
             "all",
         ]
     )
@@ -54,11 +54,27 @@ def test_validate_args():
     # Valid
     validate_args(
         [
+            "--config",
+            "dependencies2.yaml",
             "--output",
             "pyproject",
             "--matrix",
             "cuda=11.5;arch=x86_64",
-            "--file_key",
+            "--file-key",
+            "all",
+        ]
+    )
+
+    # Valid
+    validate_args(
+        [
+            "-c",
+            "dependencies2.yaml",
+            "-o",
+            "pyproject",
+            "-m",
+            "cuda=11.5;arch=x86_64",
+            "-f",
             "all",
         ]
     )
@@ -78,7 +94,7 @@ def test_validate_args():
             "conda",
             "--matrix",
             "cuda=11.5;arch=x86_64",
-            "--file_key",
+            "--file-key",
             "all",
             "--prepend-channels",
             "my_channel;my_other_channel",

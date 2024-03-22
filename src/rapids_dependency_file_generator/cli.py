@@ -17,6 +17,7 @@ def validate_args(argv):
         description=f"Generates dependency files for RAPIDS libraries (version: {version})"
     )
     parser.add_argument(
+        "-c",
         "--config",
         default=default_dependency_file_path,
         help="Path to YAML config file",
@@ -35,10 +36,12 @@ def validate_args(argv):
 
     codependent_args = parser.add_argument_group("optional, but codependent")
     codependent_args.add_argument(
-        "--file_key",
+        "-f",
+        "--file-key",
         help="The file key from `dependencies.yaml` to generate",
     )
     codependent_args.add_argument(
+        "-o",
         "--output",
         help="The output file type to generate",
         choices=[
@@ -51,6 +54,7 @@ def validate_args(argv):
         ],
     )
     codependent_args.add_argument(
+        "-m",
         "--matrix",
         help=(
             "String representing which matrix combination should be generated, "
