@@ -80,7 +80,7 @@ def validate_args(argv):
     if any(dependent_arg_values) and not all(dependent_arg_values):
         raise ValueError(
             "The following arguments must be used together:"
-            + "".join([f"\n  --{x}" for x in dependent_arg_keys])
+            + "".join([f"\n  {x}" for x in ["--file-key", "--output", "--matrix"]])
         )
 
     if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
