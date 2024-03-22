@@ -63,12 +63,14 @@ def validate_args(argv):
     )
 
     parser.add_argument(
-        "--prepend-channels",
+        "--prepend-channel",
+        action="append",
+        default=[],
+        dest="prepend_channels",
         help=(
-            "A string representing a list of conda channels to prepend to the list of "
-            "channels. Channels should be separated by a semicolon, such as "
-            '`--prepend-channels "my_channel;my_other_channel"`. This option is '
-            f"only valid with --output {OutputTypes.CONDA} or no --output"
+            "A string representing a conda channel(s) to prepend to the list of "
+            "channels. This option is only valid with --output "
+            f"{OutputTypes.CONDA} or no --output"
         ),
     )
 
@@ -83,7 +85,7 @@ def validate_args(argv):
 
     if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
         raise ValueError(
-            f"--prepend-channels is only valid with --output {OutputTypes.CONDA}"
+            f"--prepend-channel is only valid with --output {OutputTypes.CONDA}"
         )
 
     # If --clean was passed without arguments, default to cleaning from the root of the
@@ -125,8 +127,7 @@ def main(argv=None):
         }
 
     if args.prepend_channels:
-        prepend_channels = args.prepend_channels.split(";")
-        parsed_config["channels"] = prepend_channels + parsed_config.get(
+        parsed_config["channels"] = args.prepend_channels + parsed_config.get(
             "channels", default_channels
         )
 

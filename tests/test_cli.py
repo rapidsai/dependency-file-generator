@@ -34,8 +34,10 @@ def test_validate_args():
                 "cuda=11.5;arch=x86_64",
                 "--file-key",
                 "all",
-                "--prepend-channels",
-                "my_channel;my_other_channel",
+                "--prepend-channel",
+                "my_channel",
+                "--prepend-channel",
+                "my_other_channel",
             ]
         )
 
@@ -82,8 +84,10 @@ def test_validate_args():
     # Valid, with prepended channels
     validate_args(
         [
-            "--prepend-channels",
-            "my_channel;my_other_channel",
+            "--prepend-channel",
+            "my_channel",
+            "--prepend-channel",
+            "my_other_channel",
         ]
     )
 
@@ -96,7 +100,9 @@ def test_validate_args():
             "cuda=11.5;arch=x86_64",
             "--file-key",
             "all",
-            "--prepend-channels",
-            "my_channel;my_other_channel",
+            "--prepend-channel",
+            "my_channel",
+            "--prepend-channel",
+            "my_other_channel",
         ]
     )
