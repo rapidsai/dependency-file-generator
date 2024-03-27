@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+./ci/update-versions.sh "${BUILD_VERSION:-}"
+
 pip install build pytest
 
 python -m build .
