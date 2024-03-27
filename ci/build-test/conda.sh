@@ -2,4 +2,4 @@
 set -euo pipefail
 
 mamba install -y boa conda-build
-mamba build recipe
+conda mambabuild recipe/
