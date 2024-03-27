@@ -1,6 +1,6 @@
 {
   "name": "rapids-dependency-file-generator",
-  "version": "1.11.0",
+  "version": "1.12.1",
   "description": "`rapids-dependency-file-generator` is a Python CLI tool that generates conda `environment.yaml` files and `requirements.txt` files from a single YAML file, typically named `dependencies.yaml`.",
   "repository": {
     "type": "git",
@@ -15,6 +15,6 @@
   "devDependencies": {
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "semantic-release": "^22.0.0"
+    "semantic-release": "^23.0.0"
   }
 }

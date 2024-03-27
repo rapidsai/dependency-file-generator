@@ -1,0 +1,37 @@
+package:
+  name: rapids-dependency-file-generator
+  version: 1.12.1
+
+build:
+  noarch: python
+  script: pip install --no-build-isolation --no-deps .
+  entry_points:
+    - rapids-dependency-file-generator = rapids_dependency_file_generator.cli:main
+
+source:
+  path: ../
+
+requirements:
+  host:
+    - python >=3.9
+    - build
+  run:
+    - python >=3.9
+    - pyyaml
+    - jsonschema
+    - tomlkit
+
+test:
+  source_files:
+    - tests
+  requires:
+    - pytest
+  commands:
+    - pytest
+    - rapids-dependency-file-generator -h
+
+about:
+  home: https://github.com/rapidsai/dependency-file-generator
+  dev_url: https://github.com/rapidsai/dependency-file-generator
+  license: Apache-2.0
+  summary: Dependency file generator for RAPIDS

@@ -1,0 +1,28 @@
+name: Run Semantic Release
+inputs:
+  GITHUB_TOKEN:
+    required: true
+  PYPI_TOKEN: {}
+  ANACONDA_TOKEN: {}
+  DRY_RUN:
+    default: "false"
+outputs:
+  release_version:
+    value: ${{ steps.semantic-release.outputs.release_version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Run Semantic Release
+      id: semantic-release
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        PYPI_TOKEN: ${{ inputs.PYPI_TOKEN }}
+        ANACONDA_TOKEN: ${{ inputs.ANACONDA_TOKEN }}
+        DRY_RUN: ${{ inputs.DRY_RUN }}
+      run: ${GITHUB_ACTION_PATH}/semantic-release.sh
