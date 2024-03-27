@@ -3,7 +3,7 @@ set -euo pipefail
 
 OUTPUT_DIR="${OUTPUT_DIR:-"/tmp/output"}"
 
-./ci/update-versions.sh "${BUILD_VERSION:-}"
+./ci/update-versions.sh "${RELEASE_VERSION:-}"
 
 pip install build pytest
 

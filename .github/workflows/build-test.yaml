@@ -1,7 +1,7 @@
 on:
   workflow_call:
     inputs:
-      build_version:
+      release_version:
         type: string
 
 env:
@@ -18,7 +18,7 @@ jobs:
           persist-credentials: false
       - run: ./ci/build-test/conda.sh
         env:
-          BUILD_VERSION: ${{ inputs.version }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
       - uses: actions/upload-artifact@v4
         with:
           name: conda_artifacts
@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false
       - run: ./ci/build-test/wheel.sh
         env:
-          BUILD_VERSION: ${{ inputs.version }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
       - uses: actions/upload-artifact@v4
         with:
           name: wheel_artifacts

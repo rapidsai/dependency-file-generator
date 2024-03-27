@@ -25,7 +25,7 @@ jobs:
     needs: [check-release]
     uses: ./.github/workflows/build-test.yaml
     with:
-      build_version: ${{ steps.check-release.outputs.release_version }}
+      release_version: ${{ steps.check-release.outputs.release_version }}
   release:
     needs: [check-release, build-test]
     runs-on: ubuntu-latest
