@@ -74,7 +74,7 @@ def validate_args(argv):
         default=[],
         dest="prepend_channels",
         help=(
-            "A string representing a conda channel(s) to prepend to the list of "
+            "A string representing a conda channel to prepend to the list of "
             "channels. This option is only valid with --output "
             f"{OutputTypes.CONDA} or no --output"
         ),
