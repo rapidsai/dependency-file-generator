@@ -29,7 +29,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
       - run: ./ci/build-test/wheel.sh
         env:
           BUILD_VERSION: ${{ inputs.version }}
