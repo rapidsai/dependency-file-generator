@@ -79,6 +79,17 @@ def validate_args(argv):
             f"{OutputTypes.CONDA} or no --output"
         ),
     )
+    parser.add_argument(
+        "--prepend-channels",
+        dest="prepend_channels_deprecated",
+        help=(
+            "A string representing a list of conda channels to prepend to the list of "
+            "channels. Channels should be separated by a semicolon, such as "
+            '`--prepend-channels "my_channel;my_other_channel"`. This option is '
+            f"only valid with --output {OutputTypes.CONDA} or no --output."
+            "DEPRECATED: Use --prepend-channel instead."
+        ),
+    )
 
     args = parser.parse_args(argv)
 
@@ -97,6 +108,11 @@ def validate_args(argv):
             + "".join([f"\n  {x}" for x in ["--file-key", "--output", "--matrix"]])
         )
 
+    if args.prepend_channels_deprecated:
+        warnings.warn(
+            "The use of --prepend-channels is deprecated. Use --prepend-channel instead."
+        )
+        args.prepend_channels.extend(args.prepend_channels_deprecated.split(";"))
     if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
         raise ValueError(
             f"--prepend-channel is only valid with --output {OutputTypes.CONDA}"

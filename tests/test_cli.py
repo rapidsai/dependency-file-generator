@@ -154,3 +154,30 @@ def test_validate_args():
             ).file_key
             == "all"
         )
+
+    # Valid but deprecated
+    with pytest.warns(
+        Warning,
+        match=r"^The use of --prepend-channels is deprecated\. Use --prepend-channel instead\.$",
+    ):
+        assert validate_args(
+            [
+                "--output",
+                "conda",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file-key",
+                "all",
+                "--prepend-channels",
+                "deprecated_channel_1;deprecated_channel_2",
+                "--prepend-channel",
+                "my_channel",
+                "--prepend-channel",
+                "my_other_channel",
+            ]
+        ).prepend_channels == [
+            "my_channel",
+            "my_other_channel",
+            "deprecated_channel_1",
+            "deprecated_channel_2",
+        ]
