@@ -25,10 +25,4 @@ runs:
         PYPI_TOKEN: ${{ inputs.PYPI_TOKEN }}
         ANACONDA_TOKEN: ${{ inputs.ANACONDA_TOKEN }}
         DRY_RUN: ${{ inputs.DRY_RUN }}
-      run: |
-        DRY_RUN_FLAG=""
-        if [[ "${DRY_RUN}" == "true" ]]; then
-          DRY_RUN_FLAG="--dry-run"
-        fi
-        npm install
-        npx semantic-release "${DRY_RUN_FLAG}"
+      run: ${GITHUB_ACTION_PATH}/semantic-release.sh
