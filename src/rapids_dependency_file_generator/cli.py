@@ -1,5 +1,6 @@
 import argparse
 import os
+import warnings
 
 import yaml
 
@@ -41,6 +42,11 @@ def validate_args(argv):
         help="The file key from `dependencies.yaml` to generate",
     )
     codependent_args.add_argument(
+        "--file_key",
+        dest="file_key_deprecated",
+        help="Deprecated alias for --file-key",
+    )
+    codependent_args.add_argument(
         "-o",
         "--output",
         help="The output file type to generate",
@@ -75,6 +81,14 @@ def validate_args(argv):
     )
 
     args = parser.parse_args(argv)
+
+    if args.file_key_deprecated:
+        warnings.warn(
+            "The use of --file_key is deprecated. Use -f or --file-key instead."
+        )
+    if not args.file_key:
+        args.file_key = args.file_key_deprecated
+
     dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = [getattr(args, key) is None for key in dependent_arg_keys]
     if any(dependent_arg_values) and not all(dependent_arg_values):

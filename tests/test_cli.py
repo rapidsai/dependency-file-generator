@@ -106,3 +106,51 @@ def test_validate_args():
             "my_other_channel",
         ]
     )
+
+    # Valid but deprecated
+    with pytest.warns(
+        Warning,
+        match=r"^The use of --file_key is deprecated\. Use -f or --file-key instead\.$",
+    ):
+        assert (
+            validate_args(
+                [
+                    "--output",
+                    "conda",
+                    "--matrix",
+                    "cuda=11.5;arch=x86_64",
+                    "--file_key",
+                    "all",
+                    "--prepend-channel",
+                    "my_channel",
+                    "--prepend-channel",
+                    "my_other_channel",
+                ]
+            ).file_key
+            == "all"
+        )
+
+    # --file-key overrides --file_key
+    with pytest.warns(
+        Warning,
+        match=r"^The use of --file_key is deprecated\. Use -f or --file-key instead\.$",
+    ):
+        assert (
+            validate_args(
+                [
+                    "--output",
+                    "conda",
+                    "--matrix",
+                    "cuda=11.5;arch=x86_64",
+                    "--file-key",
+                    "all",
+                    "--file_key",
+                    "deprecated",
+                    "--prepend-channel",
+                    "my_channel",
+                    "--prepend-channel",
+                    "my_other_channel",
+                ]
+            ).file_key
+            == "all"
+        )
