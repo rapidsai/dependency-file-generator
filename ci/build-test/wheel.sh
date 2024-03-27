@@ -1,15 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 
+OUTPUT_DIR="${OUTPUT_DIR:-"/tmp/output"}"
+
 ./ci/update-versions.sh "${BUILD_VERSION:-}"
 
 pip install build pytest
 
 python -m build \
-  --outdir "${OUTPUT_DIR:-"/tmp/output"}" \
+  --outdir "${OUTPUT_DIR}" \
   .
 
-for PKG in dist/*; do
+for PKG in "${OUTPUT_DIR}/"*; do
   echo "$PKG"
   pip uninstall -y rapids-dependency-file-generator
   pip install "$PKG"
