@@ -3,7 +3,7 @@
 # Per https://github.com/semantic-release/exec:
 #  - stderr is used for logging
 #  - stdout is used for returning release information
-set -ue
+set -euo pipefail
 
 {
   pip install twine
@@ -12,7 +12,7 @@ set -ue
     --username __token__ \
     --password "${PYPI_TOKEN}" \
     --disable-progress-bar \
-    dist/*
+    "${WHEEL_OUTPUT_DIR}/"*
 } 1>&2
 
 jq -ncr '{name: "PyPI release", url: "https://pypi.org/project/rapids-dependency-file-generator/"}'
