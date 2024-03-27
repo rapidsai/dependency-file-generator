@@ -86,7 +86,7 @@ def validate_args(argv):
             "A string representing a list of conda channels to prepend to the list of "
             "channels. Channels should be separated by a semicolon, such as "
             '`--prepend-channels "my_channel;my_other_channel"`. This option is '
-            f"only valid with --output {OutputTypes.CONDA} or no --output."
+            f"only valid with --output {OutputTypes.CONDA} or no --output. "
             "DEPRECATED: Use --prepend-channel instead."
         ),
     )
