@@ -5,7 +5,9 @@ set -euo pipefail
 
 pip install build pytest
 
-python -m build .
+python -m build \
+  --outdir "${OUTPUT_DIR:-"/tmp/output"}" \
+  .
 
 for PKG in dist/*; do
   echo "$PKG"

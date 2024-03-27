@@ -4,6 +4,9 @@ on:
       build_version:
         type: string
 
+env:
+  OUTPUT_DIR: /tmp/output
+
 jobs:
   conda:
     runs-on: ubuntu-latest
