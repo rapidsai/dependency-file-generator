@@ -15,4 +15,7 @@ plugins:
     - publishCmd: ./ci/publish/conda.sh
   - - "@semantic-release/git"
     - assets:
-        - ./**/*
+        - src/rapids_dependency_file_generator/_version.py
+        - src/rapids_dependency_file_generator/schema.json
+        - package.json
+        - recipe/meta.yaml
