@@ -28,8 +28,6 @@ test:
     - pytest
   commands:
     - pytest
-    - pwd
-    - ls -l
     - rapids-dependency-file-generator -h
 
 about:
