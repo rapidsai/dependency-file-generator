@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+concurrency:
+  # Limit concurrency to avoid race conditions, but don't cancel in progress
+  # release since that could cause issues
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   check-release:
     runs-on: ubuntu-latest
