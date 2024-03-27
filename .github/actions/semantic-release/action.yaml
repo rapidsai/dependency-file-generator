@@ -2,8 +2,8 @@ name: Run Semantic Release
 inputs:
   GITHUB_TOKEN:
     required: true
-  PYPI_TOKEN:
-  ANACONDA_TOKEN:
+  PYPI_TOKEN: {}
+  ANACONDA_TOKEN: {}
   DRY_RUN:
     default: "false"
 outputs:
