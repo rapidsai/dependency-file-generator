@@ -75,7 +75,12 @@ def test_examples(example_dir):
 
     # Prepend channels for the prepend_channels tests
     if example_dir.name in ("prepend-channels"):
-        cli_args = ["--prepend-channels", "my_channel;my_other_channel"] + cli_args
+        cli_args = [
+            "--prepend-channel",
+            "my_channel",
+            "--prepend-channel",
+            "my_other_channel",
+        ] + cli_args
 
     main(cli_args)
 

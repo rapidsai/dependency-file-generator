@@ -1,5 +1,6 @@
 import argparse
 import os
+import warnings
 
 import yaml
 
@@ -17,6 +18,7 @@ def validate_args(argv):
         description=f"Generates dependency files for RAPIDS libraries (version: {version})"
     )
     parser.add_argument(
+        "-c",
         "--config",
         default=default_dependency_file_path,
         help="Path to YAML config file",
@@ -35,10 +37,17 @@ def validate_args(argv):
 
     codependent_args = parser.add_argument_group("optional, but codependent")
     codependent_args.add_argument(
-        "--file_key",
+        "-f",
+        "--file-key",
         help="The file key from `dependencies.yaml` to generate",
     )
     codependent_args.add_argument(
+        "--file_key",
+        dest="file_key_deprecated",
+        help="Deprecated alias for --file-key",
+    )
+    codependent_args.add_argument(
+        "-o",
         "--output",
         help="The output file type to generate",
         choices=[
@@ -51,6 +60,7 @@ def validate_args(argv):
         ],
     )
     codependent_args.add_argument(
+        "-m",
         "--matrix",
         help=(
             "String representing which matrix combination should be generated, "
@@ -59,27 +69,53 @@ def validate_args(argv):
     )
 
     parser.add_argument(
+        "--prepend-channel",
+        action="append",
+        default=[],
+        dest="prepend_channels",
+        help=(
+            "A string representing a conda channel to prepend to the list of "
+            "channels. This option is only valid with --output "
+            f"{OutputTypes.CONDA} or no --output. May be specified multiple times."
+        ),
+    )
+    parser.add_argument(
         "--prepend-channels",
+        dest="prepend_channels_deprecated",
         help=(
             "A string representing a list of conda channels to prepend to the list of "
             "channels. Channels should be separated by a semicolon, such as "
             '`--prepend-channels "my_channel;my_other_channel"`. This option is '
-            f"only valid with --output {OutputTypes.CONDA} or no --output"
+            f"only valid with --output {OutputTypes.CONDA} or no --output. "
+            "DEPRECATED: Use --prepend-channel instead."
         ),
     )
 
     args = parser.parse_args(argv)
+
+    if args.file_key_deprecated:
+        warnings.warn(
+            "The use of --file_key is deprecated. Use -f or --file-key instead."
+        )
+    if not args.file_key:
+        args.file_key = args.file_key_deprecated
+
     dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = [getattr(args, key) is None for key in dependent_arg_keys]
     if any(dependent_arg_values) and not all(dependent_arg_values):
         raise ValueError(
             "The following arguments must be used together:"
-            + "".join([f"\n  --{x}" for x in dependent_arg_keys])
+            + "".join([f"\n  {x}" for x in ["--file-key", "--output", "--matrix"]])
         )
 
+    if args.prepend_channels_deprecated:
+        warnings.warn(
+            "The use of --prepend-channels is deprecated. Use --prepend-channel instead."
+        )
+        args.prepend_channels.extend(args.prepend_channels_deprecated.split(";"))
     if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
         raise ValueError(
-            f"--prepend-channels is only valid with --output {OutputTypes.CONDA}"
+            f"--prepend-channel is only valid with --output {OutputTypes.CONDA}"
         )
 
     # If --clean was passed without arguments, default to cleaning from the root of the
@@ -121,8 +157,7 @@ def main(argv=None):
         }
 
     if args.prepend_channels:
-        prepend_channels = args.prepend_channels.split(";")
-        parsed_config["channels"] = prepend_channels + parsed_config.get(
+        parsed_config["channels"] = args.prepend_channels + parsed_config.get(
             "channels", default_channels
         )
 
