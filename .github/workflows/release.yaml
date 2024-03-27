@@ -56,7 +56,6 @@ jobs:
           name: wheel_artifacts
           path: ${{ env.WHEEL_OUTPUT_DIR }}
       - uses: ./.github/actions/semantic-release
-        id: check-release
         with:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
