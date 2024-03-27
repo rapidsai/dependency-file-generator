@@ -8,6 +8,8 @@ plugins:
   - - "@semantic-release/exec"
     - verifyReleaseCmd: ./ci/output-release-version.sh ${nextRelease.version}
   - - "@semantic-release/exec"
+    - prepareCmd: ./ci/update-versions.sh ${nextRelease.version}
+  - - "@semantic-release/exec"
     - publishCmd: ./ci/publish/wheel.sh
   - - "@semantic-release/exec"
     - publishCmd: ./ci/publish/conda.sh
