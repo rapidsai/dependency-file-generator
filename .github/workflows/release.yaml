@@ -16,7 +16,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ./.github/actions/setup-python
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

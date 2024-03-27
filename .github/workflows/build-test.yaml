@@ -1,0 +1,22 @@
+on:
+  workflow_call:
+
+jobs:
+  conda:
+    runs-on: ubuntu-latest
+    container: condaforge/miniforge3:latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: ./ci/build-test/conda.sh
+  wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: ./ci/build-test/wheel.sh
