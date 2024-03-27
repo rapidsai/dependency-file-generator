@@ -6,7 +6,7 @@ RELEASE_VERSION="${1:-}"
 
 # no `RELEASE_VERSION` is computed for PRs
 if [[ -z "${RELEASE_VERSION}" ]]; then
-  echo "No build version provided."
+  echo "No release version provided."
   echo "Skipping version replacement."
   exit 0
 fi
