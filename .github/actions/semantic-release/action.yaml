@@ -1,4 +1,4 @@
-name: "Run Semantic Release"
+name: Run Semantic Release
 inputs:
   GITHUB_TOKEN:
     required: true
@@ -11,12 +11,12 @@ outputs:
     value: ${{ steps.semantic-release.outputs.release_version }}
 
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: "lts/*"
+        node-version: lts/*
     - name: Run Semantic Release
       id: semantic-release
       shell: bash
