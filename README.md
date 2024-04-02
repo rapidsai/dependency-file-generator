@@ -333,7 +333,7 @@ The `--file-key` argument is passed the `test` key name from the `files` configu
 
 The `--file-key`, `--output`, and `--matrix` flags must be used together. `--matrix` may be an empty string if the file that should be generated does not depend on any specific matrix variations.
 
-The `--prepend-channel` argument accepts additional channels to use, like `rapids-dependency-file-generator --prepend-channel "my_channel" --prepend-channel "my_other_channel"`.
+The `--prepend-channel` argument accepts additional channels to use, like `rapids-dependency-file-generator --prepend-channel my_channel --prepend-channel my_other_channel`.
 If both `--output` and `--prepend-channel` are provided, the output format must be conda.
 Prepending channels can be useful for adding local channels with packages to be tested in CI workflows.
 
