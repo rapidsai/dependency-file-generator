@@ -15,13 +15,13 @@ from .rapids_dependency_file_validator import validate_dependencies
 
 def validate_args(argv):
     parser = argparse.ArgumentParser(
-        description=f"Generates dependency files for RAPIDS libraries (version: {version})"
+        description=f"Generates dependency files for RAPIDS libraries (version: {version})."
     )
     parser.add_argument(
         "-c",
         "--config",
         default=default_dependency_file_path,
-        help="Path to YAML config file",
+        help="Path to YAML config file.",
     )
     parser.add_argument(
         "--clean",
@@ -37,19 +37,17 @@ def validate_args(argv):
 
     codependent_args = parser.add_argument_group("optional, but codependent")
     codependent_args.add_argument(
-        "-f",
         "--file-key",
-        help="The file key from `dependencies.yaml` to generate",
+        help="The file key from `dependencies.yaml` to generate.",
     )
     codependent_args.add_argument(
         "--file_key",
         dest="file_key_deprecated",
-        help="Deprecated alias for --file-key",
+        help="The file key from `dependencies.yaml` to generate. DEPRECATED: Use --file-key instead.",
     )
     codependent_args.add_argument(
-        "-o",
         "--output",
-        help="The output file type to generate",
+        help="The output file type to generate.",
         choices=[
             str(x)
             for x in [
@@ -60,11 +58,10 @@ def validate_args(argv):
         ],
     )
     codependent_args.add_argument(
-        "-m",
         "--matrix",
         help=(
             "String representing which matrix combination should be generated, "
-            'such as `--matrix "cuda=11.5;arch=x86_64"`. May also be an empty string'
+            'such as `--matrix "cuda=11.5;arch=x86_64"`. May also be an empty string.'
         ),
     )
 
@@ -94,6 +91,10 @@ def validate_args(argv):
     args = parser.parse_args(argv)
 
     if args.file_key_deprecated:
+        if args.file_key:
+            raise ValueError(
+                "The --file_key (deprecated) and --file-key arguments cannot be specified together."
+            )
         warnings.warn(
             "The use of --file_key is deprecated. Use -f or --file-key instead."
         )
@@ -109,10 +110,14 @@ def validate_args(argv):
         )
 
     if args.prepend_channels_deprecated:
+        if args.prepend_channels:
+            raise ValueError(
+                "The --prepend-channels (deprecated) and --prepend-channel arguments cannot be specified together."
+            )
         warnings.warn(
             "The use of --prepend-channels is deprecated. Use --prepend-channel instead."
         )
-        args.prepend_channels.extend(args.prepend_channels_deprecated.split(";"))
+        args.prepend_channels = args.prepend_channels_deprecated.split(";")
     if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
         raise ValueError(
             f"--prepend-channel is only valid with --output {OutputTypes.CONDA}"

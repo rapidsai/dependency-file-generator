@@ -72,11 +72,11 @@ def test_validate_args():
         [
             "-c",
             "dependencies2.yaml",
-            "-o",
+            "--output",
             "pyproject",
-            "-m",
+            "--matrix",
             "cuda=11.5;arch=x86_64",
-            "-f",
+            "--file-key",
             "all",
         ]
     )
@@ -130,29 +130,26 @@ def test_validate_args():
             == "all"
         )
 
-    # --file-key overrides --file_key
-    with pytest.warns(
-        Warning,
-        match=r"^The use of --file_key is deprecated\. Use -f or --file-key instead\.$",
+    # Invalid
+    with pytest.raises(
+        ValueError,
+        match=r"^The --file_key \(deprecated\) and --file-key arguments cannot be specified together\.$",
     ):
-        assert (
-            validate_args(
-                [
-                    "--output",
-                    "conda",
-                    "--matrix",
-                    "cuda=11.5;arch=x86_64",
-                    "--file-key",
-                    "all",
-                    "--file_key",
-                    "deprecated",
-                    "--prepend-channel",
-                    "my_channel",
-                    "--prepend-channel",
-                    "my_other_channel",
-                ]
-            ).file_key
-            == "all"
+        validate_args(
+            [
+                "--output",
+                "conda",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file-key",
+                "all",
+                "--file_key",
+                "deprecated",
+                "--prepend-channel",
+                "my_channel",
+                "--prepend-channel",
+                "my_other_channel",
+            ]
         )
 
     # Valid but deprecated
@@ -169,15 +166,29 @@ def test_validate_args():
                 "--file-key",
                 "all",
                 "--prepend-channels",
-                "deprecated_channel_1;deprecated_channel_2",
-                "--prepend-channel",
-                "my_channel",
-                "--prepend-channel",
-                "my_other_channel",
+                "my_channel;my_other_channel",
             ]
         ).prepend_channels == [
             "my_channel",
             "my_other_channel",
-            "deprecated_channel_1",
-            "deprecated_channel_2",
         ]
+
+    # Invalid
+    with pytest.raises(
+        ValueError,
+        match=r"^The --prepend-channels \(deprecated\) and --prepend-channel arguments cannot be specified together\.$",
+    ):
+        validate_args(
+            [
+                "--output",
+                "conda",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file-key",
+                "all",
+                "--prepend-channels",
+                "my_channel;my_other_channel",
+                "--prepend-channel",
+                "other_channel_2",
+            ]
+        )
