@@ -14,11 +14,11 @@ def test_generate_matrix():
 def test_validate_args():
     # Missing output
     with pytest.raises(Exception):
-        validate_args(["--matrix", "cuda=11.5;arch=x86_64", "--file_key", "all"])
+        validate_args(["--matrix", "cuda=11.5;arch=x86_64", "--file-key", "all"])
 
     # Missing matrix
     with pytest.raises(Exception):
-        validate_args(["--output", "conda", "--file_key", "all"])
+        validate_args(["--output", "conda", "--file-key", "all"])
 
     # Missing file_key
     with pytest.raises(Exception):
@@ -32,10 +32,12 @@ def test_validate_args():
                 "requirements",
                 "--matrix",
                 "cuda=11.5;arch=x86_64",
-                "--file_key",
+                "--file-key",
                 "all",
-                "--prepend-channels",
-                "my_channel;my_other_channel",
+                "--prepend-channel",
+                "my_channel",
+                "--prepend-channel",
+                "my_other_channel",
             ]
         )
 
@@ -46,7 +48,7 @@ def test_validate_args():
             "conda",
             "--matrix",
             "cuda=11.5;arch=x86_64",
-            "--file_key",
+            "--file-key",
             "all",
         ]
     )
@@ -54,11 +56,27 @@ def test_validate_args():
     # Valid
     validate_args(
         [
+            "--config",
+            "dependencies2.yaml",
             "--output",
             "pyproject",
             "--matrix",
             "cuda=11.5;arch=x86_64",
-            "--file_key",
+            "--file-key",
+            "all",
+        ]
+    )
+
+    # Valid
+    validate_args(
+        [
+            "-c",
+            "dependencies2.yaml",
+            "--output",
+            "pyproject",
+            "--matrix",
+            "cuda=11.5;arch=x86_64",
+            "--file-key",
             "all",
         ]
     )
@@ -66,8 +84,10 @@ def test_validate_args():
     # Valid, with prepended channels
     validate_args(
         [
-            "--prepend-channels",
-            "my_channel;my_other_channel",
+            "--prepend-channel",
+            "my_channel",
+            "--prepend-channel",
+            "my_other_channel",
         ]
     )
 
@@ -78,9 +98,97 @@ def test_validate_args():
             "conda",
             "--matrix",
             "cuda=11.5;arch=x86_64",
-            "--file_key",
+            "--file-key",
             "all",
-            "--prepend-channels",
-            "my_channel;my_other_channel",
+            "--prepend-channel",
+            "my_channel",
+            "--prepend-channel",
+            "my_other_channel",
         ]
     )
+
+    # Valid but deprecated
+    with pytest.warns(
+        Warning,
+        match=r"^The use of --file_key is deprecated\. Use -f or --file-key instead\.$",
+    ):
+        assert (
+            validate_args(
+                [
+                    "--output",
+                    "conda",
+                    "--matrix",
+                    "cuda=11.5;arch=x86_64",
+                    "--file_key",
+                    "all",
+                    "--prepend-channel",
+                    "my_channel",
+                    "--prepend-channel",
+                    "my_other_channel",
+                ]
+            ).file_key
+            == "all"
+        )
+
+    # Invalid
+    with pytest.raises(
+        ValueError,
+        match=r"^The --file_key \(deprecated\) and --file-key arguments cannot be specified together\.$",
+    ):
+        validate_args(
+            [
+                "--output",
+                "conda",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file-key",
+                "all",
+                "--file_key",
+                "deprecated",
+                "--prepend-channel",
+                "my_channel",
+                "--prepend-channel",
+                "my_other_channel",
+            ]
+        )
+
+    # Valid but deprecated
+    with pytest.warns(
+        Warning,
+        match=r"^The use of --prepend-channels is deprecated\. Use --prepend-channel instead\.$",
+    ):
+        assert validate_args(
+            [
+                "--output",
+                "conda",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file-key",
+                "all",
+                "--prepend-channels",
+                "my_channel;my_other_channel",
+            ]
+        ).prepend_channels == [
+            "my_channel",
+            "my_other_channel",
+        ]
+
+    # Invalid
+    with pytest.raises(
+        ValueError,
+        match=r"^The --prepend-channels \(deprecated\) and --prepend-channel arguments cannot be specified together\.$",
+    ):
+        validate_args(
+            [
+                "--output",
+                "conda",
+                "--matrix",
+                "cuda=11.5;arch=x86_64",
+                "--file-key",
+                "all",
+                "--prepend-channels",
+                "my_channel;my_other_channel",
+                "--prepend-channel",
+                "other_channel_2",
+            ]
+        )
