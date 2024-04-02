@@ -98,7 +98,6 @@ def validate_args(argv):
         warnings.warn(
             "The use of --file_key is deprecated. Use -f or --file-key instead."
         )
-    if not args.file_key:
         args.file_key = args.file_key_deprecated
 
     dependent_arg_keys = ["file_key", "output", "matrix"]
