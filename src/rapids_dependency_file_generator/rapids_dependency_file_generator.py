@@ -47,7 +47,7 @@ def dedupe(
     dependencies : list[str | PipRequirements]
         A sequence containing dependencies (possibly including duplicates).
 
-    Yields
+    Returns
     ------
     list[str | dict[str, str]]
         The `dependencies` with all duplicates removed.
@@ -79,7 +79,7 @@ def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str]]:
 
     Yields
     ------
-    Generator[dict[str, str]]
+    dict[str, str]
         Each yielded value is a dictionary containing one of the unique
         combinations of parameter values from `gridspec`.
     """
