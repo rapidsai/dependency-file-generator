@@ -3,6 +3,7 @@ import itertools
 import os
 import textwrap
 from collections import defaultdict
+from collections.abc import Generator
 
 import tomlkit
 import yaml
@@ -43,12 +44,12 @@ def dedupe(
 
     Parameters
     ----------
-    dependencies : Sequence
+    dependencies : list[str | PipRequirements]
         A sequence containing dependencies (possibly including duplicates).
 
     Yields
     ------
-    list
+    list[str | dict[str, str]]
         The `dependencies` with all duplicates removed.
     """
     deduped = sorted({dep for dep in dependencies if isinstance(dep, str)})
@@ -62,7 +63,7 @@ def dedupe(
     return deduped
 
 
-def grid(gridspec):
+def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str]]:
     """Yields the Cartesian product of a `dict` of iterables.
 
     The input ``gridspec`` is a dictionary whose keys correspond to
@@ -73,12 +74,12 @@ def grid(gridspec):
 
     Parameters
     ----------
-    gridspec : dict
+    gridspec : dict[str, list[str]]
         A mapping from parameter names to lists of parameter values.
 
     Yields
     ------
-    Iterable[dict]
+    Generator[dict[str, str]]
         Each yielded value is a dictionary containing one of the unique
         combinations of parameter values from `gridspec`.
     """
@@ -93,7 +94,7 @@ def make_dependency_file(
     config_file: os.PathLike,
     output_dir: os.PathLike,
     conda_channels: list[str],
-    dependencies: list[str | config.PipRequirements],
+    dependencies: list[str | dict[str, list[str]]],
     extras: config.FileExtras,
 ):
     """Generate the contents of the dependency file.
@@ -102,18 +103,18 @@ def make_dependency_file(
     ----------
     file_type : Output
         An Output value used to determine the file type.
-    name : str
+    name : PathLike
         The name of the file to write.
-    config_file : str
+    config_file : PathLike
         The full path to the dependencies.yaml file.
-    output_dir : str
+    output_dir : PathLike
         The path to the directory where the dependency files will be written.
-    conda_channels : str
+    conda_channels : list[str]
         The channels to include in the file. Only used when `file_type` is
         CONDA.
-    dependencies : list
+    dependencies : list[str | dict[str, list[str]]]
         The dependencies to include in the file.
-    extras : dict
+    extras : FileExtras
         Any extra information provided for generating this dependency file.
 
     Returns
@@ -297,10 +298,10 @@ def should_use_specific_entry(
 
     Parameters
     ----------
-    matrix_combo : dict
+    matrix_combo : dict[str, str]
         A mapping from matrix keys to values for the current file being
         generated.
-    specific_entry_matrix : dict
+    specific_entry_matrix : dict[str, str]
         A mapping from matrix keys to values for the current specific
         dependency set being checked.
 
@@ -342,6 +343,8 @@ def make_dependency_files(
     matrix : dict[str, str] | None
         The matrix to use, or None if the default matrix from each file key
         should be used.
+    prepend_channels: list[str]
+        List of channels to prepend to the ones from parsed_config.
     to_stdout : bool
         Whether the output should be written to stdout. If False, it will be
         written to a file computed based on the output file type and
