@@ -8,7 +8,7 @@ def test_generate_matrix():
     assert matrix == {"cuda": ["11.5"], "arch": ["x86_64"]}
 
     matrix = generate_matrix(None)
-    assert matrix == {}
+    assert matrix is None
 
 
 def test_validate_args():

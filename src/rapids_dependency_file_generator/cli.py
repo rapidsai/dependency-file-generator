@@ -2,15 +2,13 @@ import argparse
 import os
 import warnings
 
-import yaml
-
 from ._version import __version__ as version
-from .constants import OutputTypes, default_channels, default_dependency_file_path
+from .config import Output, load_config_from_file
+from .constants import default_dependency_file_path
 from .rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
 )
-from .rapids_dependency_file_validator import validate_dependencies
 
 
 def validate_args(argv):
@@ -49,11 +47,11 @@ def validate_args(argv):
         "--output",
         help="The output file type to generate.",
         choices=[
-            str(x)
+            x.value
             for x in [
-                OutputTypes.CONDA,
-                OutputTypes.PYPROJECT,
-                OutputTypes.REQUIREMENTS,
+                Output.CONDA,
+                Output.PYPROJECT,
+                Output.REQUIREMENTS,
             ]
         ],
     )
@@ -73,7 +71,7 @@ def validate_args(argv):
         help=(
             "A string representing a conda channel to prepend to the list of "
             "channels. This option is only valid with --output "
-            f"{OutputTypes.CONDA} or no --output. May be specified multiple times."
+            f"{Output.CONDA.value} or no --output. May be specified multiple times."
         ),
     )
     parser.add_argument(
@@ -83,7 +81,7 @@ def validate_args(argv):
             "A string representing a list of conda channels to prepend to the list of "
             "channels. Channels should be separated by a semicolon, such as "
             '`--prepend-channels "my_channel;my_other_channel"`. This option is '
-            f"only valid with --output {OutputTypes.CONDA} or no --output. "
+            f"only valid with --output {Output.CONDA.value} or no --output. "
             "DEPRECATED: Use --prepend-channel instead."
         ),
     )
@@ -117,9 +115,9 @@ def validate_args(argv):
             "The use of --prepend-channels is deprecated. Use --prepend-channel instead."
         )
         args.prepend_channels = args.prepend_channels_deprecated.split(";")
-    if args.prepend_channels and args.output and args.output != str(OutputTypes.CONDA):
+    if args.prepend_channels and args.output and args.output != Output.CONDA.value:
         raise ValueError(
-            f"--prepend-channel is only valid with --output {OutputTypes.CONDA}"
+            f"--prepend-channel is only valid with --output {Output.CONDA.value}"
         )
 
     # If --clean was passed without arguments, default to cleaning from the root of the
@@ -132,7 +130,7 @@ def validate_args(argv):
 
 def generate_matrix(matrix_arg):
     if not matrix_arg:
-        return {}
+        return None
     matrix = {}
     for matrix_column in matrix_arg.split(";"):
         key, val = matrix_column.split("=")
@@ -143,29 +141,21 @@ def generate_matrix(matrix_arg):
 def main(argv=None):
     args = validate_args(argv)
 
-    with open(args.config) as f:
-        parsed_config = yaml.load(f, Loader=yaml.FullLoader)
-
-    validate_dependencies(parsed_config)
+    parsed_config = load_config_from_file(args.config)
 
     matrix = generate_matrix(args.matrix)
     to_stdout = all([args.file_key, args.output, args.matrix is not None])
 
     if to_stdout:
-        parsed_config["files"] = {
-            args.file_key: {
-                **parsed_config["files"][args.file_key],
-                "matrix": matrix,
-                "output": args.output,
-            }
-        }
-
-    if args.prepend_channels:
-        parsed_config["channels"] = args.prepend_channels + parsed_config.get(
-            "channels", default_channels
-        )
+        file_keys = [args.file_key]
+        output = {Output(args.output)}
+    else:
+        file_keys = list(parsed_config.files.keys())
+        output = {Output.PYPROJECT, Output.CONDA, Output.REQUIREMENTS}
 
     if args.clean:
         delete_existing_files(args.clean)
 
-    make_dependency_files(parsed_config, args.config, to_stdout)
+    make_dependency_files(
+        parsed_config, file_keys, output, matrix, args.prepend_channels, to_stdout
+    )

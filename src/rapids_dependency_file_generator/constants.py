@@ -1,16 +1,3 @@
-from enum import Enum
-
-
-class OutputTypes(Enum):
-    CONDA = "conda"
-    REQUIREMENTS = "requirements"
-    PYPROJECT = "pyproject"
-    NONE = "none"
-
-    def __str__(self):
-        return self.value
-
-
 cli_name = "rapids-dependency-file-generator"
 
 default_channels = [
