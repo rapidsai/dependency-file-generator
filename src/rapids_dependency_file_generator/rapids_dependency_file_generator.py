@@ -322,7 +322,7 @@ def make_dependency_files(
     parsed_config: config.Config,
     file_keys: list[str],
     output: set[config.Output],
-    matrix: dict[str, str] | None,
+    matrix: dict[str, list[str]] | None,
     prepend_channels: list[str],
     to_stdout: bool,
 ):
