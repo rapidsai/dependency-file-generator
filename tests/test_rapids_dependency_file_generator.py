@@ -1,12 +1,11 @@
 from unittest import mock
 
-import pytest
 import yaml
 
-from rapids_dependency_file_generator.constants import OutputTypes, cli_name
+from rapids_dependency_file_generator import config
+from rapids_dependency_file_generator.constants import cli_name
 from rapids_dependency_file_generator.rapids_dependency_file_generator import (
     dedupe,
-    get_requested_output_types,
     make_dependency_file,
     should_use_specific_entry,
 )
@@ -22,8 +21,8 @@ def test_dedupe():
         [
             "dep1",
             "dep1",
-            {"pip": ["pip_dep1", "pip_dep2"]},
-            {"pip": ["pip_dep1", "pip_dep2"]},
+            config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
+            config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
         ]
     )
     assert deduped == ["dep1", {"pip": ["pip_dep1", "pip_dep2"]}]
@@ -40,7 +39,7 @@ def test_make_dependency_file(mock_relpath):
 # To make changes, edit {relpath} and run `{cli_name}`.
 """
     env = make_dependency_file(
-        file_type="conda",
+        file_type=config.Output.CONDA,
         name="tmp_env.yaml",
         config_file="config_file",
         output_dir="output_path",
@@ -57,7 +56,7 @@ def test_make_dependency_file(mock_relpath):
     )
 
     env = make_dependency_file(
-        file_type="requirements",
+        file_type=config.Output.REQUIREMENTS,
         name="tmp_env.txt",
         config_file="config_file",
         output_dir="output_path",
@@ -86,37 +85,3 @@ def test_should_use_specific_entry():
     specific_entry = {"cuda": "11.5", "arch": "x86_64"}
     result = should_use_specific_entry(matrix_combo, specific_entry)
     assert result is True
-
-
-def test_get_requested_output_types():
-    result = get_requested_output_types(str(OutputTypes.NONE))
-    assert result == []
-
-    result = get_requested_output_types([str(OutputTypes.NONE)])
-    assert result == []
-
-    result = get_requested_output_types(str(OutputTypes.CONDA))
-    assert result == [str(OutputTypes.CONDA)]
-
-    result = get_requested_output_types([str(OutputTypes.CONDA)])
-    assert result == [str(OutputTypes.CONDA)]
-
-    result = get_requested_output_types(str(OutputTypes.REQUIREMENTS))
-    assert result == [str(OutputTypes.REQUIREMENTS)]
-
-    result = get_requested_output_types([str(OutputTypes.REQUIREMENTS)])
-    assert result == [str(OutputTypes.REQUIREMENTS)]
-
-    result = get_requested_output_types(
-        [str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)]
-    )
-    assert result == [str(OutputTypes.REQUIREMENTS), str(OutputTypes.CONDA)]
-
-    with pytest.raises(ValueError):
-        get_requested_output_types("invalid_value")
-
-    with pytest.raises(ValueError):
-        get_requested_output_types(["invalid_value"])
-
-    with pytest.raises(ValueError):
-        get_requested_output_types([str(OutputTypes.NONE), str(OutputTypes.CONDA)])
