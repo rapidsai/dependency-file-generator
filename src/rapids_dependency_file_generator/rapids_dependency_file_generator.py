@@ -340,7 +340,7 @@ def make_dependency_files(
         The list of file keys to use.
     output : set[Output]
         The set of file types to write.
-    matrix : dict[str, str] | None
+    matrix : dict[str, list[str]] | None
         The matrix to use, or None if the default matrix from each file key
         should be used.
     prepend_channels: list[str]
