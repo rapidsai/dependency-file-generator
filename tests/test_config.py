@@ -336,7 +336,7 @@ def test_parse_config(input, path, output):
 
 
 @pytest.mark.parametrize(
-    ["input", "path", "output"],
+    ["input", "output"],
     [
         (
             textwrap.dedent(
@@ -361,7 +361,6 @@ def test_parse_config(input, path, output):
                             packages:
                 """
             ),
-            "dependencies.yaml",
             config.Config(
                 path=Path("dependencies.yaml"),
                 files={
@@ -404,7 +403,7 @@ def test_parse_config(input, path, output):
         ),
     ],
 )
-def test_load_config(input, path, output):
+def test_load_config_from_file(input, output):
     with tempfile.NamedTemporaryFile("w") as f:
         f.write(input)
         f.flush()
