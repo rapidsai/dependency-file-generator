@@ -1,4 +1,5 @@
 import tempfile
+import textwrap
 from pathlib import Path
 
 import pytest
@@ -338,26 +339,28 @@ def test_parse_config(input, path, output):
     ["input", "path", "output"],
     [
         (
-            """\
-files:
-  python:
-    output: "pyproject"
-    includes: ["py_build"]
-channels:
-  - conda-forge
-  - nvidia
-dependencies:
-  py_build:
-    common:
-      - output_types: "pyproject"
-        packages:
-          - package1
-    specific:
-      - output_types: ["conda", "requirements"]
-        matrices:
-          - matrix:
-            packages:
-""",
+            textwrap.dedent(
+                """\
+                files:
+                  python:
+                    output: "pyproject"
+                    includes: ["py_build"]
+                channels:
+                  - conda-forge
+                  - nvidia
+                dependencies:
+                  py_build:
+                    common:
+                      - output_types: "pyproject"
+                        packages:
+                          - package1
+                    specific:
+                      - output_types: ["conda", "requirements"]
+                        matrices:
+                          - matrix:
+                            packages:
+                """
+            ),
             "dependencies.yaml",
             config.Config(
                 path=Path("dependencies.yaml"),
@@ -408,10 +411,7 @@ def test_load_config(input, path, output):
 
         if isinstance(output, type) and issubclass(output, Exception):
             with pytest.raises(output):
-                config.load_config(input, path)
-            with pytest.raises(output):
                 config.load_config_from_file(f.name)
         else:
-            assert config.load_config(input, path) == output
             output.path = Path(f.name)
             assert config.load_config_from_file(f.name) == output

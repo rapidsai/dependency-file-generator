@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from os import PathLike
 from pathlib import Path
-from typing import TextIO
 
 import yaml
 
@@ -167,10 +166,6 @@ def parse_config(config: dict[str, object], path: PathLike) -> Config:
     )
 
 
-def load_config(f: TextIO, path: PathLike) -> Config:
-    return parse_config(yaml.safe_load(f), path)
-
-
 def load_config_from_file(path: PathLike) -> Config:
     with open(path) as f:
-        return load_config(f, path)
+        return parse_config(yaml.safe_load(f), path)
