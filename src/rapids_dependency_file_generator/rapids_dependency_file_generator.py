@@ -355,7 +355,7 @@ def make_dependency_files(
         config_file_path.
 
     Raises
-    -------
+    ------
     ValueError
         If the file is malformed. There are numerous different error cases
         which are described by the error messages.

@@ -232,15 +232,18 @@ def _parse_channels(channels) -> list[str]:
 def parse_config(config: dict[str, object], path: PathLike) -> Config:
     """Parse a configuration file from a dictionary.
 
-    :param config: The dictionary to parse.
-    :type config: dict[str, object]
+    Parameters
+    ----------
+    config : dict[str, object]
+        The dictionary to parse.
+    path : PathLike
+        The path to the parsed configuration file. This will be stored as the ``path``
+        attribute.
 
-    :param path: The path to the parsed configuration file. This will be stored as
-        the ``path`` attribute.
-    :type path: PathLike
-
-    :return: The fully parsed configuration file.
-    :rtype: Config
+    Returns
+    -------
+    Config
+        The fully parsed configuration file.
     """
     validate_dependencies(config)
     return Config(
@@ -257,11 +260,15 @@ def parse_config(config: dict[str, object], path: PathLike) -> Config:
 def load_config_from_file(path: PathLike) -> Config:
     """Open a ``dependencies.yaml`` file and parse it.
 
-    :param path: The path to the configuration file to parse.
-    :type path: PathLike
+    Parameters
+    ----------
+    path : PathLike
+        The path to the configuration file to parse.
 
-    :return: The fully parsed configuration file.
-    :rtype: Config
+    Returns
+    -------
+    Config
+        The fully parsed configuration file.
     """
     with open(path) as f:
         return parse_config(yaml.safe_load(f), path)
