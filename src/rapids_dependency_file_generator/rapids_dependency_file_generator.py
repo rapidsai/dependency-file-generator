@@ -336,30 +336,29 @@ def make_dependency_files(
     `dependencies.yaml file spec <https://github.com/rapidsai/dependency-file-generator#dependenciesyaml-format>`_
     and produces the requested files.
 
-    :param parsed_config: The parsed dependencies.yaml config file.
-    :type parsed_config: Config
+    Parameters
+    ----------
+    parsed_config : Config
+        The parsed dependencies.yaml config file.
+    file_keys : list[str]
+        The list of file keys to use.
+    output : set[Output]
+        The set of file types to write.
+    matrix : dict[str, list[str]] | None
+        The matrix to use, or None if the default matrix from each file key
+        should be used.
+    prepend_channels : list[str]
+        List of channels to prepend to the ones from parsed_config.
+    to_stdout : bool
+        Whether the output should be written to stdout. If False, it will be
+        written to a file computed based on the output file type and
+        config_file_path.
 
-    :param file_keys: The list of file keys to use.
-    :type file_keys: list[str]
-
-    :param output: The set of file types to write.
-    :type output: set[Output]
-
-    :param matrix: The matrix to use, or None if the default matrix from each
-        file key should be used.
-    :type matrix: dict[str, list[str]] | None
-
-    :param prepend_channels: List of channels to prepend to the ones from
-        parsed_config.
-    :type prepend_channels: list[str]
-
-    :param to_stdout: Whether the output should be written to stdout. If
-        False, it will be written to a file computed based on the output
-        file type and ``parsed_config``'s path.
-    :type to_stdout: bool
-
-    :raises ValueError: If the file is malformed. There are numerous
-        different error cases which are described by the error messages.
+    Raises
+    -------
+    ValueError
+        If the file is malformed. There are numerous different error cases
+        which are described by the error messages.
     """
 
     for file_key in file_keys:
