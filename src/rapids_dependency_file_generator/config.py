@@ -8,67 +8,143 @@ import yaml
 from . import constants
 from .rapids_dependency_file_validator import validate_dependencies
 
+__all__ = [
+    "Output",
+    "FileExtras",
+    "File",
+    "PipRequirements",
+    "CommonDependencies",
+    "MatrixMatcher",
+    "SpecificDependencies",
+    "Dependencies",
+    "Config",
+    "parse_config",
+    "load_config_from_file",
+]
+
 
 class Output(Enum):
+    """An output file type to generate."""
+
     PYPROJECT = "pyproject"
+    """Generate a ``pyproject.toml``."""
+
     REQUIREMENTS = "requirements"
+    """Generate a ``requirements.txt``."""
+
     CONDA = "conda"
+    """Generate a Conda environment file."""
 
 
 @dataclass
 class FileExtras:
+    """The ``extras`` field of a file key in ``dependencies.yaml``."""
+
     table: str
+    """The ``table`` field."""
+
     key: str | None = None
+    """The ``key`` field."""
 
 
 @dataclass
 class File:
+    """A file key in ``dependencies.yaml``."""
+
     output: set[Output]
+    """The set of output file types to generate."""
+
     includes: list[str]
+    """The list of dependency sets to include."""
+
     extras: FileExtras | None = None
+    """Optional extra information for the file generator."""
+
     matrix: dict[str, list[str]] = field(default_factory=dict)
+    """The matrix of specific parameters to use when generating."""
+
     requirements_dir: Path = Path(constants.default_requirements_dir)
+    """The directory in which to write ``requirements.txt``."""
+
     conda_dir: Path = Path(constants.default_conda_dir)
+    """The directory in which to write the Conda environment file."""
+
     pyproject_dir: Path = Path(constants.default_pyproject_dir)
+    """The directory in which to write ``pyproject.toml``."""
 
 
 @dataclass
 class PipRequirements:
+    """A list of Pip requirements to include as dependencies."""
+
     pip: list[str]
+    """The list of Pip requirements."""
 
 
 @dataclass
 class CommonDependencies:
+    """A dependency entry in the ``common`` field of a dependency set."""
+
     output_types: set[Output]
+    """The set of output types for this entry."""
+
     packages: list[str | PipRequirements]
+    """The list of packages for this entry."""
 
 
 @dataclass
 class MatrixMatcher:
+    """\
+    A matrix matcher for a dependency entry in the ``specific`` field of a
+    dependency set.
+    """
+
     matrix: dict[str, str]
+    """The set of matrix values to match."""
+
     packages: list[str | PipRequirements]
+    """The list of packages for this entry."""
 
 
 @dataclass
 class SpecificDependencies:
+    """A dependency entry in the ``specific`` field of a dependency set."""
+
     output_types: set[Output]
+    """The set of output types for this entry."""
+
     matrices: list[MatrixMatcher]
+    """The list of matrix matchers for this entry."""
 
 
 @dataclass
 class Dependencies:
+    """A dependency set."""
+
     common: list[CommonDependencies] = field(default_factory=list)
+    """The list of common dependency entries."""
+
     specific: list[SpecificDependencies] = field(default_factory=list)
+    """The list of specific dependency entries."""
 
 
 @dataclass
 class Config:
+    """A fully parsed ``dependencies.yaml`` file."""
+
     path: Path
+    """The path to the parsed file."""
+
     files: dict[str, File] = field(default_factory=dict)
+    """The file entries, keyed by name."""
+
     channels: list[str] = field(
         default_factory=lambda: list(constants.default_channels)
     )
+    """A list of channels to include in Conda files."""
+
     dependencies: dict[str, Dependencies] = field(default_factory=dict)
+    """The dependency sets, keyed by name."""
 
 
 def _parse_outputs(outputs: str | list[str]) -> set[Output]:
@@ -154,6 +230,18 @@ def _parse_channels(channels) -> list[str]:
 
 
 def parse_config(config: dict[str, object], path: PathLike) -> Config:
+    """Parse a configuration file from a dictionary.
+
+    :param config: The dictionary to parse.
+    :type config: dict[str, object]
+
+    :param path: The path to the parsed configuration file. This will be stored as
+        the ``path`` attribute.
+    :type path: PathLike
+
+    :return: The fully parsed configuration file.
+    :rtype: Config
+    """
     validate_dependencies(config)
     return Config(
         path=Path(path),
@@ -167,5 +255,13 @@ def parse_config(config: dict[str, object], path: PathLike) -> Config:
 
 
 def load_config_from_file(path: PathLike) -> Config:
+    """Open a ``dependencies.yaml`` file and parse it.
+
+    :param path: The path to the configuration file to parse.
+    :type path: PathLike
+
+    :return: The fully parsed configuration file.
+    :rtype: Config
+    """
     with open(path) as f:
         return parse_config(yaml.safe_load(f), path)

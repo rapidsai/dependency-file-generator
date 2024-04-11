@@ -7,3 +7,4 @@ tests/**/actual
 .vscode
 *.swp
 node_modules
+docs/source/api_docs/generated/
