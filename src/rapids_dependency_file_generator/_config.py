@@ -241,6 +241,11 @@ def parse_config(config: dict[str, object], path: PathLike) -> Config:
     -------
     Config
         The fully parsed configuration file.
+
+    Raises
+    ------
+    jsonschema.exceptions.ValidationError
+        If the dependencies do not conform to the schema
     """
     validate_dependencies(config)
     return Config(
