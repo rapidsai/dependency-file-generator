@@ -8,9 +8,7 @@ import textwrap
 import jsonschema
 from jsonschema.exceptions import best_match
 
-SCHEMA = json.loads(
-    importlib.resources.files(__package__).joinpath("schema.json").read_bytes()
-)
+SCHEMA = json.loads(importlib.resources.files(__package__).joinpath("schema.json").read_bytes())
 
 
 def validate_dependencies(dependencies):
@@ -31,7 +29,5 @@ def validate_dependencies(dependencies):
     if len(errors) > 0:
         print("The provided dependency file contains schema errors.", file=sys.stderr)
         best_matching_error = best_match(errors)
-        print(
-            "\n", textwrap.indent(str(best_matching_error), "\t"), "\n", file=sys.stderr
-        )
+        print("\n", textwrap.indent(str(best_matching_error), "\t"), "\n", file=sys.stderr)
         raise RuntimeError("The provided dependencies data is invalid.")

@@ -135,9 +135,7 @@ class Config:
     files: dict[str, File] = field(default_factory=dict)
     """The file entries, keyed by name."""
 
-    channels: list[str] = field(
-        default_factory=lambda: list(_constants.default_channels)
-    )
+    channels: list[str] = field(default_factory=lambda: list(_constants.default_channels))
     """A list of channels to include in Conda files."""
 
     dependencies: dict[str, Dependencies] = field(default_factory=dict)
@@ -172,16 +170,10 @@ def _parse_file(file_config: dict[str, object]) -> File:
         output=_parse_outputs(file_config["output"]),
         extras=get_extras(),
         includes=list(file_config["includes"]),
-        matrix={
-            key: list(value) for key, value in file_config.get("matrix", {}).items()
-        },
-        requirements_dir=Path(
-            file_config.get("requirements_dir", _constants.default_requirements_dir)
-        ),
+        matrix={key: list(value) for key, value in file_config.get("matrix", {}).items()},
+        requirements_dir=Path(file_config.get("requirements_dir", _constants.default_requirements_dir)),
         conda_dir=Path(file_config.get("conda_dir", _constants.default_conda_dir)),
-        pyproject_dir=Path(
-            file_config.get("pyproject_dir", _constants.default_pyproject_dir)
-        ),
+        pyproject_dir=Path(file_config.get("pyproject_dir", _constants.default_pyproject_dir)),
     )
 
 
@@ -207,9 +199,7 @@ def _parse_dependencies(dependencies: dict[str, object]) -> Dependencies:
                 matrices=[
                     MatrixMatcher(
                         matrix=dict(m.get("matrix", {}) or {}),
-                        packages=[
-                            _parse_requirement(p) for p in m.get("packages", []) or []
-                        ],
+                        packages=[_parse_requirement(p) for p in m.get("packages", []) or []],
                     )
                     for m in d["matrices"]
                 ],
@@ -252,10 +242,7 @@ def parse_config(config: dict[str, object], path: PathLike) -> Config:
         path=Path(path),
         files={key: _parse_file(value) for key, value in config["files"].items()},
         channels=_parse_channels(config.get("channels", [])),
-        dependencies={
-            key: _parse_dependencies(value)
-            for key, value in config["dependencies"].items()
-        },
+        dependencies={key: _parse_dependencies(value) for key, value in config["dependencies"].items()},
     )
 
 

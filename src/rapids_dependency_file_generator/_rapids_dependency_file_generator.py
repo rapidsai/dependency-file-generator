@@ -30,9 +30,7 @@ def delete_existing_files(root: os.PathLike) -> None:
         The path (relative or absolute) to the root of the directory tree to search for files to delete.
     """
     for dirpath, _, filenames in os.walk(root):
-        for fn in filter(
-            lambda fn: fn.endswith(".txt") or fn.endswith(".yaml"), filenames
-        ):
+        for fn in filter(lambda fn: fn.endswith(".txt") or fn.endswith(".yaml"), filenames):
             with open(file_path := os.path.join(dirpath, fn)) as f:
                 try:
                     if HEADER in f.read():
@@ -148,15 +146,13 @@ def make_dependency_file(
             key = "requires"
             if extras.key is not None:
                 raise ValueError(
-                    "The 'key' field is not allowed for the 'pyproject' file type when "
-                    "'table' is 'build-system'."
+                    "The 'key' field is not allowed for the 'pyproject' file type when " "'table' is 'build-system'."
                 )
         elif extras.table == "project":
             key = "dependencies"
             if extras.key is not None:
                 raise ValueError(
-                    "The 'key' field is not allowed for the 'pyproject' file type when "
-                    "'table' is 'project'."
+                    "The 'key' field is not allowed for the 'pyproject' file type when " "'table' is 'project'."
                 )
         else:
             if extras.key is None:
@@ -200,9 +196,7 @@ def make_dependency_file(
     return file_contents
 
 
-def get_filename(
-    file_type: _config.Output, file_key: str, matrix_combo: dict[str, str]
-):
+def get_filename(file_type: _config.Output, file_key: str, matrix_combo: dict[str, str]):
     """Get the name of the file to which to write a generated dependency set.
 
     The file name will be composed of the following components, each determined
@@ -245,15 +239,11 @@ def get_filename(
         # need to have that exact name and are never prefixed.
         file_name_prefix = "pyproject"
         suffix = ""
-    filename = "_".join(
-        filter(None, (file_type_prefix, file_name_prefix, suffix))
-    ).replace(".", "")
+    filename = "_".join(filter(None, (file_type_prefix, file_name_prefix, suffix))).replace(".", "")
     return filename + file_ext
 
 
-def get_output_dir(
-    file_type: _config.Output, config_file_path: os.PathLike, file_config: _config.File
-):
+def get_output_dir(file_type: _config.Output, config_file_path: os.PathLike, file_config: _config.File):
     """Get the directory to which to write a generated dependency file.
 
     The output directory is determined by the `file_type` and the corresponding
@@ -286,9 +276,7 @@ def get_output_dir(
     return os.path.join(*path)
 
 
-def should_use_specific_entry(
-    matrix_combo: dict[str, str], specific_entry_matrix: dict[str, str]
-):
+def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matrix: dict[str, str]):
     """Check if an entry should be used.
 
     Dependencies listed in the [dependencies.$DEPENDENCY_GROUP.specific]
@@ -318,8 +306,7 @@ def should_use_specific_entry(
         `matrix_combo` and False otherwise.
     """
     return all(
-        specific_key in matrix_combo
-        and fnmatch.fnmatch(matrix_combo[specific_key], specific_value)
+        specific_key in matrix_combo and fnmatch.fnmatch(matrix_combo[specific_key], specific_value)
         for specific_key, specific_value in specific_entry_matrix.items()
     )
 
@@ -370,10 +357,7 @@ def make_dependency_files(
         else:
             file_matrix = file_config.matrix
         calculated_grid = list(grid(file_matrix))
-        if (
-            _config.Output.PYPROJECT in file_types_to_generate
-            and len(calculated_grid) > 1
-        ):
+        if _config.Output.PYPROJECT in file_types_to_generate and len(calculated_grid) > 1:
             raise ValueError("Pyproject outputs can't have more than one matrix output")
         for file_type in file_types_to_generate:
             for matrix_combo in calculated_grid:
@@ -407,41 +391,29 @@ def make_dependency_files(
                                 fallback_entry = specific_matrices_entry
                                 continue
 
-                            if should_use_specific_entry(
-                                matrix_combo, specific_matrices_entry.matrix
-                            ):
+                            if should_use_specific_entry(matrix_combo, specific_matrices_entry.matrix):
                                 # Raise an error if multiple specific entries
                                 # (not including the fallback_entry) match a
                                 # requested matrix combination.
                                 if found:
-                                    raise ValueError(
-                                        f"Found multiple matches for matrix {matrix_combo}"
-                                    )
+                                    raise ValueError(f"Found multiple matches for matrix {matrix_combo}")
                                 found = True
                                 # A package list may be empty as a way to
                                 # indicate that for some matrix elements no
                                 # packages should be installed.
-                                dependencies.extend(
-                                    specific_matrices_entry.packages or []
-                                )
+                                dependencies.extend(specific_matrices_entry.packages or [])
 
                         if not found:
                             if fallback_entry:
                                 dependencies.extend(fallback_entry.packages)
                             else:
-                                raise ValueError(
-                                    f"No matching matrix found in '{include}' for: {matrix_combo}"
-                                )
+                                raise ValueError(f"No matching matrix found in '{include}' for: {matrix_combo}")
 
                 # Dedupe deps and print / write to filesystem
                 full_file_name = get_filename(file_type, file_key, matrix_combo)
                 deduped_deps = dedupe(dependencies)
 
-                output_dir = (
-                    "."
-                    if to_stdout
-                    else get_output_dir(file_type, parsed_config.path, file_config)
-                )
+                output_dir = "." if to_stdout else get_output_dir(file_type, parsed_config.path, file_config)
                 contents = make_dependency_file(
                     file_type=file_type,
                     name=full_file_name,
