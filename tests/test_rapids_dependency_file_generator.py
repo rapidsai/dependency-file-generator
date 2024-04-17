@@ -29,7 +29,7 @@ def test_dedupe():
 
 
 @mock.patch(
-    "rapids_dependency_file_generator.rapids_dependency_file_generator.os.path.relpath"
+    "rapids_dependency_file_generator._rapids_dependency_file_generator.os.path.relpath"
 )
 def test_make_dependency_file(mock_relpath):
     relpath = "../../config_file.yaml"
