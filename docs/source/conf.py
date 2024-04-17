@@ -24,6 +24,7 @@ release = str(DFG_VERSION)
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
     "numpydoc",
 ]
 
@@ -56,3 +57,7 @@ html_static_path = ["_static"]
 templates_path = ["_templates"]
 
 autosummary_ignore_module_all = False
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+}
