@@ -37,8 +37,11 @@ version = {attr = "rapids_dependency_file_generator._version.__version__"}
 [tool.isort]
 profile = "black"
 
+[tool.ruff]
+line-length = 120
+
 [tool.ruff.lint]
-select = ["F", "I", "D"]
+select = ["E", "F", "W", "I", "D"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
