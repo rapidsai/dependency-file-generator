@@ -6,7 +6,7 @@ build:
   noarch: python
   script: pip install --no-build-isolation --no-deps .
   entry_points:
-    - rapids-dependency-file-generator = rapids_dependency_file_generator.cli:main
+    - rapids-dependency-file-generator = rapids_dependency_file_generator._cli:main
 
 source:
   path: ../

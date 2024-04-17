@@ -2,13 +2,13 @@ import argparse
 import os
 import warnings
 
-from ._version import __version__ as version
-from .config import Output, load_config_from_file
-from .constants import default_dependency_file_path
-from .rapids_dependency_file_generator import (
+from ._config import Output, load_config_from_file
+from ._constants import default_dependency_file_path
+from ._rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
 )
+from ._version import __version__ as version
 
 
 def validate_args(argv):
@@ -90,12 +90,8 @@ def validate_args(argv):
 
     if args.file_key_deprecated:
         if args.file_key:
-            raise ValueError(
-                "The --file_key (deprecated) and --file-key arguments cannot be specified together."
-            )
-        warnings.warn(
-            "The use of --file_key is deprecated. Use -f or --file-key instead."
-        )
+            raise ValueError("The --file_key (deprecated) and --file-key arguments cannot be specified together.")
+        warnings.warn("The use of --file_key is deprecated. Use -f or --file-key instead.")
         args.file_key = args.file_key_deprecated
 
     dependent_arg_keys = ["file_key", "output", "matrix"]
@@ -111,14 +107,10 @@ def validate_args(argv):
             raise ValueError(
                 "The --prepend-channels (deprecated) and --prepend-channel arguments cannot be specified together."
             )
-        warnings.warn(
-            "The use of --prepend-channels is deprecated. Use --prepend-channel instead."
-        )
+        warnings.warn("The use of --prepend-channels is deprecated. Use --prepend-channel instead.")
         args.prepend_channels = args.prepend_channels_deprecated.split(";")
     if args.prepend_channels and args.output and args.output != Output.CONDA.value:
-        raise ValueError(
-            f"--prepend-channel is only valid with --output {Output.CONDA.value}"
-        )
+        raise ValueError(f"--prepend-channel is only valid with --output {Output.CONDA.value}")
 
     # If --clean was passed without arguments, default to cleaning from the root of the
     # tree where the config file is.
@@ -156,6 +148,4 @@ def main(argv=None):
     if args.clean:
         delete_existing_files(args.clean)
 
-    make_dependency_files(
-        parsed_config, file_keys, output, matrix, args.prepend_channels, to_stdout
-    )
+    make_dependency_files(parsed_config, file_keys, output, matrix, args.prepend_channels, to_stdout)
