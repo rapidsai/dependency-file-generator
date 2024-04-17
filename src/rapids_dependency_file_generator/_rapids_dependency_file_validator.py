@@ -14,7 +14,7 @@ SCHEMA = json.loads(
 
 
 def validate_dependencies(dependencies):
-    """Valid a dictionary against the dependencies.yaml spec.
+    """Validate a dictionary against the dependencies.yaml spec.
 
     Parameters
     ----------

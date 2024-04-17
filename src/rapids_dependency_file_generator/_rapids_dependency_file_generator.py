@@ -8,8 +8,8 @@ from collections.abc import Generator
 import tomlkit
 import yaml
 
-from . import config
-from .constants import cli_name
+from . import _config
+from ._constants import cli_name
 
 __all__ = [
     "make_dependency_files",
@@ -42,7 +42,7 @@ def delete_existing_files(root: os.PathLike) -> None:
 
 
 def dedupe(
-    dependencies: list[str | config.PipRequirements],
+    dependencies: list[str | _config.PipRequirements],
 ) -> list[str | dict[str, str]]:
     """Generate the unique set of dependencies contained in a dependency list.
 
@@ -52,14 +52,14 @@ def dedupe(
         A sequence containing dependencies (possibly including duplicates).
 
     Returns
-    ------
+    -------
     list[str | dict[str, str]]
         The `dependencies` with all duplicates removed.
     """
     deduped = sorted({dep for dep in dependencies if isinstance(dep, str)})
     dict_deps = defaultdict(list)
     for dep in filter(lambda dep: not isinstance(dep, str), dependencies):
-        if isinstance(dep, config.PipRequirements):
+        if isinstance(dep, _config.PipRequirements):
             dict_deps["pip"].extend(dep.pip)
             dict_deps["pip"] = sorted(set(dict_deps["pip"]))
     if dict_deps:
@@ -68,7 +68,7 @@ def dedupe(
 
 
 def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str]]:
-    """Yields the Cartesian product of a `dict` of iterables.
+    """Yield the Cartesian product of a `dict` of iterables.
 
     The input ``gridspec`` is a dictionary whose keys correspond to
     parameter names. Each key is associated with an iterable of the
@@ -93,13 +93,13 @@ def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str]]:
 
 def make_dependency_file(
     *,
-    file_type: config.Output,
+    file_type: _config.Output,
     name: os.PathLike,
     config_file: os.PathLike,
     output_dir: os.PathLike,
     conda_channels: list[str],
     dependencies: list[str | dict[str, list[str]]],
-    extras: config.FileExtras,
+    extras: _config.FileExtras,
 ):
     """Generate the contents of the dependency file.
 
@@ -133,7 +133,7 @@ def make_dependency_file(
         # To make changes, edit {relative_path_to_config_file} and run `{cli_name}`.
         """
     )
-    if file_type == config.Output.CONDA:
+    if file_type == _config.Output.CONDA:
         file_contents += yaml.dump(
             {
                 "name": os.path.splitext(name)[0],
@@ -141,9 +141,9 @@ def make_dependency_file(
                 "dependencies": dependencies,
             }
         )
-    elif file_type == config.Output.REQUIREMENTS:
+    elif file_type == _config.Output.REQUIREMENTS:
         file_contents += "\n".join(dependencies) + "\n"
-    elif file_type == config.Output.PYPROJECT:
+    elif file_type == _config.Output.PYPROJECT:
         if extras.table == "build-system":
             key = "requires"
             if extras.key is not None:
@@ -200,7 +200,9 @@ def make_dependency_file(
     return file_contents
 
 
-def get_filename(file_type: config.Output, file_key: str, matrix_combo: dict[str, str]):
+def get_filename(
+    file_type: _config.Output, file_key: str, matrix_combo: dict[str, str]
+):
     """Get the name of the file to which to write a generated dependency set.
 
     The file name will be composed of the following components, each determined
@@ -231,12 +233,12 @@ def get_filename(file_type: config.Output, file_key: str, matrix_combo: dict[str
     file_ext = ""
     file_name_prefix = file_key
     suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
-    if file_type == config.Output.CONDA:
+    if file_type == _config.Output.CONDA:
         file_ext = ".yaml"
-    elif file_type == config.Output.REQUIREMENTS:
+    elif file_type == _config.Output.REQUIREMENTS:
         file_ext = ".txt"
         file_type_prefix = "requirements"
-    elif file_type == config.Output.PYPROJECT:
+    elif file_type == _config.Output.PYPROJECT:
         file_ext = ".toml"
         # Unlike for files like requirements.txt or conda environment YAML files, which
         # may be named with additional prefixes (e.g. all_cuda_*) pyproject.toml files
@@ -250,7 +252,7 @@ def get_filename(file_type: config.Output, file_key: str, matrix_combo: dict[str
 
 
 def get_output_dir(
-    file_type: config.Output, config_file_path: os.PathLike, file_config: config.File
+    file_type: _config.Output, config_file_path: os.PathLike, file_config: _config.File
 ):
     """Get the directory to which to write a generated dependency file.
 
@@ -275,11 +277,11 @@ def get_output_dir(
         The directory to write the file to.
     """
     path = [os.path.dirname(config_file_path)]
-    if file_type == config.Output.CONDA:
+    if file_type == _config.Output.CONDA:
         path.append(file_config.conda_dir)
-    elif file_type == config.Output.REQUIREMENTS:
+    elif file_type == _config.Output.REQUIREMENTS:
         path.append(file_config.requirements_dir)
-    elif file_type == config.Output.PYPROJECT:
+    elif file_type == _config.Output.PYPROJECT:
         path.append(file_config.pyproject_dir)
     return os.path.join(*path)
 
@@ -323,9 +325,9 @@ def should_use_specific_entry(
 
 
 def make_dependency_files(
-    parsed_config: config.Config,
+    parsed_config: _config.Config,
     file_keys: list[str],
-    output: set[config.Output],
+    output: set[_config.Output],
     matrix: dict[str, list[str]] | None,
     prepend_channels: list[str],
     to_stdout: bool,
@@ -360,7 +362,6 @@ def make_dependency_files(
         If the file is malformed. There are numerous different error cases
         which are described by the error messages.
     """
-
     for file_key in file_keys:
         file_config = parsed_config.files[file_key]
         file_types_to_generate = file_config.output & output
@@ -370,7 +371,7 @@ def make_dependency_files(
             file_matrix = file_config.matrix
         calculated_grid = list(grid(file_matrix))
         if (
-            config.Output.PYPROJECT in file_types_to_generate
+            _config.Output.PYPROJECT in file_types_to_generate
             and len(calculated_grid) > 1
         ):
             raise ValueError("Pyproject outputs can't have more than one matrix output")

@@ -8,7 +8,7 @@ import pytest
 import yaml
 from jsonschema.exceptions import ValidationError
 
-from rapids_dependency_file_generator.cli import main
+from rapids_dependency_file_generator._cli import main
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 

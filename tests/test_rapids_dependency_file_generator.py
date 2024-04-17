@@ -2,9 +2,9 @@ from unittest import mock
 
 import yaml
 
-from rapids_dependency_file_generator import config
-from rapids_dependency_file_generator.constants import cli_name
-from rapids_dependency_file_generator.rapids_dependency_file_generator import (
+from rapids_dependency_file_generator import _config
+from rapids_dependency_file_generator._constants import cli_name
+from rapids_dependency_file_generator._rapids_dependency_file_generator import (
     dedupe,
     make_dependency_file,
     should_use_specific_entry,
@@ -21,8 +21,8 @@ def test_dedupe():
         [
             "dep1",
             "dep1",
-            config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
-            config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
+            _config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
+            _config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
         ]
     )
     assert deduped == ["dep1", {"pip": ["pip_dep1", "pip_dep2"]}]
@@ -39,7 +39,7 @@ def test_make_dependency_file(mock_relpath):
 # To make changes, edit {relpath} and run `{cli_name}`.
 """
     env = make_dependency_file(
-        file_type=config.Output.CONDA,
+        file_type=_config.Output.CONDA,
         name="tmp_env.yaml",
         config_file="config_file",
         output_dir="output_path",
@@ -56,7 +56,7 @@ def test_make_dependency_file(mock_relpath):
     )
 
     env = make_dependency_file(
-        file_type=config.Output.REQUIREMENTS,
+        file_type=_config.Output.REQUIREMENTS,
         name="tmp_env.txt",
         config_file="config_file",
         output_dir="output_path",

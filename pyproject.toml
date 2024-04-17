@@ -36,3 +36,9 @@ version = {attr = "rapids_dependency_file_generator._version.__version__"}
 
 [tool.isort]
 profile = "black"
+
+[tool.ruff.lint]
+select = ["F", "I", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

@@ -39,3 +39,10 @@ repos:
           files: ^tests/examples/([^/]*)/dependencies.yaml$
           args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
         - id: check-github-workflows
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.4
+    hooks:
+      - id: ruff
+        files: src/.*$
+      - id: ruff-format
+        files: src/.*$

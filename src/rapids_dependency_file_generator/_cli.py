@@ -2,13 +2,13 @@ import argparse
 import os
 import warnings
 
-from ._version import __version__ as version
-from .config import Output, load_config_from_file
-from .constants import default_dependency_file_path
-from .rapids_dependency_file_generator import (
+from ._config import Output, load_config_from_file
+from ._constants import default_dependency_file_path
+from ._rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
 )
+from ._version import __version__ as version
 
 
 def validate_args(argv):

@@ -5,8 +5,8 @@ from pathlib import Path
 
 import yaml
 
-from . import constants
-from .rapids_dependency_file_validator import validate_dependencies
+from . import _constants
+from ._rapids_dependency_file_validator import validate_dependencies
 
 __all__ = [
     "Output",
@@ -63,13 +63,13 @@ class File:
     matrix: dict[str, list[str]] = field(default_factory=dict)
     """The matrix of specific parameters to use when generating."""
 
-    requirements_dir: Path = Path(constants.default_requirements_dir)
+    requirements_dir: Path = Path(_constants.default_requirements_dir)
     """The directory in which to write ``requirements.txt``."""
 
-    conda_dir: Path = Path(constants.default_conda_dir)
+    conda_dir: Path = Path(_constants.default_conda_dir)
     """The directory in which to write the Conda environment file."""
 
-    pyproject_dir: Path = Path(constants.default_pyproject_dir)
+    pyproject_dir: Path = Path(_constants.default_pyproject_dir)
     """The directory in which to write ``pyproject.toml``."""
 
 
@@ -94,10 +94,7 @@ class CommonDependencies:
 
 @dataclass
 class MatrixMatcher:
-    """\
-    A matrix matcher for a dependency entry in the ``specific`` field of a
-    dependency set.
-    """
+    """A matrix matcher for a ``specific`` dependency entry."""
 
     matrix: dict[str, str]
     """The set of matrix values to match."""
@@ -139,7 +136,7 @@ class Config:
     """The file entries, keyed by name."""
 
     channels: list[str] = field(
-        default_factory=lambda: list(constants.default_channels)
+        default_factory=lambda: list(_constants.default_channels)
     )
     """A list of channels to include in Conda files."""
 
@@ -179,11 +176,11 @@ def _parse_file(file_config: dict[str, object]) -> File:
             key: list(value) for key, value in file_config.get("matrix", {}).items()
         },
         requirements_dir=Path(
-            file_config.get("requirements_dir", constants.default_requirements_dir)
+            file_config.get("requirements_dir", _constants.default_requirements_dir)
         ),
-        conda_dir=Path(file_config.get("conda_dir", constants.default_conda_dir)),
+        conda_dir=Path(file_config.get("conda_dir", _constants.default_conda_dir)),
         pyproject_dir=Path(
-            file_config.get("pyproject_dir", constants.default_pyproject_dir)
+            file_config.get("pyproject_dir", _constants.default_pyproject_dir)
         ),
     )
 
