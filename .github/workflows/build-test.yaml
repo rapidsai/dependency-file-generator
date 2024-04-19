@@ -23,6 +23,13 @@ jobs:
         with:
           name: conda_artifacts
           path: ${{ env.OUTPUT_DIR }}
+  docs-build:
+    if: github.ref_type == 'branch'
+    needs: conda
+    runs-on: ubuntu-latest
+    container: rapidsai/ci-conda:latest
+    steps:
+      - run: ./ci/build_docs.sh
   wheel:
     runs-on: ubuntu-latest
     container: python:3
