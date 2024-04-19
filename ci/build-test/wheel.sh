@@ -5,7 +5,7 @@ OUTPUT_DIR="${OUTPUT_DIR:-"/tmp/output"}"
 
 ./ci/update-versions.sh "${RELEASE_VERSION:-}"
 
-pip install build pytest sphinx numpydoc
+pip install build pytest sphinx numpydoc pydata-sphinx-theme
 
 python -m build \
   --outdir "${OUTPUT_DIR}" \
