@@ -314,7 +314,7 @@ def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matri
 def make_dependency_files(
     parsed_config: _config.Config,
     file_keys: list[str],
-    output: set[_config.Output],
+    output: set[_config.Output] | None,
     matrix: dict[str, list[str]] | None,
     prepend_channels: list[str],
     to_stdout: bool,
@@ -331,8 +331,9 @@ def make_dependency_files(
         The parsed dependencies.yaml config file.
     file_keys : list[str]
         The list of file keys to use.
-    output : set[Output]
-        The set of file types to write.
+    output : set[Output] | None
+        The set of file types to write, or None to write the file types
+        specified by the file key.
     matrix : dict[str, list[str]] | None
         The matrix to use, or None if the default matrix from each file key
         should be used.
@@ -351,7 +352,7 @@ def make_dependency_files(
     """
     for file_key in file_keys:
         file_config = parsed_config.files[file_key]
-        file_types_to_generate = file_config.output & output
+        file_types_to_generate = file_config.output if output is None else output
         if matrix is not None:
             file_matrix = matrix
         else:

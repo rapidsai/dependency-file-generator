@@ -143,7 +143,7 @@ def main(argv=None):
         output = {Output(args.output)}
     else:
         file_keys = list(parsed_config.files.keys())
-        output = {Output.PYPROJECT, Output.CONDA, Output.REQUIREMENTS}
+        output = None
 
     if args.clean:
         delete_existing_files(args.clean)
