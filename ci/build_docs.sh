@@ -19,7 +19,7 @@ conda activate docs
 rapids-print-env
 
 rapids-mamba-retry install \
-  --channel "artifacts-channel" \
+  --channel "file://$(pwd)/artifacts-channel" \
   rapids-dependency-file-generator
 
 export RAPIDS_DOCS_DIR="$(mktemp -d)"
