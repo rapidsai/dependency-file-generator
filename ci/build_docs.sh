@@ -18,11 +18,8 @@ conda activate docs
 
 rapids-print-env
 
-rapids-logger "Downloading artifacts from previous jobs"
-PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
-
 rapids-mamba-retry install \
-  --channel "${PYTHON_CHANNEL}" \
+  --channel "artifacts-channel" \
   rapids-dependency-file-generator
 
 export RAPIDS_DOCS_DIR="$(mktemp -d)"

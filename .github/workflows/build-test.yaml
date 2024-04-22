@@ -33,6 +33,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: conda_artifacts
+          path: artifacts-channel
       - run: ./ci/build_docs.sh
   wheel:
     runs-on: ubuntu-latest
