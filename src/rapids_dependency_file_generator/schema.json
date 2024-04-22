@@ -106,7 +106,7 @@
                     ]
                 },
                 "packages": {"oneOf": [
-                    {"$ref": "#/$defs/requirements"},
+                    {"$ref": "#/$defs/packages"},
                     {"type": "null"}
                 ]}
             },
