@@ -8,5 +8,6 @@ dependencies:
     common:
       - output_types: [conda]
         packages:
+          - make
           - numpydoc
           - sphinx
