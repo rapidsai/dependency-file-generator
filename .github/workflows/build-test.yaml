@@ -38,6 +38,10 @@ jobs:
           name: conda_artifacts
           path: artifacts-channel
       - run: ./ci/build_docs.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs_artifacts
+          path: ${{ env.OUTPUT_DIR }}
   wheel:
     runs-on: ubuntu-latest
     container: python:3

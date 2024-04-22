@@ -22,16 +22,12 @@ rapids-mamba-retry install \
   --channel "file://$(pwd)/artifacts-channel" \
   rapids-dependency-file-generator
 
-export RAPIDS_DOCS_DIR="$(mktemp -d)"
-
 rapids-logger "Build rapids-dependency-file-generator Sphinx docs"
 pushd docs
 make dirhtml
-mkdir -p "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/html"
-mv build/dirhtml/* "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/html"
+mkdir -p "${OUTPUT_DIR}/rapids-dependency-file-generator/html"
+mv build/dirhtml/* "${OUTPUT_DIR}/rapids-dependency-file-generator/html"
 make text
-mkdir -p "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/txt"
-mv build/text/* "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/txt"
+mkdir -p "${OUTPUT_DIR}/rapids-dependency-file-generator/txt"
+mv build/text/* "${OUTPUT_DIR}/rapids-dependency-file-generator/txt"
 popd
-
-rapids-upload-docs
