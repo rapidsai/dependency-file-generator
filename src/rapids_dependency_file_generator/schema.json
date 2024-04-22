@@ -107,6 +107,7 @@
                 },
                 "packages": {"oneOf": [
                     {"$ref": "#/$defs/requirements"},
+                    {"$ref": "#/$defs/pip-requirements"},
                     {"type": "null"}
                 ]}
             },
