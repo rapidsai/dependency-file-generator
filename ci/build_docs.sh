@@ -8,7 +8,12 @@ rapids-logger "Create test conda environment"
 
 ENV_YAML_DIR="$(mktemp -d)"
 
-rapids-mamba-retry env create --yes -n docs
+rapids-dependency-file-generator \
+  --output conda \
+  --file_key docs \
+  --matrix "" | tee "${ENV_YAML_DIR}/env.yaml"
+
+rapids-mamba-retry env create --yes -f "${ENV_YAML_DIR}/env.yaml" -n docs
 conda activate docs
 
 rapids-print-env
