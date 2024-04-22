@@ -29,6 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     container: rapidsai/ci-conda:latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - run: ./ci/build_docs.sh
   wheel:
     runs-on: ubuntu-latest
