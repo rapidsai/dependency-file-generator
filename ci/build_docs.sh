@@ -29,11 +29,9 @@ pushd docs
 make dirhtml
 mkdir -p "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/html"
 mv build/dirhtml/* "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/html"
-if [[ "${RAPIDS_BUILD_TYPE}" != "pull-request" ]]; then
-  make text
-  mkdir -p "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/txt"
-  mv build/text/* "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/txt"
-fi
+make text
+mkdir -p "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/txt"
+mv build/text/* "${RAPIDS_DOCS_DIR}/rapids-dependency-file-generator/txt"
 popd
 
 rapids-upload-docs
