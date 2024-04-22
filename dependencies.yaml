@@ -10,4 +10,5 @@ dependencies:
         packages:
           - make
           - numpydoc
+          - pydata-sphinx-theme
           - sphinx
