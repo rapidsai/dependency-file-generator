@@ -2,6 +2,7 @@ import fnmatch
 import itertools
 import os
 import textwrap
+import typing
 from collections import defaultdict
 from collections.abc import Generator
 
@@ -40,8 +41,8 @@ def delete_existing_files(root: os.PathLike) -> None:
 
 
 def dedupe(
-    dependencies: list[str | _config.PipRequirements],
-) -> list[str | dict[str, str]]:
+    dependencies: list[typing.Union[str, _config.PipRequirements]],
+) -> list[typing.Union[str, dict[str, str]]]:
     """Generate the unique set of dependencies contained in a dependency list.
 
     Parameters
@@ -96,7 +97,7 @@ def make_dependency_file(
     config_file: os.PathLike,
     output_dir: os.PathLike,
     conda_channels: list[str],
-    dependencies: list[str | dict[str, list[str]]],
+    dependencies: list[typing.Union[str, dict[str, list[str]]]],
     extras: _config.FileExtras,
 ):
     """Generate the contents of the dependency file.
@@ -314,8 +315,8 @@ def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matri
 def make_dependency_files(
     parsed_config: _config.Config,
     file_keys: list[str],
-    output: set[_config.Output] | None,
-    matrix: dict[str, list[str]] | None,
+    output: typing.Union[set[_config.Output], None],
+    matrix: typing.Union[dict[str, list[str]], None],
     prepend_channels: list[str],
     to_stdout: bool,
 ):

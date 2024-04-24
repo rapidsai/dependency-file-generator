@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass, field
 from enum import Enum
 from os import PathLike
@@ -43,7 +44,7 @@ class FileExtras:
     table: str
     """The ``table`` field."""
 
-    key: str | None = None
+    key: typing.Union[str, None] = None
     """The ``key`` field."""
 
 
@@ -57,7 +58,7 @@ class File:
     includes: list[str]
     """The list of dependency sets to include."""
 
-    extras: FileExtras | None = None
+    extras: typing.Union[FileExtras, None] = None
     """Optional extra information for the file generator."""
 
     matrix: dict[str, list[str]] = field(default_factory=dict)
@@ -88,7 +89,7 @@ class CommonDependencies:
     output_types: set[Output]
     """The set of output types for this entry."""
 
-    packages: list[str | PipRequirements]
+    packages: list[typing.Union[str, PipRequirements]]
     """The list of packages for this entry."""
 
 
@@ -99,7 +100,7 @@ class MatrixMatcher:
     matrix: dict[str, str]
     """The set of matrix values to match."""
 
-    packages: list[str | PipRequirements]
+    packages: list[typing.Union[str, PipRequirements]]
     """The list of packages for this entry."""
 
 
@@ -142,7 +143,7 @@ class Config:
     """The dependency sets, keyed by name."""
 
 
-def _parse_outputs(outputs: str | list[str]) -> set[Output]:
+def _parse_outputs(outputs: typing.Union[str, list[str]]) -> set[Output]:
     if isinstance(outputs, str):
         outputs = [outputs]
     if outputs == ["none"]:
@@ -177,7 +178,7 @@ def _parse_file(file_config: dict[str, object]) -> File:
     )
 
 
-def _parse_requirement(requirement: str | dict[str, str]) -> str | PipRequirements:
+def _parse_requirement(requirement: typing.Union[str, dict[str, str]]) -> typing.Union[str, PipRequirements]:
     if isinstance(requirement, str):
         return requirement
 
