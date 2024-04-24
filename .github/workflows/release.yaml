@@ -59,7 +59,8 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
-          ANACONDA_TOKEN: ${{ secrets.CONDA_RAPIDSAI_TOKEN }}
+          ANACONDA_STABLE_TOKEN: ${{ secrets.CONDA_RAPIDSAI_TOKEN }}
+          ANACONDA_NIGHTLY_TOKEN: ${{ secrets.CONDA_RAPIDSAI_NIGHTLY_TOKEN }}
       - name: Trigger CI Images
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}

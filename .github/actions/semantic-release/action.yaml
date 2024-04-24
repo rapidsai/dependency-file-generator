@@ -3,7 +3,8 @@ inputs:
   GITHUB_TOKEN:
     required: true
   PYPI_TOKEN: {}
-  ANACONDA_TOKEN: {}
+  ANACONDA_STABLE_TOKEN: {}
+  ANACONDA_NIGHTLY_TOKEN: {}
   DRY_RUN:
     default: "false"
 outputs:
@@ -23,6 +24,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         PYPI_TOKEN: ${{ inputs.PYPI_TOKEN }}
-        ANACONDA_TOKEN: ${{ inputs.ANACONDA_TOKEN }}
+        ANACONDA_STABLE_TOKEN: ${{ inputs.ANACONDA_STABLE_TOKEN }}
+        ANACONDA_NIGHTLY_TOKEN: ${{ inputs.ANACONDA_NIGHTLY_TOKEN }}
         DRY_RUN: ${{ inputs.DRY_RUN }}
       run: ${GITHUB_ACTION_PATH}/semantic-release.sh

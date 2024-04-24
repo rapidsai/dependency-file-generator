@@ -12,7 +12,9 @@ plugins:
   - - "@semantic-release/exec"
     - publishCmd: ./ci/publish/wheel.sh
   - - "@semantic-release/exec"
-    - publishCmd: ./ci/publish/conda.sh
+    - publishCmd: ./ci/publish/conda.sh rapidsai
+  - - "@semantic-release/exec"
+    - publishCmd: ./ci/publish/conda.sh rapidsai-nightly
   - - "@semantic-release/git"
     - assets:
         - src/rapids_dependency_file_generator/_version.py
