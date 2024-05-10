@@ -1,0 +1,24 @@
+files:
+  sparkly_unicorn:
+    output: pyproject
+    includes:
+      - run_deps
+    extras:
+      table: project
+    pyproject_dir: some/cool/code
+dependencies:
+  run_deps:
+    common:
+      - output_types: [pyproject]
+        packages:
+          - fsspec>=0.6.0
+    specific:
+      - output_types: [pyproject]
+        matrices:
+          - matrix: {"cuda": "100.*"}
+            packages:
+              - cuda-python>=100.1,<101.0a0
+          - matrix: {"cuda": "11.*"}
+            packages:
+              - cuda-python>=11.7.1,<12.0a0
+          - {matrix: null, packages: ["should-not-be-found-by-test"]}

@@ -1,12 +1,15 @@
 from unittest import mock
 
 import yaml
+import tomlkit
+import pathlib
 
 from rapids_dependency_file_generator import _config
 from rapids_dependency_file_generator._constants import cli_name
 from rapids_dependency_file_generator._rapids_dependency_file_generator import (
     dedupe,
     make_dependency_file,
+    make_dependency_files,
     should_use_specific_entry,
 )
 
@@ -65,6 +68,30 @@ def test_make_dependency_file(mock_relpath):
         extras=None,
     )
     assert env == header + "dep1\ndep2\n"
+
+
+def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):
+
+    current_dir = pathlib.Path(__file__).parent
+    make_dependency_files(
+        parsed_config=_config.load_config_from_file(current_dir / "examples" / "nested-pyproject" / "dependencies.yaml"),
+        file_keys=["sparkly_unicorn"],
+        output={_config.Output.PYPROJECT},
+        matrix={"cuda": ["100.17"]},
+        prepend_channels=[],
+        to_stdout=True
+    )
+    captured_stdout = capsys.readouterr().out
+
+    # should be valid TOML, containing the expected dependencies and the other contents of
+    # the nested pyproject.toml file
+    doc = tomlkit.loads(captured_stdout)
+    assert doc["project"]["name"] == "beep-boop"
+    assert doc["project"]["version"] == "1.2.3"
+    assert sorted(doc["project"]["dependencies"]) == ["cuda-python>=100.1,<101.0a0", "fsspec>=0.6.0"]
+
+    # and should NOT contain anything from the root-level pyproject.toml
+    assert set(dict(doc).keys()) == {"project"}
 
 
 def test_should_use_specific_entry():

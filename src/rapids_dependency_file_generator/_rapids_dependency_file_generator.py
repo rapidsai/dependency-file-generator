@@ -244,8 +244,8 @@ def get_filename(file_type: _config.Output, file_key: str, matrix_combo: dict[st
     return filename + file_ext
 
 
-def get_output_dir(file_type: _config.Output, config_file_path: os.PathLike, file_config: _config.File):
-    """Get the directory to which to write a generated dependency file.
+def get_output_dir(*, file_type: _config.Output, config_file_path: os.PathLike, file_config: _config.File):
+    """Get the directory containing a generated dependency file's contents.
 
     The output directory is determined by the `file_type` and the corresponding
     key in the `file_config`. The path provided in `file_config` will be taken
@@ -255,17 +255,16 @@ def get_output_dir(file_type: _config.Output, config_file_path: os.PathLike, fil
     ----------
     file_type : Output
         An Output value used to determine the file type.
-    output_root : PathLike
-        The path to the root directory where dependency files are placed.
+    config_file_path : PathLike
+        Path to the dependency-file-generator config file (e.g. dependencies.yaml).
     file_config : File
         A dictionary corresponding to one of the [files.$FILENAME] sections of
-        the dependencies.yaml file. May contain `conda_dir` or
-        `requirements_dir`.
+        the dependencies.yaml file. May contain `conda_dir`, `pyproject_dir`, or `requirements_dir`.
 
     Returns
     -------
     str
-        The directory to write the file to.
+        The directory containing the dependency file's contents.
     """
     path = [os.path.dirname(config_file_path)]
     if file_type == _config.Output.CONDA:
@@ -415,7 +414,11 @@ def make_dependency_files(
                 full_file_name = get_filename(file_type, file_key, matrix_combo)
                 deduped_deps = dedupe(dependencies)
 
-                output_dir = "." if to_stdout else get_output_dir(file_type, parsed_config.path, file_config)
+                output_dir = get_output_dir(
+                    file_type=file_type,
+                    config_file_path=parsed_config.path,
+                    file_config=file_config,
+                )
                 contents = make_dependency_file(
                     file_type=file_type,
                     name=full_file_name,
