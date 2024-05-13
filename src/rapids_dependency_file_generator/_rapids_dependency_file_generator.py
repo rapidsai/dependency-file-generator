@@ -312,13 +312,14 @@ def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matri
 
 
 def make_dependency_files(
+    *,
     parsed_config: _config.Config,
     file_keys: list[str],
     output: typing.Union[set[_config.Output], None],
     matrix: typing.Union[dict[str, list[str]], None],
     prepend_channels: list[str],
     to_stdout: bool,
-):
+) -> None:
     """Generate dependency files.
 
     This function iterates over data parsed from a YAML file conforming to the
