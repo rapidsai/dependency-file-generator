@@ -1,1 +1,2 @@
+include src/rapids_dependency_file_generator/py.typed
 include src/rapids_dependency_file_generator/schema.json
