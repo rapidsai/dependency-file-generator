@@ -148,4 +148,11 @@ def main(argv=None):
     if args.clean:
         delete_existing_files(args.clean)
 
-    make_dependency_files(parsed_config, file_keys, output, matrix, args.prepend_channels, to_stdout)
+    make_dependency_files(
+        parsed_config=parsed_config,
+        file_keys=file_keys,
+        output=output,
+        matrix=matrix,
+        prepend_channels=args.prepend_channels,
+        to_stdout=to_stdout,
+    )
