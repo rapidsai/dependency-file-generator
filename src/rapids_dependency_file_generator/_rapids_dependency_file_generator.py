@@ -68,7 +68,7 @@ def dedupe(
         return sorted(string_deps)
 
 
-def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str]]:
+def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str], None, None]:
     """Yield the Cartesian product of a `dict` of iterables.
 
     The input ``gridspec`` is a dictionary whose keys correspond to
@@ -278,7 +278,7 @@ def get_output_dir(*, file_type: _config.Output, config_file_path: os.PathLike, 
     return os.path.join(*path)
 
 
-def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matrix: dict[str, str]):
+def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matrix: dict[str, str]) -> bool:
     """Check if an entry should be used.
 
     Dependencies listed in the [dependencies.$DEPENDENCY_GROUP.specific]

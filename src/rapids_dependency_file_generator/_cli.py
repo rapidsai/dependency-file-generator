@@ -130,7 +130,7 @@ def generate_matrix(matrix_arg):
     return matrix
 
 
-def main(argv=None):
+def main(argv=None) -> None:
     args = validate_args(argv)
 
     parsed_config = load_config_from_file(args.config)
