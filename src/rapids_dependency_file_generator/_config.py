@@ -158,7 +158,7 @@ def _parse_extras(extras: dict[str, str]) -> FileExtras:
     )
 
 
-def _parse_file(file_config: dict[str, object]) -> File:
+def _parse_file(file_config: dict[str, typing.Any]) -> File:
     def get_extras():
         try:
             extras = file_config["extras"]
@@ -185,7 +185,7 @@ def _parse_requirement(requirement: typing.Union[str, dict[str, list[str]]]) -> 
     return PipRequirements(pip=requirement["pip"])
 
 
-def _parse_dependencies(dependencies: dict[str, object]) -> Dependencies:
+def _parse_dependencies(dependencies: dict[str, typing.Any]) -> Dependencies:
     return Dependencies(
         common=[
             CommonDependencies(
@@ -217,12 +217,12 @@ def _parse_channels(channels) -> list[str]:
     return list(channels)
 
 
-def parse_config(config: dict[str, object], path: PathLike) -> Config:
+def parse_config(config: dict[str, typing.Any], path: PathLike) -> Config:
     """Parse a configuration file from a dictionary.
 
     Parameters
     ----------
-    config : dict[str, object]
+    config : dict[str, Any]
         The dictionary to parse.
     path : PathLike
         The path to the parsed configuration file. This will be stored as the ``path``
