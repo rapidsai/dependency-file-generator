@@ -19,7 +19,7 @@ def test_dedupe():
     deduped = dedupe(["dep1", "dep1", "dep2"])
     assert deduped == ["dep1", "dep2"]
 
-    # list w/ pip dependencies
+    # list w/ mix of simple and pip dependencies
     deduped = dedupe(
         [
             "dep1",
@@ -29,6 +29,15 @@ def test_dedupe():
         ]
     )
     assert deduped == ["dep1", {"pip": ["pip_dep1", "pip_dep2"]}]
+
+    # list w/ only pip dependencies
+    deduped = dedupe(
+        [
+            _config.PipRequirements(pip=["pip_dep1", "pip_dep2"]),
+            _config.PipRequirements(pip=["pip_dep3", "pip_dep1"]),
+        ]
+    )
+    assert deduped == [{"pip": ["pip_dep1", "pip_dep2", "pip_dep3"]}]
 
 
 @mock.patch(

@@ -3,7 +3,6 @@ import itertools
 import os
 import textwrap
 import typing
-from collections import defaultdict
 from collections.abc import Generator
 
 import tomlkit
@@ -42,7 +41,7 @@ def delete_existing_files(root: os.PathLike) -> None:
 
 def dedupe(
     dependencies: list[typing.Union[str, _config.PipRequirements]],
-) -> list[typing.Union[str, dict[str, str]]]:
+) -> typing.Sequence[typing.Union[str, dict[str, list[str]]]]:
     """Generate the unique set of dependencies contained in a dependency list.
 
     Parameters
@@ -52,18 +51,21 @@ def dedupe(
 
     Returns
     -------
-    list[str | dict[str, str]]
-        The `dependencies` with all duplicates removed.
+    Sequence[str | dict[str, list[str]]]
+        The ``dependencies`` with all duplicates removed.
     """
-    deduped = sorted({dep for dep in dependencies if isinstance(dep, str)})
-    dict_deps = defaultdict(list)
-    for dep in filter(lambda dep: not isinstance(dep, str), dependencies):
-        if isinstance(dep, _config.PipRequirements):
-            dict_deps["pip"].extend(dep.pip)
-            dict_deps["pip"] = sorted(set(dict_deps["pip"]))
-    if dict_deps:
-        deduped.append(dict(dict_deps))
-    return deduped
+    string_deps: set[str] = set()
+    pip_deps: set[str] = set()
+    for dep in dependencies:
+        if isinstance(dep, str):
+            string_deps.add(dep)
+        elif isinstance(dep, _config.PipRequirements):
+            pip_deps.update(dep.pip)
+
+    if pip_deps:
+        return [*sorted(string_deps), {"pip": sorted(pip_deps)}]
+    else:
+        return sorted(string_deps)
 
 
 def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str]]:
@@ -97,7 +99,7 @@ def make_dependency_file(
     config_file: os.PathLike,
     output_dir: os.PathLike,
     conda_channels: list[str],
-    dependencies: list[typing.Union[str, dict[str, list[str]]]],
+    dependencies: typing.Sequence[typing.Union[str, dict[str, list[str]]]],
     extras: _config.FileExtras,
 ):
     """Generate the contents of the dependency file.
@@ -115,7 +117,7 @@ def make_dependency_file(
     conda_channels : list[str]
         The channels to include in the file. Only used when `file_type` is
         CONDA.
-    dependencies : list[str | dict[str, list[str]]]
+    dependencies : Sequence[str | dict[str, list[str]]]
         The dependencies to include in the file.
     extras : FileExtras
         Any extra information provided for generating this dependency file.
