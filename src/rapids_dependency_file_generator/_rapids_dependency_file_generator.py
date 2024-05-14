@@ -41,7 +41,7 @@ def delete_existing_files(root: os.PathLike) -> None:
 
 def dedupe(
     dependencies: list[typing.Union[str, _config.PipRequirements]],
-) -> typing.Sequence[str | dict[str, list[str]]]:
+) -> typing.Sequence[typing.Union[str, dict[str, list[str]]]]:
     """Generate the unique set of dependencies contained in a dependency list.
 
     Parameters
