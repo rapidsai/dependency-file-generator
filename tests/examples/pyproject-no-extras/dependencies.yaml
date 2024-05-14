@@ -1,0 +1,12 @@
+files:
+  beep_boop:
+    output: pyproject
+    includes:
+      - run_deps
+    pyproject_dir: .
+dependencies:
+  run_deps:
+    common:
+      - output_types: [pyproject]
+        packages:
+          - fsspec>=0.6.0

@@ -17,6 +17,7 @@ _erroneous_examples = [
     "no-specific-match",
     "pyproject_matrix_multi",
     "pyproject_bad_key",
+    "pyproject-no-extras",
 ]
 EXAMPLE_FILES = [
     pth
