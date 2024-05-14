@@ -1,4 +1,5 @@
-# tests that 'pip:' in a conda requirements list is an array of packages, not a single string
+# tests that dfg rejects a config where 'pip:' in a conda requirements is a single string
+# (it should always be an array of packages)
 files:
   build:
     output: conda
