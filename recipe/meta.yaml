@@ -1,6 +1,6 @@
 package:
   name: rapids-dependency-file-generator
-  version: 1.13.5
+  version: 1.13.6
 
 build:
   noarch: python
