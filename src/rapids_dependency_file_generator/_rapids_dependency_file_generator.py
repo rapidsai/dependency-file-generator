@@ -100,7 +100,7 @@ def make_dependency_file(
     output_dir: os.PathLike,
     conda_channels: list[str],
     dependencies: typing.Sequence[typing.Union[str, dict[str, list[str]]]],
-    extras: _config.FileExtras,
+    extras: typing.Union[_config.FileExtras, None],
 ):
     """Generate the contents of the dependency file.
 
@@ -119,7 +119,7 @@ def make_dependency_file(
         CONDA.
     dependencies : Sequence[str | dict[str, list[str]]]
         The dependencies to include in the file.
-    extras : FileExtras
+    extras : FileExtras | None
         Any extra information provided for generating this dependency file.
 
     Returns
@@ -145,17 +145,20 @@ def make_dependency_file(
     elif file_type == _config.Output.REQUIREMENTS:
         file_contents += "\n".join(dependencies) + "\n"
     elif file_type == _config.Output.PYPROJECT:
+        if extras is None:
+            raise ValueError("The 'extras' field must be provided for the 'pyproject' file type.")
+
         if extras.table == "build-system":
             key = "requires"
             if extras.key is not None:
                 raise ValueError(
-                    "The 'key' field is not allowed for the 'pyproject' file type when " "'table' is 'build-system'."
+                    "The 'key' field is not allowed for the 'pyproject' file type when 'table' is 'build-system'."
                 )
         elif extras.table == "project":
             key = "dependencies"
             if extras.key is not None:
                 raise ValueError(
-                    "The 'key' field is not allowed for the 'pyproject' file type when " "'table' is 'project'."
+                    "The 'key' field is not allowed for the 'pyproject' file type when 'table' is 'project'."
                 )
         else:
             if extras.key is None:

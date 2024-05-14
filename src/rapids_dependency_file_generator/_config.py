@@ -159,7 +159,7 @@ def _parse_extras(extras: dict[str, str]) -> FileExtras:
 
 
 def _parse_file(file_config: dict[str, typing.Any]) -> File:
-    def get_extras():
+    def get_extras() -> typing.Union[FileExtras, None]:
         try:
             extras = file_config["extras"]
         except KeyError:

@@ -3,6 +3,7 @@ from unittest import mock
 import yaml
 import tomlkit
 import pathlib
+import pytest
 
 from rapids_dependency_file_generator import _config
 from rapids_dependency_file_generator._constants import cli_name
@@ -77,6 +78,20 @@ def test_make_dependency_file(mock_relpath):
         extras=None,
     )
     assert env == header + "dep1\ndep2\n"
+
+
+def test_make_dependency_file_should_raise_informative_error_when_extras_is_missing_for_pyproj():
+
+    current_dir = pathlib.Path(__file__).parent
+    with pytest.raises(ValueError, match=r"The 'extras' field must be provided for the 'pyproject' file type"):
+        make_dependency_files(
+            parsed_config=_config.load_config_from_file(current_dir / "examples" / "pyproject-no-extras" / "dependencies.yaml"),
+            file_keys=["beep_boop"],
+            output={_config.Output.PYPROJECT},
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=True
+        )
 
 
 def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):
