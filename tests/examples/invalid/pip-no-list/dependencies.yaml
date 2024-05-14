@@ -1,0 +1,18 @@
+# tests that dfg rejects a config where 'pip:' in a conda requirements is a single string
+# (it should always be an array of packages)
+files:
+  build:
+    output: conda
+    includes:
+      - build
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    common:
+      - output_types: [conda]
+        packages:
+          - beep-boop=1.2.3
+          - pip
+          - pip: pandas
