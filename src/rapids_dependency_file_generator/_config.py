@@ -178,7 +178,7 @@ def _parse_file(file_config: dict[str, object]) -> File:
     )
 
 
-def _parse_requirement(requirement: typing.Union[str, dict[str, str]]) -> typing.Union[str, PipRequirements]:
+def _parse_requirement(requirement: typing.Union[str, dict[str, list[str]]]) -> typing.Union[str, PipRequirements]:
     if isinstance(requirement, str):
         return requirement
 

@@ -38,7 +38,7 @@ def test_parse_outputs(input, output):
     ["input", "output"],
     [
         ("package", "package"),
-        ({"pip": "package"}, _config.PipRequirements(pip="package")),
+        ({"pip": ["package", "other-package"]}, _config.PipRequirements(pip=["package", "other-package"])),
         ({"other": "invalid"}, KeyError),
     ],
 )

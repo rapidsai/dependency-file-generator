@@ -1,0 +1,17 @@
+# tests that 'pip:' in a conda requirements list is an array of packages, not a single string
+files:
+  build:
+    output: conda
+    includes:
+      - build
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    common:
+      - output_types: [conda]
+        packages:
+          - beep-boop=1.2.3
+          - pip
+          - pip: pandas
