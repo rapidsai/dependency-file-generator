@@ -1,0 +1,14 @@
+files:
+  all_of_the_things:
+    output: requirements
+    includes:
+      - run_deps
+    requirements_dir: .
+dependencies:
+  run_deps:
+    common:
+      - output_types: [requirements]
+        packages:
+          - fsspec>=0.6.0
+          - pip:
+            - pandas<1.0

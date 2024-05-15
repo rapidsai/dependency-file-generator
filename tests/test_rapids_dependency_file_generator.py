@@ -4,6 +4,7 @@ import yaml
 import tomlkit
 import pathlib
 import pytest
+import re
 
 from rapids_dependency_file_generator import _config
 from rapids_dependency_file_generator._constants import cli_name
@@ -88,6 +89,20 @@ def test_make_dependency_file_should_raise_informative_error_when_extras_is_miss
             parsed_config=_config.load_config_from_file(current_dir / "examples" / "pyproject-no-extras" / "dependencies.yaml"),
             file_keys=["beep_boop"],
             output={_config.Output.PYPROJECT},
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=True
+        )
+
+
+def test_make_dependency_files_should_raise_informative_error_on_map_inputs_for_requirements():
+
+    current_dir = pathlib.Path(__file__).parent
+    with pytest.raises(ValueError, match=re.escape("Map inputs like {'pip': ['pandas<1.0']} are not allowed for the 'requirements' file type.")):
+        make_dependency_files(
+            parsed_config=_config.load_config_from_file(current_dir / "examples" / "requirements-pip-dict" / "dependencies.yaml"),
+            file_keys=["all_of_the_things"],
+            output={_config.Output.REQUIREMENTS},
             matrix=None,
             prepend_channels=[],
             to_stdout=True
