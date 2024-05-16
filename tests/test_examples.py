@@ -18,6 +18,7 @@ _erroneous_examples = [
     "pyproject_matrix_multi",
     "pyproject_bad_key",
     "pyproject-no-extras",
+    "requirements-pip-dict"
 ]
 EXAMPLE_FILES = [
     pth

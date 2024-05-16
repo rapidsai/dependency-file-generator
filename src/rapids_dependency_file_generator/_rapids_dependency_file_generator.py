@@ -143,7 +143,11 @@ def make_dependency_file(
             }
         )
     elif file_type == _config.Output.REQUIREMENTS:
-        file_contents += "\n".join(dependencies) + "\n"
+        for dep in dependencies:
+            if isinstance(dep, dict):
+                raise ValueError(f"Map inputs like {dep} are not allowed for the 'requirements' file type.")
+
+            file_contents += f"{dep}\n"
     elif file_type == _config.Output.PYPROJECT:
         if extras is None:
             raise ValueError("The 'extras' field must be provided for the 'pyproject' file type.")
