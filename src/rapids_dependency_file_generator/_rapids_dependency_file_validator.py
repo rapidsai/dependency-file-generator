@@ -11,7 +11,7 @@ from jsonschema.exceptions import best_match
 SCHEMA = json.loads(importlib.resources.files(__package__).joinpath("schema.json").read_bytes())
 
 
-def validate_dependencies(dependencies):
+def validate_dependencies(dependencies) -> None:
     """Validate a dictionary against the dependencies.yaml spec.
 
     Parameters
