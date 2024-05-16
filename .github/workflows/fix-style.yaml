@@ -31,6 +31,10 @@ jobs:
           repository: '${{ fromJSON(steps.pr-info.outputs.PR_INFO).headRepositoryOwner.login }}/${{ fromJSON(steps.pr-info.outputs.PR_INFO).headRepository.name }}'
           ref: '${{ fromJSON(steps.pr-info.outputs.PR_INFO).headRefName }}'
       - uses: actions/setup-python@v5
+        with:
+          # this should be kept in sync with 'default_language_version' in .pre-commit-config.yaml,
+          # and should be the oldest Python version RAPIDS supports
+          python-version: '3.9'
       - run: python -m pip install pre-commit
       - run: pre-commit run --all-files --show-diff-on-failure --color=always
       - uses: EndBug/add-and-commit@v9
