@@ -1,6 +1,5 @@
 import argparse
 import os
-import warnings
 
 from ._config import Output, load_config_from_file
 from ._constants import default_dependency_file_path
@@ -39,11 +38,6 @@ def validate_args(argv):
         help="The file key from `dependencies.yaml` to generate.",
     )
     codependent_args.add_argument(
-        "--file_key",
-        dest="file_key_deprecated",
-        help="The file key from `dependencies.yaml` to generate. DEPRECATED: Use --file-key instead.",
-    )
-    codependent_args.add_argument(
         "--output",
         help="The output file type to generate.",
         choices=[
@@ -74,25 +68,8 @@ def validate_args(argv):
             f"{Output.CONDA.value} or no --output. May be specified multiple times."
         ),
     )
-    parser.add_argument(
-        "--prepend-channels",
-        dest="prepend_channels_deprecated",
-        help=(
-            "A string representing a list of conda channels to prepend to the list of "
-            "channels. Channels should be separated by a semicolon, such as "
-            '`--prepend-channels "my_channel;my_other_channel"`. This option is '
-            f"only valid with --output {Output.CONDA.value} or no --output. "
-            "DEPRECATED: Use --prepend-channel instead."
-        ),
-    )
 
     args = parser.parse_args(argv)
-
-    if args.file_key_deprecated:
-        if args.file_key:
-            raise ValueError("The --file_key (deprecated) and --file-key arguments cannot be specified together.")
-        warnings.warn("The use of --file_key is deprecated. Use -f or --file-key instead.")
-        args.file_key = args.file_key_deprecated
 
     dependent_arg_keys = ["file_key", "output", "matrix"]
     dependent_arg_values = [getattr(args, key) is None for key in dependent_arg_keys]
@@ -102,13 +79,6 @@ def validate_args(argv):
             + "".join([f"\n  {x}" for x in ["--file-key", "--output", "--matrix"]])
         )
 
-    if args.prepend_channels_deprecated:
-        if args.prepend_channels:
-            raise ValueError(
-                "The --prepend-channels (deprecated) and --prepend-channel arguments cannot be specified together."
-            )
-        warnings.warn("The use of --prepend-channels is deprecated. Use --prepend-channel instead.")
-        args.prepend_channels = args.prepend_channels_deprecated.split(";")
     if args.prepend_channels and args.output and args.output != Output.CONDA.value:
         raise ValueError(f"--prepend-channel is only valid with --output {Output.CONDA.value}")
 
