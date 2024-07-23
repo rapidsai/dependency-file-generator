@@ -11,6 +11,16 @@ def test_generate_matrix():
     assert matrix is None
 
 
+def test_generate_matrix_allows_duplicates_and_chooses_the_final_value():
+    # duplicate keys
+    matrix = generate_matrix("thing=abc;other_thing=true;thing=def;thing=ghi")
+    assert matrix == {"other_thing": ["true"], "thing": ["ghi"]}
+
+    # duplicate keys and values
+    matrix = generate_matrix("thing=abc;thing=abc")
+    assert matrix == {"thing": ["abc"]}
+
+
 def test_validate_args():
     # Missing output
     with pytest.raises(Exception):
@@ -104,5 +114,19 @@ def test_validate_args():
             "my_channel",
             "--prepend-channel",
             "my_other_channel",
+        ]
+    )
+
+    # Valid, with duplicates in --matrix
+    validate_args(
+        [
+            "-c",
+            "dependencies2.yaml",
+            "--output",
+            "pyproject",
+            "--matrix",
+            "cuda_suffixed=true;arch=x86_64;cuda_suffixed=false",
+            "--file-key",
+            "all",
         ]
     )
