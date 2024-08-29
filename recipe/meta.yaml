@@ -14,7 +14,7 @@ source:
 requirements:
   host:
     - python >=3.9
-    - build
+    - python-build
   run:
     - python >=3.9
     - pyyaml
