@@ -9,7 +9,7 @@ set -euo pipefail
   . /usr/share/miniconda/etc/profile.d/conda.sh
   conda activate base
   conda install -y anaconda-client
-  pkgs_to_upload=$(find "${CONDA_OUTPUT_DIR}" -name "*.tar.bz2")
+  pkgs_to_upload=$(find "${CONDA_OUTPUT_DIR}" -name "*.conda" -o -name "*.tar.bz2")
 
   export CONDA_ORG="${1}"
 
