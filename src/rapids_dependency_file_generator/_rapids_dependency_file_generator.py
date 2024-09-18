@@ -389,7 +389,20 @@ def make_dependency_files(
                         if file_type not in specific_entry.output_types:
                             continue
 
-                        found = False
+                        # Ensure that all specific matrices are unique
+                        num_matrices = len(specific_entry.matrices)
+                        num_unique = len(
+                            {
+                                frozenset(specific_matrices_entry.matrix.items())
+                                for specific_matrices_entry in specific_entry.matrices
+                            }
+                        )
+                        if num_matrices != num_unique:
+                            err = f"All matrix entries must be unique. Found duplicates in '{include}':"
+                            for specific_matrices_entry in specific_entry.matrices:
+                                err += f"\n - {specific_matrices_entry.matrix}"
+                            raise ValueError(err)
+
                         fallback_entry = None
                         for specific_matrices_entry in specific_entry.matrices:
                             # An empty `specific_matrices_entry["matrix"]` is
@@ -403,18 +416,12 @@ def make_dependency_files(
                                 continue
 
                             if should_use_specific_entry(matrix_combo, specific_matrices_entry.matrix):
-                                # Raise an error if multiple specific entries
-                                # (not including the fallback_entry) match a
-                                # requested matrix combination.
-                                if found:
-                                    raise ValueError(f"Found multiple matches for matrix {matrix_combo}")
-                                found = True
                                 # A package list may be empty as a way to
                                 # indicate that for some matrix elements no
                                 # packages should be installed.
                                 dependencies.extend(specific_matrices_entry.packages or [])
-
-                        if not found:
+                                break
+                        else:
                             if fallback_entry:
                                 dependencies.extend(fallback_entry.packages)
                             else:
