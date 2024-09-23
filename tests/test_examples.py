@@ -14,11 +14,12 @@ CURRENT_DIR = pathlib.Path(__file__).parent
 
 # Erroneous examples raise runtime errors from the generator.
 _erroneous_examples = [
+    "duplicate-specific-matrix-entries",
     "no-specific-match",
-    "pyproject_matrix_multi",
-    "pyproject_bad_key",
     "pyproject-no-extras",
-    "requirements-pip-dict"
+    "pyproject_bad_key",
+    "pyproject_matrix_multi",
+    "requirements-pip-dict",
 ]
 EXAMPLE_FILES = [
     pth
