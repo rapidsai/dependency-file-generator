@@ -25,7 +25,7 @@ jobs:
           path: ${{ env.OUTPUT_DIR }}
   wheel:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.13
     steps:
       - uses: actions/checkout@v4
         with:
