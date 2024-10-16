@@ -101,7 +101,7 @@ def make_dependency_file(
     conda_channels: list[str],
     dependencies: typing.Sequence[typing.Union[str, dict[str, list[str]]]],
     extras: typing.Union[_config.FileExtras, None],
-):
+) -> str:
     """Generate the contents of the dependency file.
 
     Parameters
@@ -360,6 +360,20 @@ def make_dependency_files(
         If the file is malformed. There are numerous different error cases
         which are described by the error messages.
     """
+
+    # the list of conda channels does not depend on individual file keys
+    conda_channels=prepend_channels + parsed_config.channels
+
+    # to support merging lists before writing to stdout
+    stdout_collection = {
+        "conda_channels": conda_channels,
+        "dependencies": {
+            "str_deps": set(),
+            "dict_deps": dict()
+        },
+        "extras": set()
+    }
+
     for file_key in file_keys:
         file_config = parsed_config.files[file_key]
         file_types_to_generate = file_config.output if output is None else output
@@ -436,20 +450,41 @@ def make_dependency_files(
                     config_file_path=parsed_config.path,
                     file_config=file_config,
                 )
-                contents = make_dependency_file(
-                    file_type=file_type,
-                    name=full_file_name,
-                    config_file=parsed_config.path,
-                    output_dir=output_dir,
-                    conda_channels=prepend_channels + parsed_config.channels,
-                    dependencies=deduped_deps,
-                    extras=file_config.extras,
-                )
-
+                
                 if to_stdout:
-                    print(contents)
+                    for dep in deduped_deps:
+                        if isinstance(dep, dict):
+                            stdout_collection["dependencies"]["dict_deps"].update(dep)
+                        else:
+                            stdout_collection["dependencies"]["str_deps"].add(dep)
+                    #stdout_collection["dependencies"] = stdout_collection["dependencies"].union(set(deduped_deps))
+                    print("---")
+                    print(deduped_deps)
+                    print("---")
                 else:
+                    contents = make_dependency_file(
+                        file_type=file_type,
+                        name=full_file_name,
+                        config_file=parsed_config.path,
+                        output_dir=output_dir,
+                        conda_channels=conda_channels,
+                        dependencies=deduped_deps,
+                        extras=file_config.extras,
+                    )
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
                     with open(file_path, "w") as f:
                         f.write(contents)
+
+    # create one unified output from all the file_keys, and print it to stdout
+    if to_stdout:
+        contents = make_dependency_file(
+            file_type=output.pop(),
+            name="to-stdout",
+            config_file=parsed_config.path,
+            output_dir=parsed_config.path,
+            conda_channels=stdout_collection["conda_channels"],
+            dependencies=sorted(stdout_collection["dependencies"]["str_deps"]),
+            extras=None
+        )
+        print(contents)
