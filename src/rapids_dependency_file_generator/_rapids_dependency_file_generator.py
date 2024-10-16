@@ -360,18 +360,17 @@ def make_dependency_files(
         If the file is malformed. There are numerous different error cases
         which are described by the error messages.
     """
+    if to_stdout and len(file_keys) > 1:
+        raise ValueError("Using --file-key multiple times when writing to stdout is not supported.")
 
     # the list of conda channels does not depend on individual file keys
-    conda_channels=prepend_channels + parsed_config.channels
+    conda_channels = prepend_channels + parsed_config.channels
 
     # to support merging lists before writing to stdout
     stdout_collection = {
         "conda_channels": conda_channels,
-        "dependencies": {
-            "str_deps": set(),
-            "dict_deps": dict()
-        },
-        "extras": set()
+        "dependencies": {"str_deps": set(), "dict_deps": dict()},
+        "extras": parsed_config.files[file_keys[0]].extras,
     }
 
     for file_key in file_keys:
@@ -450,34 +449,44 @@ def make_dependency_files(
                     config_file_path=parsed_config.path,
                     file_config=file_config,
                 )
-                
+                contents = make_dependency_file(
+                    file_type=file_type,
+                    name=full_file_name,
+                    config_file=parsed_config.path,
+                    output_dir=output_dir,
+                    conda_channels=conda_channels,
+                    dependencies=deduped_deps,
+                    extras=file_config.extras,
+                )
+
                 if to_stdout:
-                    for dep in deduped_deps:
-                        if isinstance(dep, dict):
-                            stdout_collection["dependencies"]["dict_deps"].update(dep)
-                        else:
-                            stdout_collection["dependencies"]["str_deps"].add(dep)
-                    #stdout_collection["dependencies"] = stdout_collection["dependencies"].union(set(deduped_deps))
-                    print("---")
-                    print(deduped_deps)
-                    print("---")
+                    if len(file_keys) == 1:
+                        print(contents)
+                    else:
+                        for dep in deduped_deps:
+                            if isinstance(dep, dict):
+                                stdout_collection["dependencies"]["dict_deps"].update(dep)
+                            else:
+                                stdout_collection["dependencies"]["str_deps"].add(dep)
+                        # stdout_collection["dependencies"] = stdout_collection["dependencies"].union(set(deduped_deps))
+                        print("---")
+                        print(deduped_deps)
+                        print("---")
                 else:
-                    contents = make_dependency_file(
-                        file_type=file_type,
-                        name=full_file_name,
-                        config_file=parsed_config.path,
-                        output_dir=output_dir,
-                        conda_channels=conda_channels,
-                        dependencies=deduped_deps,
-                        extras=file_config.extras,
-                    )
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
                     with open(file_path, "w") as f:
                         f.write(contents)
 
     # create one unified output from all the file_keys, and print it to stdout
-    if to_stdout:
+    #
+    # notes:
+    #
+    #  * 'output' is technically a set because of https://github.com/rapidsai/dependency-file-generator/pull/74,
+    #    but since https://github.com/rapidsai/dependency-file-generator/pull/79 it's only ever one of the following:
+    #       - an exactly-1-item set (stdout=True, or when used with rapids-build-backend)
+    #       - 'None' (stdout=False)
+    if to_stdout and len(file_keys) > 1:
         contents = make_dependency_file(
             file_type=output.pop(),
             name="to-stdout",
@@ -485,6 +494,6 @@ def make_dependency_files(
             output_dir=parsed_config.path,
             conda_channels=stdout_collection["conda_channels"],
             dependencies=sorted(stdout_collection["dependencies"]["str_deps"]),
-            extras=None
+            extras=stdout_collection["extras"],
         )
         print(contents)

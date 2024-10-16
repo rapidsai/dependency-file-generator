@@ -35,7 +35,7 @@ def validate_args(argv):
     codependent_args = parser.add_argument_group("optional, but codependent")
     codependent_args.add_argument(
         "--file-key",
-        action='append',
+        action="append",
         help=(
             "The file key from `dependencies.yaml` to generate. "
             "If supplied multiple times, dependency lists from all requested file keys will be merged."
