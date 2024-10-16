@@ -394,7 +394,7 @@ def make_dependency_files(
     """
     if to_stdout and len(file_keys) > 1 and output is not None and _config.Output.PYPROJECT in output:
         raise ValueError(
-            f"Using --file-key multiple times together with '--output {_config.Output.PYPROJECT}' "
+            f"Using --file-key multiple times together with '--output {_config.Output.PYPROJECT.value}' "
             "when writing to stdout is not supported."
         )
 
