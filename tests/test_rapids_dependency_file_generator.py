@@ -54,7 +54,8 @@ def test_make_dependency_file(mock_relpath):
 """
     env = make_dependency_file(
         file_type=_config.Output.CONDA,
-        name="tmp_env.yaml",
+        conda_env_name="tmp_env",
+        file_name="tmp_env.yaml",
         config_file="config_file",
         output_dir="output_path",
         conda_channels=["rapidsai", "nvidia"],
@@ -71,7 +72,8 @@ def test_make_dependency_file(mock_relpath):
 
     env = make_dependency_file(
         file_type=_config.Output.REQUIREMENTS,
-        name="tmp_env.txt",
+        conda_env_name="tmp_env",
+        file_name="tmp_env.txt",
         config_file="config_file",
         output_dir="output_path",
         conda_channels=["rapidsai", "nvidia"],

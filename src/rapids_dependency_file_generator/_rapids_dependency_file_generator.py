@@ -4,6 +4,7 @@ import os
 import textwrap
 import typing
 from collections.abc import Generator
+from dataclasses import dataclass
 
 import tomlkit
 import yaml
@@ -95,7 +96,8 @@ def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str], None, None
 def make_dependency_file(
     *,
     file_type: _config.Output,
-    name: os.PathLike,
+    conda_env_name: str,
+    file_name: str,
     config_file: os.PathLike,
     output_dir: os.PathLike,
     conda_channels: list[str],
@@ -108,14 +110,18 @@ def make_dependency_file(
     ----------
     file_type : Output
         An Output value used to determine the file type.
-    name : PathLike
-        The name of the file to write.
+    conda_env_name : str
+        Name to put in the 'name: ' field when generating conda environment YAML files.
+        Only used when ``file_type`` is CONDA.
+    file_name : str
+        Name of a file in ``output_dir`` to read in.
+        Only used when ``file_type`` is PYPROJECT.
     config_file : PathLike
         The full path to the dependencies.yaml file.
     output_dir : PathLike
         The path to the directory where the dependency files will be written.
     conda_channels : list[str]
-        The channels to include in the file. Only used when `file_type` is
+        The channels to include in the file. Only used when ``file_type`` is
         CONDA.
     dependencies : Sequence[str | dict[str, list[str]]]
         The dependencies to include in the file.
@@ -137,7 +143,7 @@ def make_dependency_file(
     if file_type == _config.Output.CONDA:
         file_contents += yaml.dump(
             {
-                "name": os.path.splitext(name)[0],
+                "name": conda_env_name,
                 "channels": conda_channels,
                 "dependencies": dependencies,
             }
@@ -173,7 +179,7 @@ def make_dependency_file(
             key = extras.key
 
         # This file type needs to be modified in place instead of built from scratch.
-        with open(os.path.join(output_dir, name)) as f:
+        with open(os.path.join(output_dir, file_name)) as f:
             file_contents_toml = tomlkit.load(f)
 
         toml_deps = tomlkit.array()
@@ -320,6 +326,32 @@ def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matri
     )
 
 
+@dataclass
+class _DependencyCollection:
+    str_deps: set[str]
+    # e.g. {"pip": ["dgl", "pyg"]}, used in conda envs
+    dict_deps: dict[str, list[str]]
+
+    def update(self, deps: typing.Sequence[typing.Union[str, dict[str, list[str]]]]) -> None:
+        for dep in deps:
+            if isinstance(dep, dict):
+                for k, v in dep.items():
+                    if k in self.dict_deps:
+                        self.dict_deps[k].extend(v)
+                        self.dict_deps[k] = sorted(set(self.dict_deps[k]))
+                    else:
+                        self.dict_deps[k] = v
+            else:
+                self.str_deps.add(dep)
+
+    @property
+    def deps_list(self) -> typing.Sequence[typing.Union[str, dict[str, list[str]]]]:
+        if self.dict_deps:
+            return [*sorted(self.str_deps), self.dict_deps]
+
+        return [*sorted(self.str_deps)]
+
+
 def make_dependency_files(
     *,
     parsed_config: _config.Config,
@@ -360,18 +392,18 @@ def make_dependency_files(
         If the file is malformed. There are numerous different error cases
         which are described by the error messages.
     """
-    if to_stdout and len(file_keys) > 1:
-        raise ValueError("Using --file-key multiple times when writing to stdout is not supported.")
+    if to_stdout and len(file_keys) > 1 and output is not None and _config.Output.PYPROJECT in output:
+        raise ValueError(
+            f"Using --file-key multiple times together with '--output {_config.Output.PYPROJECT}' "
+            "when writing to stdout is not supported."
+        )
 
     # the list of conda channels does not depend on individual file keys
     conda_channels = prepend_channels + parsed_config.channels
 
-    # to support merging lists before writing to stdout
-    stdout_collection = {
-        "conda_channels": conda_channels,
-        "dependencies": {"str_deps": set(), "dict_deps": dict()},
-        "extras": parsed_config.files[file_keys[0]].extras,
-    }
+    # initialize a container for "all dependencies found across all files", to support
+    # passing multiple files keys and writing a merged result to stdout
+    all_dependencies = _DependencyCollection(str_deps=set(), dict_deps={})
 
     for file_key in file_keys:
         file_config = parsed_config.files[file_key]
@@ -451,7 +483,8 @@ def make_dependency_files(
                 )
                 contents = make_dependency_file(
                     file_type=file_type,
-                    name=full_file_name,
+                    conda_env_name=os.path.splitext(full_file_name)[0],
+                    file_name=full_file_name,
                     config_file=parsed_config.path,
                     output_dir=output_dir,
                     conda_channels=conda_channels,
@@ -463,15 +496,7 @@ def make_dependency_files(
                     if len(file_keys) == 1:
                         print(contents)
                     else:
-                        for dep in deduped_deps:
-                            if isinstance(dep, dict):
-                                stdout_collection["dependencies"]["dict_deps"].update(dep)
-                            else:
-                                stdout_collection["dependencies"]["str_deps"].add(dep)
-                        # stdout_collection["dependencies"] = stdout_collection["dependencies"].union(set(deduped_deps))
-                        print("---")
-                        print(deduped_deps)
-                        print("---")
+                        all_dependencies.update(deduped_deps)
                 else:
                     os.makedirs(output_dir, exist_ok=True)
                     file_path = os.path.join(output_dir, full_file_name)
@@ -479,21 +504,29 @@ def make_dependency_files(
                         f.write(contents)
 
     # create one unified output from all the file_keys, and print it to stdout
-    #
-    # notes:
-    #
-    #  * 'output' is technically a set because of https://github.com/rapidsai/dependency-file-generator/pull/74,
-    #    but since https://github.com/rapidsai/dependency-file-generator/pull/79 it's only ever one of the following:
-    #       - an exactly-1-item set (stdout=True, or when used with rapids-build-backend)
-    #       - 'None' (stdout=False)
     if to_stdout and len(file_keys) > 1:
+        # convince mypy that 'output' is not None here
+        #
+        # 'output' is technically a set because of https://github.com/rapidsai/dependency-file-generator/pull/74,
+        # but since https://github.com/rapidsai/dependency-file-generator/pull/79 it's only ever one of the following:
+        #
+        #   - an exactly-1-item set (stdout=True, or when used by rapids-build-backend)
+        #   - 'None' (stdout=False)
+        #
+        err_msg = (
+            "Exactly 1 output type should be provided when asking rapids-dependency-file-generator to write to stdout. "
+            "If you see this, you've found a bug. Please report it at https://github.com/rapidsai/dependency-file-generator/issues."
+        )
+        assert output is not None, err_msg
+
         contents = make_dependency_file(
             file_type=output.pop(),
-            name="to-stdout",
+            conda_env_name="rapids-dfg-combined",
+            file_name="ignored-because-multiple-pyproject-files-are-not-supported",
             config_file=parsed_config.path,
             output_dir=parsed_config.path,
-            conda_channels=stdout_collection["conda_channels"],
-            dependencies=sorted(stdout_collection["dependencies"]["str_deps"]),
-            extras=stdout_collection["extras"],
+            conda_channels=conda_channels,
+            dependencies=all_dependencies.deps_list,
+            extras=None,
         )
         print(contents)
