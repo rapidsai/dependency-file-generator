@@ -35,7 +35,11 @@ def validate_args(argv):
     codependent_args = parser.add_argument_group("optional, but codependent")
     codependent_args.add_argument(
         "--file-key",
-        help="The file key from `dependencies.yaml` to generate.",
+        action="append",
+        help=(
+            "The file key from `dependencies.yaml` to generate. "
+            "If supplied multiple times, dependency lists from all requested file keys will be merged."
+        ),
     )
     codependent_args.add_argument(
         "--output",
@@ -109,7 +113,7 @@ def main(argv=None) -> None:
     to_stdout = all([args.file_key, args.output, args.matrix is not None])
 
     if to_stdout:
-        file_keys = [args.file_key]
+        file_keys = args.file_key
         output = {Output(args.output)}
     else:
         file_keys = list(parsed_config.files.keys())
