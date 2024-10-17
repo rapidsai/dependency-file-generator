@@ -147,6 +147,39 @@ def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):
     # and should NOT contain anything from the root-level pyproject.toml
     assert set(dict(doc).keys()) == {"project"}
 
+def test_make_dependency_files_requirements_to_stdout_with_multiple_file_keys_works(capsys):
+
+    current_dir = pathlib.Path(__file__).parent
+    make_dependency_files(
+        parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
+        file_keys=["build_deps", "even_more_build_deps"],
+        output={_config.Output.REQUIREMENTS},
+        matrix={"arch": ["x86_64"]},
+        prepend_channels=[],
+        to_stdout=True
+    )
+    captured_stdout = capsys.readouterr().out
+    reqs_list = [r for r in captured_stdout.split("\n") if not (r.startswith(r"#") or r == "")]
+
+    # should contain exactly the expected dependencies, sorted alphabetically, with no duplicates
+    assert reqs_list == ["numpy>=2.0", "rapids-build-backend>=0.3.1", "scikit-build-core[pyproject]>=0.9.0"]
+
+# def test_make_dependency_files_requirements_to_stdout_with_multiple_file_keys_works(capsys):
+
+#     current_dir = pathlib.Path(__file__).parent
+#     make_dependency_files(
+#         parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
+#         file_keys=["build_deps", "even_more_build_deps"],
+#         output={_config.Output.REQUIREMENTS},
+#         matrix={"arch": ["x86_64"]},
+#         prepend_channels=[],
+#         to_stdout=True
+#     )
+#     captured_stdout = capsys.readouterr().out
+#     reqs_list = [r for r in captured_stdout.split("\n") if not (r.startswith(r"#") or r == "")]
+
+#     # should contain exactly the expected dependencies, sorted alphabetically, with no duplicates
+#     assert reqs_list == ["numpy>=2.0", "rapids-build-backend>=0.3.1", "scikit-build-core[pyproject]>=0.9.0"]
 
 def test_should_use_specific_entry():
     # no match
