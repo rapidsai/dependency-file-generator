@@ -83,7 +83,7 @@ def test_make_dependency_file(mock_relpath):
     assert env == header + "dep1\ndep2\n"
 
 
-def test_make_dependency_files_should_raise_informative_error_when_extras_is_missing_for_pyproj():
+def test_make_dependency_file_should_raise_informative_error_when_extras_is_missing_for_pyproj():
 
     current_dir = pathlib.Path(__file__).parent
     with pytest.raises(ValueError, match=r"The 'extras' field must be provided for the 'pyproject' file type"):
