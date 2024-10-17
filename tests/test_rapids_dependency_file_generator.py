@@ -162,24 +162,49 @@ def test_make_dependency_files_requirements_to_stdout_with_multiple_file_keys_wo
     reqs_list = [r for r in captured_stdout.split("\n") if not (r.startswith(r"#") or r == "")]
 
     # should contain exactly the expected dependencies, sorted alphabetically, with no duplicates
-    assert reqs_list == ["numpy>=2.0", "rapids-build-backend>=0.3.1", "scikit-build-core[pyproject]>=0.9.0"]
+    assert reqs_list == ["numpy>=2.0", "pandas<3.0", "rapids-build-backend>=0.3.1", "scikit-build-core[pyproject]>=0.9.0"]
 
-# def test_make_dependency_files_requirements_to_stdout_with_multiple_file_keys_works(capsys):
+def test_make_dependency_files_conda_to_stdout_with_multiple_file_keys_works(capsys):
 
-#     current_dir = pathlib.Path(__file__).parent
-#     make_dependency_files(
-#         parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
-#         file_keys=["build_deps", "even_more_build_deps"],
-#         output={_config.Output.REQUIREMENTS},
-#         matrix={"arch": ["x86_64"]},
-#         prepend_channels=[],
-#         to_stdout=True
-#     )
-#     captured_stdout = capsys.readouterr().out
-#     reqs_list = [r for r in captured_stdout.split("\n") if not (r.startswith(r"#") or r == "")]
+    current_dir = pathlib.Path(__file__).parent
+    make_dependency_files(
+        parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
+        file_keys=["test_with_sklearn", "test_deps", "even_more_test_deps"],
+        output={_config.Output.CONDA},
+        matrix={"py": ["4.7"]},
+        prepend_channels=[],
+        to_stdout=True
+    )
+    captured_stdout = capsys.readouterr().out
+    env_dict = yaml.safe_load(captured_stdout)
 
-#     # should contain exactly the expected dependencies, sorted alphabetically, with no duplicates
-#     assert reqs_list == ["numpy>=2.0", "rapids-build-backend>=0.3.1", "scikit-build-core[pyproject]>=0.9.0"]
+    # should only have the expected keys
+    assert sorted(env_dict.keys()) == ["channels", "dependencies", "name"]
+
+    # should use preserve the channels from dependencies.yaml, in the order they were supplied
+    assert env_dict["channels"] == ["rapidsai", "conda-forge"]
+
+    # should use the hard-coded env name
+    assert env_dict["name"] == "rapids-dfg-combined"
+
+    # dependencies list should:
+    #
+    #  * be sorted alphabetically (other than "pip:" list at the end)
+    #  * should include the "pip:" subsection
+    #  * should not have any duplicates
+    #  * should contain the union of all dependencies from all requested file keys
+    #
+    assert env_dict["dependencies"] == [
+        "matplotlib",
+        "pandas<3.0",
+        "pip",
+        "scikit-learn>=1.5",
+        {"pip": [
+            "folium",
+            "numpy >=2.0",
+        ]}
+    ]
+
 
 def test_should_use_specific_entry():
     # no match

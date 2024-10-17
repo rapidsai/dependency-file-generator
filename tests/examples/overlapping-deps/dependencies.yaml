@@ -26,6 +26,10 @@ files:
     includes:
       - depends_on_numpy
       - test_python
+  test_with_sklearn:
+    output: none
+    includes:
+      - depends_on_scikit_learn
 channels:
   - rapidsai
   - conda-forge
@@ -45,21 +49,26 @@ dependencies:
     common:
       - output_types: [conda, requirements, pyproject]
         packages:
-          - numpy>=2.0
-  even_more_test_deps:
+          - pandas<3.0
+  depends_on_scikit_learn:
+    common:
+      - output_types: [conda, requirements, pyproject]
+        packages:
+          - scikit-learn>=1.5
+  test_python:
     common:
       - output_types: [conda, requirements, pyproject]
         packages:
           - matplotlib
-          - scikit-learn>=1.5
       - output_types: [conda]
         packages:
           - pip
           # intentional overlap (numpy) with depends_on_numpy's pip list, to
           # test that pip dependencies don't have duplicates
           - pip:
-            - folium
+            # intentionally not in alphabetical order
             - numpy >=2.0
+            - folium
   rapids_build_skbuild:
     common:
       - output_types: [conda, requirements, pyproject]
