@@ -96,7 +96,7 @@ def grid(gridspec: dict[str, list[str]]) -> Generator[dict[str, str], None, None
 def make_dependency_file(
     *,
     file_type: _config.Output,
-    conda_env_name: str,
+    conda_env_name: typing.Union[str, None],
     file_name: str,
     config_file: os.PathLike,
     output_dir: os.PathLike,
@@ -110,8 +110,9 @@ def make_dependency_file(
     ----------
     file_type : Output
         An Output value used to determine the file type.
-    conda_env_name : str
+    conda_env_name : str | None
         Name to put in the 'name: ' field when generating conda environment YAML files.
+        If ``None``, the generated cond environment file will not have a 'name:' entry.
         Only used when ``file_type`` is CONDA.
     file_name : str
         Name of a file in ``output_dir`` to read in.
@@ -141,13 +142,13 @@ def make_dependency_file(
         """
     )
     if file_type == _config.Output.CONDA:
-        file_contents += yaml.dump(
-            {
-                "name": conda_env_name,
-                "channels": conda_channels,
-                "dependencies": dependencies,
-            }
-        )
+        env_dict = {
+            "channels": conda_channels,
+            "dependencies": dependencies,
+        }
+        if conda_env_name is not None:
+            env_dict["name"] = conda_env_name
+        file_contents += yaml.dump(env_dict)
     elif file_type == _config.Output.REQUIREMENTS:
         for dep in dependencies:
             if isinstance(dep, dict):
@@ -515,13 +516,13 @@ def make_dependency_files(
         #
         err_msg = (
             "Exactly 1 output type should be provided when asking rapids-dependency-file-generator to write to stdout. "
-            "If you see this, you've found a bug. Please report it at https://github.com/rapidsai/dependency-file-generator/issues."
+            "If you see this, you've found a bug. Please report it."
         )
         assert output is not None, err_msg
 
         contents = make_dependency_file(
             file_type=output.pop(),
-            conda_env_name="rapids-dfg-combined",
+            conda_env_name=None,
             file_name="ignored-because-multiple-pyproject-files-are-not-supported",
             config_file=parsed_config.path,
             output_dir=parsed_config.path,

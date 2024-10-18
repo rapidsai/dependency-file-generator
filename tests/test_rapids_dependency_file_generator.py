@@ -179,13 +179,10 @@ def test_make_dependency_files_conda_to_stdout_with_multiple_file_keys_works(cap
     env_dict = yaml.safe_load(captured_stdout)
 
     # should only have the expected keys
-    assert sorted(env_dict.keys()) == ["channels", "dependencies", "name"]
+    assert sorted(env_dict.keys()) == ["channels", "dependencies"]
 
     # should use preserve the channels from dependencies.yaml, in the order they were supplied
     assert env_dict["channels"] == ["rapidsai", "conda-forge"]
-
-    # should use the hard-coded env name
-    assert env_dict["name"] == "rapids-dfg-combined"
 
     # dependencies list should:
     #
@@ -201,7 +198,7 @@ def test_make_dependency_files_conda_to_stdout_with_multiple_file_keys_works(cap
         "scikit-learn>=1.5",
         {"pip": [
             "folium",
-            "numpy >=2.0",
+            "numpy>=2.0",
         ]}
     ]
 
