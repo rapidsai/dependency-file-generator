@@ -322,7 +322,7 @@ ENV_NAME="cudf_test"
 rapids-dependency-file-generator \
   --file-key "test" \
   --output "conda" \
-  --matrix "cuda=11.5;arch=$(arch)" > env.yaml
+  --matrix "cuda=12.5;arch=$(arch)" > env.yaml
 mamba env create --file env.yaml
 mamba activate "$ENV_NAME"
 
@@ -334,6 +334,16 @@ The `--file-key` argument is passed the `test` key name from the `files` configu
 The `--file-key`, `--output`, and `--matrix` flags must be used together. `--matrix` may be an empty string if the file that should be generated does not depend on any specific matrix variations.
 
 Where multiple values for the same key are passed to `--matrix`, e.g. `cuda_suffixed=true;cuda_suffixed=false`, only the last value will be used.
+
+Where `--file-key` is supplied multiple times in the same invocation, the output printed to `stdout` will contain a union (without duplicates) of all of the corresponding dependencies. For example:
+
+```shell
+rapids-dependency-file-generator \
+  --file-key "test" \
+  --file-key "test_notebooks" \
+  --output "conda" \
+  --matrix "cuda=12.5;arch=$(arch)" > env.yaml
+```
 
 The `--prepend-channel` argument accepts additional channels to use, like `rapids-dependency-file-generator --prepend-channel my_channel --prepend-channel my_other_channel`.
 If both `--output` and `--prepend-channel` are provided, the output format must be conda.

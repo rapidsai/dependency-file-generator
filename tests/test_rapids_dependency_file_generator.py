@@ -54,7 +54,8 @@ def test_make_dependency_file(mock_relpath):
 """
     env = make_dependency_file(
         file_type=_config.Output.CONDA,
-        name="tmp_env.yaml",
+        conda_env_name="tmp_env",
+        file_name="tmp_env.yaml",
         config_file="config_file",
         output_dir="output_path",
         conda_channels=["rapidsai", "nvidia"],
@@ -71,7 +72,8 @@ def test_make_dependency_file(mock_relpath):
 
     env = make_dependency_file(
         file_type=_config.Output.REQUIREMENTS,
-        name="tmp_env.txt",
+        conda_env_name="tmp_env",
+        file_name="tmp_env.txt",
         config_file="config_file",
         output_dir="output_path",
         conda_channels=["rapidsai", "nvidia"],
@@ -94,6 +96,19 @@ def test_make_dependency_file_should_raise_informative_error_when_extras_is_miss
             to_stdout=True
         )
 
+
+def test_make_dependency_files_should_raise_informative_error_when_multiple_files_requested_for_pyproject():
+
+    current_dir = pathlib.Path(__file__).parent
+    with pytest.raises(ValueError, match=r"Using \-\-file\-key multiple times together with.*pyproject"):
+        make_dependency_files(
+            parsed_config=_config.load_config_from_file(current_dir / "examples" / "integration" / "dependencies.yaml"),
+            file_keys=["all", "test"],
+            output={_config.Output.PYPROJECT},
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=True
+        )
 
 def test_make_dependency_files_should_raise_informative_error_on_map_inputs_for_requirements():
 
@@ -131,6 +146,61 @@ def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):
 
     # and should NOT contain anything from the root-level pyproject.toml
     assert set(dict(doc).keys()) == {"project"}
+
+def test_make_dependency_files_requirements_to_stdout_with_multiple_file_keys_works(capsys):
+
+    current_dir = pathlib.Path(__file__).parent
+    make_dependency_files(
+        parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
+        file_keys=["build_deps", "even_more_build_deps"],
+        output={_config.Output.REQUIREMENTS},
+        matrix={"arch": ["x86_64"]},
+        prepend_channels=[],
+        to_stdout=True
+    )
+    captured_stdout = capsys.readouterr().out
+    reqs_list = [r for r in captured_stdout.split("\n") if not (r.startswith(r"#") or r == "")]
+
+    # should contain exactly the expected dependencies, sorted alphabetically, with no duplicates
+    assert reqs_list == ["numpy>=2.0", "pandas<3.0", "rapids-build-backend>=0.3.1", "scikit-build-core[pyproject]>=0.9.0"]
+
+def test_make_dependency_files_conda_to_stdout_with_multiple_file_keys_works(capsys):
+
+    current_dir = pathlib.Path(__file__).parent
+    make_dependency_files(
+        parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
+        file_keys=["test_with_sklearn", "test_deps", "even_more_test_deps"],
+        output={_config.Output.CONDA},
+        matrix={"py": ["4.7"]},
+        prepend_channels=[],
+        to_stdout=True
+    )
+    captured_stdout = capsys.readouterr().out
+    env_dict = yaml.safe_load(captured_stdout)
+
+    # should only have the expected keys
+    assert sorted(env_dict.keys()) == ["channels", "dependencies"]
+
+    # should use preserve the channels from dependencies.yaml, in the order they were supplied
+    assert env_dict["channels"] == ["rapidsai", "conda-forge"]
+
+    # dependencies list should:
+    #
+    #  * be sorted alphabetically (other than "pip:" list at the end)
+    #  * should include the "pip:" subsection
+    #  * should not have any duplicates
+    #  * should contain the union of all dependencies from all requested file keys
+    #
+    assert env_dict["dependencies"] == [
+        "matplotlib",
+        "pandas<3.0",
+        "pip",
+        "scikit-learn>=1.5",
+        {"pip": [
+            "folium",
+            "numpy>=2.0",
+        ]}
+    ]
 
 
 def test_should_use_specific_entry():

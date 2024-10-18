@@ -130,3 +130,47 @@ def test_validate_args():
             "all",
         ]
     )
+
+    # Valid, with 2 files for --output requirements
+    validate_args(
+        [
+            "--output",
+            "requirements",
+            "--matrix",
+            "cuda=12.5",
+            "--file-key",
+            "all",
+            "--file-key",
+            "test_python",
+        ]
+    )
+
+    # Valid, with 2 files for --output conda
+    validate_args(
+        [
+            "--output",
+            "conda",
+            "--matrix",
+            "cuda=12.5",
+            "--file-key",
+            "all",
+            "--file-key",
+            "test_python",
+        ]
+    )
+
+    # Valid, with 3 files
+    validate_args(
+        [
+            "--output",
+            "requirements",
+            "--matrix",
+            "cuda=12.5",
+            "--file-key",
+            "all",
+            "--file-key",
+            "test_python",
+            "--file-key",
+            "build_python",
+        ]
+    )
