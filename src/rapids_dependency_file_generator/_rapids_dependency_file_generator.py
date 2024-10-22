@@ -112,7 +112,7 @@ def make_dependency_file(
         An Output value used to determine the file type.
     conda_env_name : str | None
         Name to put in the 'name: ' field when generating conda environment YAML files.
-        If ``None``, the generated cond environment file will not have a 'name:' entry.
+        If ``None``, the generated conda environment file will not have a 'name:' entry.
         Only used when ``file_type`` is CONDA.
     file_name : str
         Name of a file in ``output_dir`` to read in.
