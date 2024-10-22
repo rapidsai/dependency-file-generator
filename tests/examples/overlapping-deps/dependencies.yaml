@@ -1,0 +1,82 @@
+files:
+  build_deps:
+    output: [pyproject]
+    pyproject_dir: output/actual
+    extras:
+      table: build-system
+    includes:
+      - rapids_build_skbuild
+      - depends_on_numpy
+  even_more_build_deps:
+    output: [pyproject]
+    pyproject_dir: output/actual
+    extras:
+      table: tool.rapids-build-backend
+      key: requires
+    includes:
+      - depends_on_numpy
+      - depends_on_pandas
+  test_deps:
+    output: none
+    includes:
+      - depends_on_numpy
+      - depends_on_pandas
+  even_more_test_deps:
+    output: none
+    includes:
+      - depends_on_numpy
+      - test_python
+  test_with_sklearn:
+    output: none
+    includes:
+      - depends_on_scikit_learn
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  depends_on_numpy:
+    common:
+      - output_types: [requirements, pyproject]
+        packages:
+          - numpy>=2.0
+      # using 'pip' intentionally to test handling of that nested list
+      - output_types: [conda]
+        packages:
+          - pip
+          - pip:
+            - numpy>=2.0
+  depends_on_pandas:
+    common:
+      - output_types: [conda, requirements, pyproject]
+        packages:
+          - pandas<3.0
+  depends_on_scikit_learn:
+    common:
+      - output_types: [conda, requirements, pyproject]
+        packages:
+          - scikit-learn>=1.5
+  test_python:
+    common:
+      - output_types: [conda, requirements, pyproject]
+        packages:
+          - matplotlib
+      - output_types: [conda]
+        packages:
+          - pip
+          # intentional overlap (numpy) with depends_on_numpy's pip list, to
+          # test that pip dependencies don't have duplicates
+          - pip:
+            # intentionally not in alphabetical order
+            - numpy>=2.0
+            - folium
+  rapids_build_skbuild:
+    common:
+      - output_types: [conda, requirements, pyproject]
+        packages:
+          - rapids-build-backend>=0.3.1
+      - output_types: [requirements, pyproject]
+        packages:
+          - scikit-build-core[pyproject]>=0.9.0
+      - output_types: [conda]
+        packages:
+          - scikit-build-core>=0.9.0
