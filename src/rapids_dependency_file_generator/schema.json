@@ -87,7 +87,10 @@
             "patternProperties": {
                 ".*": {
                     "type": "array",
-                    "items": {"type": "string"}
+                    "items": {"oneOf": [
+                        {"type": "string"},
+                        {"type": "null"}
+                    ]}
                 }
             }
         },

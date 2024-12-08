@@ -243,7 +243,7 @@ def get_filename(file_type: _config.Output, file_key: str, matrix_combo: dict[st
     file_type_prefix = ""
     file_ext = ""
     file_name_prefix = file_key
-    suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items()])
+    suffix = "_".join([f"{k}-{v}" for k, v in matrix_combo.items() if v])
     if file_type == _config.Output.CONDA:
         file_ext = ".yaml"
     elif file_type == _config.Output.REQUIREMENTS:
@@ -322,7 +322,7 @@ def should_use_specific_entry(matrix_combo: dict[str, str], specific_entry_matri
         `matrix_combo` and False otherwise.
     """
     return all(
-        specific_key in matrix_combo and fnmatch.fnmatch(matrix_combo[specific_key], specific_value)
+        matrix_combo.get(specific_key) and fnmatch.fnmatch(matrix_combo[specific_key], specific_value)
         for specific_key, specific_value in specific_entry_matrix.items()
     )
 
