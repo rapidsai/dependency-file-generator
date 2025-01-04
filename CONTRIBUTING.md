@@ -38,3 +38,4 @@ To create new `example` tests do the following:
 - Manually inspect the generated files for correctness
 - Copy the contents of `output/actual` to `output/expected`, so it will be committed to the repository and used as a baseline for future changes
 - Add the new folder name to [test_examples.py](./tests/test_examples.py)
+
