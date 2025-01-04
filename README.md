@@ -4,18 +4,6 @@
 
 When installed, it makes the `rapids-dependency-file-generator` CLI command available which is responsible for parsing a `dependencies.yaml` configuration file and generating the appropriate conda `environment.yaml` and `requirements.txt` dependency files.
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [`dependencies.yaml` Format](#dependenciesyaml-format)
-  - [`files` key](#files-key)
-  - [`channels` key](#channels-key)
-  - [`dependencies` key](#dependencies-key)
-- [How Dependency Lists Are Merged](#how-dependency-lists-are-merged)
-- [Additional CLI Notes](#additional-cli-notes)
-- [Examples](#examples)
-
 ## Installation
 
 `rapids-dependency-file-generator` is available on [PyPI](https://pypi.org/project/rapids-dependency-file-generator/). To install, run:
