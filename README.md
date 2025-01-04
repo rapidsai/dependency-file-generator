@@ -139,7 +139,7 @@ In the absence of a `channels` key, some sensible defaults for RAPIDS will be us
 
 The top-level `dependencies` key is where the bifurcated dependency lists should be specified.
 
-Underneath the `dependencies` key are sets of key-value pairs. For each pair, the key can be arbitarily named, but should match an item from the `includes` list of any `files` entry.
+Underneath the `dependencies` key are sets of key-value pairs. For each pair, the key can be arbitrarily named, but should match an item from the `includes` list of any `files` entry.
 
 The value of each key-value pair can have the following children keys:
 
@@ -350,16 +350,3 @@ If both `--output` and `--prepend-channel` are provided, the output format must 
 Prepending channels can be useful for adding local channels with packages to be tested in CI workflows.
 
 Running `rapids-dependency-file-generator -h` will show the most up-to-date CLI arguments.
-
-## Examples
-
-The [tests/examples](./tests/examples/) directory has example `dependencies.yaml` files along with their corresponding output files.
-
-To create new `example` tests do the following:
-
-- Create a new directory with a `dependencies.yaml` file in [tests/examples](tests/examples/)
-- Ensure the `output` directories (e.g. `conda_dir`, `requirements_dir`, etc.) are set to write to `output/actual`
-- Run `rapids-dependency-file-generator --config tests/examples/<new_folder_name>/dependencies.yaml` to generate the initial output files
-- Manually inspect the generated files for correctness
-- Copy the contents of `output/actual` to `output/expected`, so it will be committed to the repository and used as a baseline for future changes
-- Add the new folder name to [test_examples.py](./tests/test_examples.py)
