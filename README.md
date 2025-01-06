@@ -24,8 +24,6 @@ The `dependencies.yaml` file has the following characteristics:
 
 ## `dependencies.yaml` Format
 
-> The [Examples](#examples) section below has instructions on where example `dependency.yaml` files and their corresponding output can be viewed.
-
 The `dependencies.yaml` file has three relevant top-level keys: `files`, `channels`, and `dependencies`. These keys are described in detail below.
 
 ### `files` Key
