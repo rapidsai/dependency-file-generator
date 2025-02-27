@@ -3,7 +3,7 @@ set -euo pipefail
 
 ./ci/update-versions.sh "${RELEASE_VERSION:-}"
 
-mamba install -y boa conda-build
-conda mambabuild \
+mamba install -y conda-build
+conda build \
   --output-folder "${OUTPUT_DIR:-"/tmp/output"}" \
   recipe/
