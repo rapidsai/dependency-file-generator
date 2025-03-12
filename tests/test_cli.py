@@ -174,3 +174,10 @@ def test_validate_args():
             "build_python",
         ]
     )
+
+    # Verify --version flag
+    args = validate_args([])
+    assert not args.version
+
+    args = validate_args(["--version"])
+    assert args.version
