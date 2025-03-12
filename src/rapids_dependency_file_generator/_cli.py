@@ -76,7 +76,7 @@ def validate_args(argv):
     parser.add_argument(
         "--version",
         default=False,
-        action='store_true',
+        action="store_true",
         help="Show the version and exit.",
     )
 
