@@ -6,7 +6,9 @@
 set -euo pipefail
 
 {
-  pip install twine
+  pip install \
+    'packaging>=24.2' \
+    'twine>=6.1.0'
 
   twine upload \
     --username __token__ \

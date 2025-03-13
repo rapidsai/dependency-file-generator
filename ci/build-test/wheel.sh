@@ -5,7 +5,7 @@ OUTPUT_DIR="${OUTPUT_DIR:-"/tmp/output"}"
 
 ./ci/update-versions.sh "${RELEASE_VERSION:-}"
 
-pip install build pytest twine
+pip install build pytest 'packaging>=24.2' 'twine>=6.1.0'
 
 python -m build \
   --outdir "${OUTPUT_DIR}" \
