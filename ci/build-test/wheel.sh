@@ -11,7 +11,7 @@ python -m build \
   --outdir "${OUTPUT_DIR}" \
   .
 
-twine check --strict "$(echo "${OUTPUT_DIR}"/*.whl)"
+twine check --strict "$(echo "${OUTPUT_DIR}"/*)"
 
 for PKG in "${OUTPUT_DIR}/"*; do
   echo "$PKG"
