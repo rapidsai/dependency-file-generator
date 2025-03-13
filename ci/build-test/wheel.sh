@@ -5,11 +5,13 @@ OUTPUT_DIR="${OUTPUT_DIR:-"/tmp/output"}"
 
 ./ci/update-versions.sh "${RELEASE_VERSION:-}"
 
-pip install build pytest
+pip install build pytest twine
 
 python -m build \
   --outdir "${OUTPUT_DIR}" \
   .
+
+twine check --strict "$(echo "${OUTPUT_DIR}"/*.whl)"
 
 for PKG in "${OUTPUT_DIR}/"*; do
   echo "$PKG"
