@@ -2,7 +2,7 @@ import argparse
 import os
 
 from ._config import Output, load_config_from_file
-from ._constants import default_dependency_file_path
+from ._constants import cli_name, default_dependency_file_path
 from ._rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
@@ -73,6 +73,13 @@ def validate_args(argv):
         ),
     )
 
+    parser.add_argument(
+        "--version",
+        default=False,
+        action="store_true",
+        help="Show the version and exit.",
+    )
+
     args = parser.parse_args(argv)
 
     dependent_arg_keys = ["file_key", "output", "matrix"]
@@ -106,6 +113,10 @@ def generate_matrix(matrix_arg):
 
 def main(argv=None) -> None:
     args = validate_args(argv)
+
+    if args.version:
+        print(f"{cli_name}, version {version}")
+        return
 
     parsed_config = load_config_from_file(args.config)
 
