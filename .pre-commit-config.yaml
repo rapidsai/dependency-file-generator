@@ -18,7 +18,7 @@ repos:
         args: ["--config-file=pyproject.toml", "src/", "docs/"]
         pass_filenames: false
   - repo: https://github.com/asottile/pyupgrade
-    rev: 'v3.19.1'
+    rev: 'v3.20.0'
     hooks:
       - id: pyupgrade
         args:
@@ -33,7 +33,7 @@ repos:
           args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
         - id: check-github-workflows
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.10
+    rev: v0.11.11
     hooks:
       - id: ruff
         files: src/.*$
