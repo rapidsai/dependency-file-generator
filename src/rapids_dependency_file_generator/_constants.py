@@ -3,9 +3,7 @@ cli_name = "rapids-dependency-file-generator"
 default_channels = [
     "rapidsai",
     "rapidsai-nightly",
-    "dask/label/dev",
     "conda-forge",
-    "nvidia",
 ]
 
 default_conda_dir = "conda/environments"
