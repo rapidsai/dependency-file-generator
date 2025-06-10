@@ -4,7 +4,6 @@ default_channels = [
     "rapidsai",
     "rapidsai-nightly",
     "conda-forge",
-    "nvidia",
 ]
 
 default_conda_dir = "conda/environments"
