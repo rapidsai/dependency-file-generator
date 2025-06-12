@@ -42,5 +42,9 @@ repos:
         files: src/.*$
       - id: ruff-format
         files: src/.*$
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
 default_language_version:
     python: python3
