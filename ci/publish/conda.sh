@@ -6,10 +6,11 @@
 set -euo pipefail
 
 {
+  # shellcheck disable=SC1091
   . /usr/share/miniconda/etc/profile.d/conda.sh
   conda activate base
   conda install -y anaconda-client
-  pkgs_to_upload=$(find "${CONDA_OUTPUT_DIR}" -name "*.conda" -o -name "*.tar.bz2")
+  readarray -d '' pkgs_to_upload < <(find "${CONDA_OUTPUT_DIR}" -name "*.conda" -o -name "*.tar.bz2")
 
   export CONDA_ORG="${1}"
 
@@ -31,7 +32,7 @@ set -euo pipefail
     -t "${TOKEN}" \
     upload \
     --no-progress \
-    ${pkgs_to_upload}
+    "${pkgs_to_upload[@]}"
 } 1>&2
 
 jq -ncr '{name: "Conda release - \(env.CONDA_ORG)", url: "https://anaconda.org/\(env.CONDA_ORG)/rapids-dependency-file-generator"}'
