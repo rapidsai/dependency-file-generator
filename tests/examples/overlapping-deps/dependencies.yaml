@@ -57,12 +57,13 @@ dependencies:
           - scikit-learn>=1.5
   test_python:
     common:
-      - output_types: [conda, requirements, pyproject]
+      - output_types: [requirements, pyproject]
         packages:
           - matplotlib
       - output_types: [conda]
         packages:
           - pip
+          - matplotlib-base
           # intentional overlap (numpy) with depends_on_numpy's pip list, to
           # test that pip dependencies don't have duplicates
           - pip:
