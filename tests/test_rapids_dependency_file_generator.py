@@ -198,7 +198,6 @@ def test_make_dependency_files_conda_to_stdout_with_multiple_file_keys_works(cap
         "scikit-learn>=1.5",
         {"pip": [
             "folium",
-            "matplotlib",
             "numpy>=2.0",
         ]}
     ]
