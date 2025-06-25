@@ -192,7 +192,7 @@ def test_make_dependency_files_conda_to_stdout_with_multiple_file_keys_works(cap
     #  * should contain the union of all dependencies from all requested file keys
     #
     assert env_dict["dependencies"] == [
-        "matplotlib",
+        "matplotlib-base",
         "pandas<3.0",
         "pip",
         "scikit-learn>=1.5",
