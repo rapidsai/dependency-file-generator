@@ -1,6 +1,6 @@
  {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/rapidsai/dependency-file-generator/v1.18.1/src/rapids_dependency_file_generator/schema.json",
+    "$id": "https://raw.githubusercontent.com/rapidsai/dependency-file-generator/v1.19.0/src/rapids_dependency_file_generator/schema.json",
     "type": "object",
     "title": "RAPIDS Package Dependency Specification Format",
     "description": "Consolidated specification of RAPIDS project dependencies",
