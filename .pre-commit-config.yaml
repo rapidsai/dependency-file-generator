@@ -3,7 +3,7 @@ ci:
   autoupdate_commit_msg: "chore(ci): pre-commit autoupdate"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 'v5.0.0'
+    rev: 'v6.0.0'
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
@@ -36,14 +36,14 @@ repos:
           args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
         - id: check-github-workflows
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.7
+    rev: v0.12.8
     hooks:
       - id: ruff
         files: src/.*$
       - id: ruff-format
         files: src/.*$
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
 default_language_version:
