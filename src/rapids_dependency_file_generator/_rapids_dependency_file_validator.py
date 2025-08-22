@@ -5,11 +5,20 @@ import json
 import sys
 import textwrap
 import typing
+import warnings
 
 import jsonschema
 from jsonschema.exceptions import best_match
 
 SCHEMA = json.loads(importlib.resources.files(__package__).joinpath("schema.json").read_bytes())
+
+__all__ = [
+    "UnusedDependencySetWarning",
+]
+
+
+class UnusedDependencySetWarning(UserWarning):
+    pass
 
 
 def validate_dependencies(dependencies: dict[str, typing.Any]) -> None:
@@ -32,3 +41,10 @@ def validate_dependencies(dependencies: dict[str, typing.Any]) -> None:
         best_matching_error = best_match(errors)
         print("\n", textwrap.indent(str(best_matching_error), "\t"), "\n", file=sys.stderr)
         raise RuntimeError("The provided dependencies data is invalid.")
+
+    unused_dependency_sets = set(dependencies["dependencies"].keys())
+    unused_dependency_sets.difference_update(
+        i for file_config in dependencies["files"].values() for i in file_config["includes"]
+    )
+    for dep in sorted(unused_dependency_sets):
+        warnings.warn(f'Dependency set "{dep}" is unused.', UnusedDependencySetWarning)

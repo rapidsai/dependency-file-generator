@@ -1,5 +1,6 @@
 import argparse
 import os
+import warnings
 
 from ._config import Output, load_config_from_file
 from ._constants import cli_name, default_dependency_file_path
@@ -7,6 +8,7 @@ from ._rapids_dependency_file_generator import (
     delete_existing_files,
     make_dependency_files,
 )
+from ._rapids_dependency_file_validator import UnusedDependencySetWarning
 from ._version import __version__ as version
 
 
@@ -80,6 +82,20 @@ def validate_args(argv):
         help="Show the version and exit.",
     )
 
+    parser.add_argument(
+        "-Wunused-dependencies",
+        default=False,
+        action="store_true",
+        help="Warn if there are unused dependency sets.",
+    )
+
+    parser.add_argument(
+        "-Werror",
+        default=False,
+        action="store_true",
+        help="Treat warnings as errors.",
+    )
+
     args = parser.parse_args(argv)
 
     dependent_arg_keys = ["file_key", "output", "matrix"]
@@ -117,6 +133,11 @@ def main(argv=None) -> None:
     if args.version:
         print(f"{cli_name}, version {version}")
         return
+
+    if args.Werror:
+        warnings.simplefilter("error")
+    if not args.Wunused_dependencies:
+        warnings.simplefilter("ignore", category=UnusedDependencySetWarning)
 
     parsed_config = load_config_from_file(args.config)
 
