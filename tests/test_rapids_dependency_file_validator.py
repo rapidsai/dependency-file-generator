@@ -29,5 +29,5 @@ def test_validate_dependencies_warn_on_unused_deps():
         })
 
     assert len(warnings) == 2
-    assert warnings[0].message.args[0] == 'Dependency set "c" is unused.'
-    assert warnings[1].message.args[0] == 'Dependency set "d" is unused.'
+    assert warnings[0].message.args[0] == 'Dependency set "c" is not referred to anywhere in "files:"'
+    assert warnings[1].message.args[0] == 'Dependency set "d" is not referred to anywhere in "files:"'

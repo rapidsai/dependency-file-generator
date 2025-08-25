@@ -47,4 +47,4 @@ def validate_dependencies(dependencies: dict[str, typing.Any]) -> None:
         i for file_config in dependencies["files"].values() for i in file_config["includes"]
     )
     for dep in sorted(unused_dependency_sets):
-        warnings.warn(f'Dependency set "{dep}" is unused.', UnusedDependencySetWarning)
+        warnings.warn(f'Dependency set "{dep}" is not referred to anywhere in "files:"', UnusedDependencySetWarning)

@@ -5,3 +5,4 @@
     language: python
     files: "dependencies.yaml"
     pass_filenames: false
+    args: [-Wunused-dependencies, -Werror]
