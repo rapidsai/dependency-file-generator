@@ -1,6 +1,11 @@
+import contextlib
+import os.path
+from textwrap import dedent
+
 import pytest
 
-from rapids_dependency_file_generator._cli import generate_matrix, validate_args
+from rapids_dependency_file_generator._cli import generate_matrix, main, validate_args
+from rapids_dependency_file_generator._rapids_dependency_file_validator import UnusedDependencySetWarning
 
 
 def test_generate_matrix():
@@ -181,3 +186,52 @@ def test_validate_args():
 
     args = validate_args(["--version"])
     assert args.version
+
+
+@pytest.mark.parametrize(
+    ["extra_args", "context"],
+    [
+        (
+            [],
+            contextlib.nullcontext(),
+        ),
+        (
+            ["--strict"],
+            contextlib.nullcontext(),
+        ),
+        (
+            ["--warn-unused-dependencies"],
+            pytest.warns(UnusedDependencySetWarning),
+        ),
+        (
+            ["--warn-unused-dependencies", "--strict"],
+            pytest.raises(UnusedDependencySetWarning),
+        ),
+        (
+            ["--warn-all"],
+            pytest.warns(UnusedDependencySetWarning),
+        ),
+        (
+            ["--warn-all", "--strict"],
+            pytest.raises(UnusedDependencySetWarning),
+        ),
+    ],
+)
+def test_warnings(tmp_path, extra_args, context):
+    config_file = os.path.join(tmp_path, "dependencies.yaml")
+    with open(config_file, "w") as f:
+        f.write(dedent("""
+        files:
+          all:
+            output: conda
+            includes: [a]
+        channels: []
+        dependencies:
+          a:
+            common: []
+          b:
+            common: []
+        """))
+
+    with context:
+        main(["--config", config_file, *extra_args])
