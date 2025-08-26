@@ -84,21 +84,21 @@ def validate_args(argv):
     )
 
     parser.add_argument(
-        "-Wall",
+        "--warn-all",
         default=False,
         action="store_true",
         help="Activate all warnings.",
     )
 
     parser.add_argument(
-        "-Wunused-dependencies",
+        "--warn-unused-dependencies",
         default=False,
         action="store_true",
         help="Warn if there are unused dependency sets.",
     )
 
     parser.add_argument(
-        "-Werror",
+        "--strict",
         default=False,
         action="store_true",
         help="Treat warnings as errors.",
@@ -142,9 +142,9 @@ def main(argv=None) -> None:
         print(f"{cli_name}, version {version}")
         return
 
-    if args.Werror:
+    if args.strict:
         warnings.simplefilter("error", category=DependencyFileGeneratorWarning)
-    if not args.Wunused_dependencies and not args.Wall:
+    if not args.warn_unused_dependencies and not args.warn_all:
         warnings.simplefilter("ignore", category=UnusedDependencySetWarning)
 
     parsed_config = load_config_from_file(args.config)

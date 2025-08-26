@@ -196,23 +196,23 @@ def test_validate_args():
             contextlib.nullcontext(),
         ),
         (
-            ["-Werror"],
+            ["--strict"],
             contextlib.nullcontext(),
         ),
         (
-            ["-Wunused-dependencies"],
+            ["--warn-unused-dependencies"],
             pytest.warns(UnusedDependencySetWarning),
         ),
         (
-            ["-Wunused-dependencies", "-Werror"],
+            ["--warn-unused-dependencies", "--strict"],
             pytest.raises(UnusedDependencySetWarning),
         ),
         (
-            ["-Wall"],
+            ["--warn-all"],
             pytest.warns(UnusedDependencySetWarning),
         ),
         (
-            ["-Wall", "-Werror"],
+            ["--warn-all", "--strict"],
             pytest.raises(UnusedDependencySetWarning),
         ),
     ],
