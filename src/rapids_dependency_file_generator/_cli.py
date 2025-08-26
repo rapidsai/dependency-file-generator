@@ -2,6 +2,7 @@ import argparse
 import os
 import warnings
 
+from . import DependencyFileGeneratorWarning
 from ._config import Output, load_config_from_file
 from ._constants import cli_name, default_dependency_file_path
 from ._rapids_dependency_file_generator import (
@@ -83,6 +84,13 @@ def validate_args(argv):
     )
 
     parser.add_argument(
+        "-Wall",
+        default=False,
+        action="store_true",
+        help="Activate all warnings.",
+    )
+
+    parser.add_argument(
         "-Wunused-dependencies",
         default=False,
         action="store_true",
@@ -135,8 +143,8 @@ def main(argv=None) -> None:
         return
 
     if args.Werror:
-        warnings.simplefilter("error")
-    if not args.Wunused_dependencies:
+        warnings.simplefilter("error", category=DependencyFileGeneratorWarning)
+    if not args.Wunused_dependencies and not args.Wall:
         warnings.simplefilter("ignore", category=UnusedDependencySetWarning)
 
     parsed_config = load_config_from_file(args.config)

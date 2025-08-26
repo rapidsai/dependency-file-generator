@@ -10,15 +10,9 @@ import warnings
 import jsonschema
 from jsonschema.exceptions import best_match
 
+from ._warnings import UnusedDependencySetWarning
+
 SCHEMA = json.loads(importlib.resources.files(__package__).joinpath("schema.json").read_bytes())
-
-__all__ = [
-    "UnusedDependencySetWarning",
-]
-
-
-class UnusedDependencySetWarning(UserWarning):
-    pass
 
 
 def validate_dependencies(dependencies: dict[str, typing.Any]) -> None:

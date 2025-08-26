@@ -207,6 +207,14 @@ def test_validate_args():
             ["-Wunused-dependencies", "-Werror"],
             pytest.raises(UnusedDependencySetWarning),
         ),
+        (
+            ["-Wall"],
+            pytest.warns(UnusedDependencySetWarning),
+        ),
+        (
+            ["-Wall", "-Werror"],
+            pytest.raises(UnusedDependencySetWarning),
+        ),
     ],
 )
 def test_warnings(tmp_path, extra_args, context):
