@@ -18,7 +18,7 @@ jobs:
       release_version: ${{ steps.check-release.outputs.release_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -41,7 +41,7 @@ jobs:
       WHEEL_OUTPUT_DIR: /tmp/wheel_output
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
