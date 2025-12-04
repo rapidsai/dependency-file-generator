@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,9 +13,8 @@ authors = [
 urls = { homepage = "https://github.com/rapidsai/dependency-file-generator" }
 description = "Tool for generating RAPIDS environment files"
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { file = "LICENSE" }
+license = "Apache-2.0"
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
 ]
 requires-python = ">=3.9"
@@ -44,7 +43,18 @@ ignore_missing_imports = true
 line-length = 120
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "D"]
+select = [
+    # pydocstyle
+    "D",
+    # pycodestyle (errors)
+    "E",
+    # pyflakes
+    "F",
+    # isort
+    "I",
+    # pycodestyle (warnings)
+    "W",
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
