@@ -46,12 +46,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Download Conda Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: conda_artifacts
           path: ${{ env.CONDA_OUTPUT_DIR }}
       - name: Download Wheel Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: wheel_artifacts
           path: ${{ env.WHEEL_OUTPUT_DIR }}
