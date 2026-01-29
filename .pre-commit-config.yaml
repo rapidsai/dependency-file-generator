@@ -47,5 +47,12 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
+  - repo: https://github.com/rapidsai/pre-commit-hooks
+    rev: v1.3.3
+    hooks:
+      - id: verify-pyproject-license
+        exclude:
+          (?x)
+            ^tests/.*$
 default_language_version:
     python: python3

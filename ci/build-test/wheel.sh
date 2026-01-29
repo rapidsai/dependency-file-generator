@@ -5,11 +5,18 @@ OUTPUT_DIR="${OUTPUT_DIR:-"/tmp/output"}"
 
 ./ci/update-versions.sh "${RELEASE_VERSION:-}"
 
-pip install build pytest 'packaging>=24.2' 'twine>=6.1.0'
+pip install build pytest \
+  'packaging>=24.2' \
+  'pydistcheck>=0.11.3' \
+  'twine>=6.1.0'
 
 python -m build \
   --outdir "${OUTPUT_DIR}" \
   .
+
+pydistcheck \
+  --inspect \
+  "${OUTPUT_DIR}"/*
 
 twine check --strict "${OUTPUT_DIR}"/*
 
