@@ -3,8 +3,13 @@ __pycache__
 *.egg-info
 dist
 build
+.mypy_cache
+.ruff_cache
 tests/**/actual
 .vscode
 *.swp
 node_modules
 docs/source/api_docs/generated/
+*.tar.gz
+*.whl
+*.zip
