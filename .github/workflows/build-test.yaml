@@ -19,7 +19,7 @@ jobs:
       - run: ./ci/build-test/conda.sh
         env:
           RELEASE_VERSION: ${{ inputs.release_version }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: conda_artifacts
           path: ${{ env.OUTPUT_DIR }}
@@ -34,7 +34,7 @@ jobs:
       - run: ./ci/build-test/wheel.sh
         env:
           RELEASE_VERSION: ${{ inputs.release_version }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: wheel_artifacts
           path: ${{ env.OUTPUT_DIR }}
