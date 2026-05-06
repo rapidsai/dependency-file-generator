@@ -6,7 +6,7 @@ on:
 concurrency:
   group: pr-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
+permissions: {}
 jobs:
   build-test:
     uses: ./.github/workflows/build-test.yaml

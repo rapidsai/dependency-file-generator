@@ -1,6 +1,10 @@
 name: pr-title
 
-on:
+# `zizmor` always flags these triggers because they are easy to use
+# incorrectly. This usage doesn't execute any PR specific code, it
+# only confirms that the PR title conforms to conventional commits
+# and so can be run from a forked PR.
+on: # zizmor: ignore[dangerous-triggers]
   pull_request_target:
     types:
       - opened
@@ -11,10 +15,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   semantic-pr-title:
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v6
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
