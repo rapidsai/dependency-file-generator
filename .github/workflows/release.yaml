@@ -10,7 +10,7 @@ concurrency:
   # release since that could cause issues
   group: release-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
-
+permissions: {}
 jobs:
   check-release:
     runs-on: ubuntu-latest

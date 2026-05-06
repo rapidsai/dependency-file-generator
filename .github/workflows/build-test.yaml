@@ -6,7 +6,7 @@ on:
 
 env:
   OUTPUT_DIR: /tmp/output
-
+permissions: {}
 jobs:
   conda:
     runs-on: ubuntu-latest
