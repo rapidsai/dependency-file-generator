@@ -5,6 +5,7 @@ import textwrap
 import typing
 from collections.abc import Generator
 from dataclasses import dataclass
+from pathlib import Path
 
 import tomlkit
 import yaml
@@ -213,6 +214,54 @@ def make_dependency_file(
     return file_contents
 
 
+def make_conda_build_config_file(
+    *,
+    config_file: os.PathLike,
+    output_dir: os.PathLike,
+    matrix: dict[str, list[str]],
+) -> str:
+    """Generate the contents of a conda_build_config.yaml file.
+
+    This function aggregates matrix values from the dependencies.yaml file and
+    formats them in the conda-build config format.
+
+    Parameters
+    ----------
+    config_file : PathLike
+        The full path to the dependencies.yaml file.
+    output_dir : PathLike
+        The path to the directory where the conda_build_config.yaml file will be written.
+    matrix : dict[str, list[str]]
+        The matrix of specific parameters to use when generating.
+
+    Returns
+    -------
+    str
+        The contents of the conda_build_config.yaml file.
+    """
+    relative_path_to_config_file = os.path.relpath(config_file, output_dir)
+    file_contents = textwrap.dedent(
+        f"""\
+        {HEADER}
+        # To make changes, edit {relative_path_to_config_file} and run `{cli_name}`.
+        # This file contains matrix values aggregated from dependencies.yaml
+        """
+    )
+
+    # Convert matrix values to conda-build config format
+    conda_build_config = {}
+    for key, values in matrix.items():
+        # Rename "py" key to "python" for conda-build compatibility
+        if key == "py":
+            conda_build_config["python"] = values
+        else:
+            conda_build_config[key] = values
+
+    file_contents += yaml.dump(conda_build_config, default_flow_style=False)
+
+    return file_contents
+
+
 def get_filename(file_type: _config.Output, file_key: str, matrix_combo: dict[str, str]):
     """Get the name of the file to which to write a generated dependency set.
 
@@ -256,6 +305,7 @@ def get_filename(file_type: _config.Output, file_key: str, matrix_combo: dict[st
         # need to have that exact name and are never prefixed.
         file_name_prefix = "pyproject"
         suffix = ""
+
     filename = "_".join(filter(None, (file_type_prefix, file_name_prefix, suffix))).replace(".", "")
     return filename + file_ext
 
@@ -289,6 +339,7 @@ def get_output_dir(*, file_type: _config.Output, config_file_path: os.PathLike, 
         path.append(file_config.requirements_dir)
     elif file_type == _config.Output.PYPROJECT:
         path.append(file_config.pyproject_dir)
+
     return os.path.join(*path)
 
 
@@ -417,6 +468,25 @@ def make_dependency_files(
         if _config.Output.PYPROJECT in file_types_to_generate and len(calculated_grid) > 1:
             raise ValueError("Pyproject outputs can't have more than one matrix output")
         for file_type in file_types_to_generate:
+            # Generate conda_build_config.yaml if this is a conda output type
+            if file_type == _config.Output.CONDA and not to_stdout:
+                conda_build_config_name = "conda_build_config.yaml"
+                output_dir = get_output_dir(
+                    file_type=file_type,
+                    config_file_path=parsed_config.path,
+                    file_config=file_config,
+                )
+                conda_build_config_contents = make_conda_build_config_file(
+                    config_file=parsed_config.path,
+                    output_dir=output_dir,
+                    matrix=file_matrix,
+                )
+
+                os.makedirs(output_dir, exist_ok=True)
+                conda_build_config_path = Path(output_dir) / conda_build_config_name
+                with open(conda_build_config_path, "w") as f:
+                    f.write(conda_build_config_contents)
+
             for matrix_combo in calculated_grid:
                 dependencies = []
 
