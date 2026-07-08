@@ -1,3 +1,4 @@
+from textwrap import dedent
 from unittest import mock
 
 import yaml
@@ -125,35 +126,34 @@ def test_make_dependency_files_should_raise_informative_error_on_map_inputs_for_
 
 
 def _config_with_late_requirements_error(tmp_path):
-    requirements = _config.Output.REQUIREMENTS
-    return _config.Config(
-        path=tmp_path / "dependencies.yaml",
-        files={
-            "all": _config.File(
-                output={requirements},
-                includes=["dependencies"],
-                matrix={"variant": ["valid", "invalid"]},
-                requirements_dir=pathlib.Path("generated"),
-            )
-        },
-        channels=[],
-        dependencies={
-            "dependencies": _config.Dependencies(
-                specific=[
-                    _config.SpecificDependencies(
-                        output_types={requirements},
-                        matrices=[
-                            _config.MatrixMatcher(matrix={"variant": "valid"}, packages=["valid-dependency"]),
-                            _config.MatrixMatcher(
-                                matrix={"variant": "invalid"},
-                                packages=[_config.PipRequirements(pip=["invalid-dependency"])],
-                            ),
-                        ],
-                    )
-                ]
-            )
-        },
+    config_file = tmp_path / "dependencies.yaml"
+    config_file.write_text(
+        dedent("""\
+        files:
+          all:
+            output: requirements
+            includes: [dependencies]
+            matrix:
+              variant: [valid, invalid]
+            requirements_dir: generated
+        channels: []
+        dependencies:
+          dependencies:
+            specific:
+              - output_types: [requirements]
+                matrices:
+                  - matrix:
+                      variant: valid
+                    packages:
+                      - valid-dependency
+                  - matrix:
+                      variant: invalid
+                    packages:
+                      - pip:
+                          - invalid-dependency
+        """)
     )
+    return _config.load_config_from_file(config_file)
 
 
 def test_make_dependency_files_does_not_print_earlier_outputs_when_a_later_output_fails(tmp_path, capsys):
