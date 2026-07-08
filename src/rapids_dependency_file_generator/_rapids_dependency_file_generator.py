@@ -103,6 +103,7 @@ def make_dependency_file(
     conda_channels: list[str],
     dependencies: typing.Sequence[typing.Union[str, dict[str, list[str]]]],
     extras: typing.Union[_config.FileExtras, None],
+    existing_pyproject_contents: typing.Union[str, None] = None,
 ) -> str:
     """Generate the contents of the dependency file.
 
@@ -128,6 +129,9 @@ def make_dependency_file(
         The dependencies to include in the file.
     extras : FileExtras | None
         Any extra information provided for generating this dependency file.
+    existing_pyproject_contents : str | None
+        Previously rendered contents for a pyproject file that has not yet been
+        written. If ``None``, the existing pyproject file is read from disk.
 
     Returns
     -------
@@ -180,8 +184,11 @@ def make_dependency_file(
             key = extras.key
 
         # This file type needs to be modified in place instead of built from scratch.
-        with open(os.path.join(output_dir, file_name)) as f:
-            file_contents_toml = tomlkit.load(f)
+        if existing_pyproject_contents is None:
+            with open(os.path.join(output_dir, file_name)) as f:
+                file_contents_toml = tomlkit.load(f)
+        else:
+            file_contents_toml = tomlkit.loads(existing_pyproject_contents)
 
         toml_deps = tomlkit.array()
         for dep in dependencies:
@@ -406,6 +413,12 @@ def make_dependency_files(
     # passing multiple files keys and writing a merged result to stdout
     all_dependencies = _DependencyCollection(str_deps=set(), dict_deps={})
 
+    # Render every requested output before producing any side effects. This ensures
+    # that a validation or rendering error in a later output cannot leave behind
+    # partial stdout or files from earlier outputs.
+    buffered_stdout: list[str] = []
+    buffered_file_contents: dict[str, str] = {}
+
     for file_key in file_keys:
         file_config = parsed_config.files[file_key]
         file_types_to_generate = file_config.output if output is None else output
@@ -482,6 +495,7 @@ def make_dependency_files(
                     config_file_path=parsed_config.path,
                     file_config=file_config,
                 )
+                file_path = os.path.join(output_dir, full_file_name)
                 contents = make_dependency_file(
                     file_type=file_type,
                     conda_env_name=os.path.splitext(full_file_name)[0],
@@ -491,18 +505,20 @@ def make_dependency_files(
                     conda_channels=conda_channels,
                     dependencies=deduped_deps,
                     extras=file_config.extras,
+                    existing_pyproject_contents=(
+                        buffered_file_contents.get(file_path)
+                        if not to_stdout and file_type == _config.Output.PYPROJECT
+                        else None
+                    ),
                 )
 
                 if to_stdout:
                     if len(file_keys) == 1:
-                        print(contents)
+                        buffered_stdout.append(contents)
                     else:
                         all_dependencies.update(deduped_deps)
                 else:
-                    os.makedirs(output_dir, exist_ok=True)
-                    file_path = os.path.join(output_dir, full_file_name)
-                    with open(file_path, "w") as f:
-                        f.write(contents)
+                    buffered_file_contents[file_path] = contents
 
     # create one unified output from all the file_keys, and print it to stdout
     if to_stdout and len(file_keys) > 1:
@@ -530,4 +546,13 @@ def make_dependency_files(
             dependencies=all_dependencies.deps_list,
             extras=None,
         )
-        print(contents)
+        buffered_stdout.append(contents)
+
+    if to_stdout:
+        for contents in buffered_stdout:
+            print(contents)
+    else:
+        for file_path, contents in buffered_file_contents.items():
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, "w") as f:
+                f.write(contents)

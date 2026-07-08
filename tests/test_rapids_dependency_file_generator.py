@@ -124,6 +124,85 @@ def test_make_dependency_files_should_raise_informative_error_on_map_inputs_for_
         )
 
 
+def _config_with_late_requirements_error(tmp_path):
+    requirements = _config.Output.REQUIREMENTS
+    return _config.Config(
+        path=tmp_path / "dependencies.yaml",
+        files={
+            "all": _config.File(
+                output={requirements},
+                includes=["dependencies"],
+                matrix={"variant": ["valid", "invalid"]},
+                requirements_dir=pathlib.Path("generated"),
+            )
+        },
+        channels=[],
+        dependencies={
+            "dependencies": _config.Dependencies(
+                specific=[
+                    _config.SpecificDependencies(
+                        output_types={requirements},
+                        matrices=[
+                            _config.MatrixMatcher(matrix={"variant": "valid"}, packages=["valid-dependency"]),
+                            _config.MatrixMatcher(
+                                matrix={"variant": "invalid"},
+                                packages=[_config.PipRequirements(pip=["invalid-dependency"])],
+                            ),
+                        ],
+                    )
+                ]
+            )
+        },
+    )
+
+
+def test_make_dependency_files_does_not_print_earlier_outputs_when_a_later_output_fails(tmp_path, capsys):
+    with pytest.raises(ValueError, match="Map inputs"):
+        make_dependency_files(
+            parsed_config=_config_with_late_requirements_error(tmp_path),
+            file_keys=["all"],
+            output={_config.Output.REQUIREMENTS},
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=True,
+        )
+
+    assert capsys.readouterr().out == ""
+
+
+def test_make_dependency_files_does_not_write_earlier_outputs_when_a_later_output_fails(tmp_path):
+    with pytest.raises(ValueError, match="Map inputs"):
+        make_dependency_files(
+            parsed_config=_config_with_late_requirements_error(tmp_path),
+            file_keys=["all"],
+            output=None,
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=False,
+        )
+
+    assert not (tmp_path / "generated").exists()
+
+
+def test_make_dependency_files_does_not_overwrite_existing_files_when_a_later_output_fails(tmp_path):
+    output_dir = tmp_path / "generated"
+    output_dir.mkdir()
+    existing_output = output_dir / "requirements_all_variant-valid.txt"
+    existing_output.write_text("existing contents")
+
+    with pytest.raises(ValueError, match="Map inputs"):
+        make_dependency_files(
+            parsed_config=_config_with_late_requirements_error(tmp_path),
+            file_keys=["all"],
+            output=None,
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=False,
+        )
+
+    assert existing_output.read_text() == "existing contents"
+
+
 def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):
 
     current_dir = pathlib.Path(__file__).parent
