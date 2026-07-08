@@ -130,6 +130,12 @@ def _config_with_late_requirements_error(tmp_path):
     config_file.write_text(
         dedent("""\
         files:
+          pyproject:
+            output: pyproject
+            pyproject_dir: .
+            extras:
+              table: project
+            includes: [pyproject]
           all:
             output: requirements
             includes: [dependencies]
@@ -138,6 +144,10 @@ def _config_with_late_requirements_error(tmp_path):
             requirements_dir: generated
         channels: []
         dependencies:
+          pyproject:
+            common:
+              - output_types: [pyproject]
+                packages: [new-run-dependency]
           dependencies:
             specific:
               - output_types: [requirements]
@@ -201,6 +211,109 @@ def test_make_dependency_files_does_not_overwrite_existing_files_when_a_later_ou
         )
 
     assert existing_output.read_text() == "existing contents"
+
+
+def test_make_dependency_files_does_not_write_pyproject_when_a_later_output_fails(tmp_path):
+    pyproject_file = tmp_path / "pyproject.toml"
+    original_contents = dedent("""\
+    [project]
+    name = "example"
+    dependencies = ["old-run-dependency"]
+    """)
+    pyproject_file.write_text(original_contents)
+
+    with pytest.raises(ValueError, match="Map inputs"):
+        make_dependency_files(
+            parsed_config=_config_with_late_requirements_error(tmp_path),
+            file_keys=["pyproject", "all"],
+            output=None,
+            matrix=None,
+            prepend_channels=[],
+            to_stdout=False,
+        )
+
+    assert pyproject_file.read_text() == original_contents
+    assert not (tmp_path / "generated").exists()
+
+
+def test_make_dependency_files_composes_pyproject_updates_in_memory(tmp_path):
+    config_file = tmp_path / "dependencies.yaml"
+    config_file.write_text(
+        dedent("""\
+        files:
+          build:
+            output: pyproject
+            pyproject_dir: .
+            extras:
+              table: build-system
+            includes: [build]
+          run:
+            output: pyproject
+            pyproject_dir: nested/..
+            extras:
+              table: project
+            includes: [run]
+          other:
+            output: pyproject
+            pyproject_dir: other
+            extras:
+              table: project
+            includes: [other]
+        dependencies:
+          build:
+            common:
+              - output_types: [pyproject]
+                packages: [new-build-dependency]
+          run:
+            common:
+              - output_types: [pyproject]
+                packages: [new-run-dependency]
+          other:
+            common:
+              - output_types: [pyproject]
+                packages: [new-other-dependency]
+        """)
+    )
+    pyproject_file = tmp_path / "pyproject.toml"
+    pyproject_file.write_text(
+        dedent("""\
+        [build-system]
+        requires = ["old-build-dependency"]
+
+        [project]
+        name = "example"
+        dependencies = ["old-run-dependency"]
+        """)
+    )
+    (tmp_path / "nested").mkdir()
+    other_dir = tmp_path / "other"
+    other_dir.mkdir()
+    other_pyproject_file = other_dir / "pyproject.toml"
+    other_pyproject_file.write_text(
+        dedent("""\
+        [project]
+        name = "other"
+        dependencies = ["old-other-dependency"]
+        """)
+    )
+
+    make_dependency_files(
+        parsed_config=_config.load_config_from_file(config_file),
+        file_keys=["build", "run", "other"],
+        output=None,
+        matrix=None,
+        prepend_channels=[],
+        to_stdout=False,
+    )
+
+    document = tomlkit.parse(pyproject_file.read_text())
+    assert list(document["build-system"]["requires"]) == ["new-build-dependency"]
+    assert document["project"]["name"] == "example"
+    assert list(document["project"]["dependencies"]) == ["new-run-dependency"]
+
+    other_document = tomlkit.parse(other_pyproject_file.read_text())
+    assert other_document["project"]["name"] == "other"
+    assert list(other_document["project"]["dependencies"]) == ["new-other-dependency"]
 
 
 def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):

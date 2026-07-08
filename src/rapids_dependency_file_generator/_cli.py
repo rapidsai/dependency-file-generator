@@ -5,10 +5,7 @@ import warnings
 from . import DependencyFileGeneratorWarning
 from ._config import Output, load_config_from_file
 from ._constants import cli_name, default_dependency_file_path
-from ._rapids_dependency_file_generator import (
-    delete_existing_files,
-    make_dependency_files,
-)
+from ._rapids_dependency_file_generator import make_dependency_files
 from ._rapids_dependency_file_validator import UnusedDependencySetWarning
 from ._version import __version__ as version
 
@@ -159,9 +156,6 @@ def main(argv=None) -> None:
         file_keys = list(parsed_config.files.keys())
         output = None
 
-    if args.clean:
-        delete_existing_files(args.clean)
-
     make_dependency_files(
         parsed_config=parsed_config,
         file_keys=file_keys,
@@ -169,4 +163,5 @@ def main(argv=None) -> None:
         matrix=matrix,
         prepend_channels=args.prepend_channels,
         to_stdout=to_stdout,
+        clean=args.clean,
     )
