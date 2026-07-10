@@ -15,7 +15,7 @@ repos:
       - id: debug-statements
       - id: requirements-txt-fixer
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v2.1.0'
+    rev: 'v2.2.0'
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML]
@@ -37,7 +37,7 @@ repos:
           args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
         - id: check-github-workflows
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.20
+    rev: v0.15.21
     hooks:
       - id: ruff
         files: src/.*$

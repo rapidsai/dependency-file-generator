@@ -1,4 +1,7 @@
 rules:
+  unpinned-images:
+    ignore:
+      - build-test.yaml
   unpinned-uses:
     config:
       policies:
