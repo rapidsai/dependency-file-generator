@@ -1,8 +1,8 @@
--   id: rapids-dependency-file-generator
-    name: RAPIDS dependency file generator
-    description: Update dependency files according to the RAPIDS dependencies spec
-    entry: rapids-dependency-file-generator
-    language: python
-    files: "dependencies.yaml"
-    pass_filenames: false
-    args: [--warn-all, --strict]
+- id: rapids-dependency-file-generator
+  name: RAPIDS dependency file generator
+  description: Update dependency files according to the RAPIDS dependencies spec
+  entry: rapids-dependency-file-generator
+  language: python
+  files: "dependencies.yaml"
+  pass_filenames: false
+  args: [--warn-all, --strict]

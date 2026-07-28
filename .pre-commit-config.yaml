@@ -30,12 +30,12 @@ repos:
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.37.4
     hooks:
-        - id: check-metaschema
-          files: ^src/rapids_dependency_file_generator/schema.json$
-        - id: check-jsonschema
-          files: ^tests/examples/([^/]*)/dependencies.yaml$
-          args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
-        - id: check-github-workflows
+      - id: check-metaschema
+        files: ^src/rapids_dependency_file_generator/schema.json$
+      - id: check-jsonschema
+        files: ^tests/examples/([^/]*)/dependencies.yaml$
+        args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
+      - id: check-github-workflows
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.22
     hooks:
@@ -64,9 +64,18 @@ repos:
         exclude:
           (?x)
             ^tests/.*$
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        additional_dependencies: [pyyaml]
+        exclude: |
+          (?x)^(
+            .*/output/expected/.*$
+          )
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: v1.27.0
     hooks:
       - id: zizmor
 default_language_version:
-    python: python3
+  python: python3
