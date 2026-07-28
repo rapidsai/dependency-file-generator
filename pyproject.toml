@@ -47,6 +47,25 @@ select = [
 # PyPI hard limit is 1GiB, but try to keep this as small as possible
 max_allowed_size_compressed = '2Mi'
 
+[tool.rstcheck]
+report_level = "INFO"
+
+# rstcheck only knows about directives coming from 'docutils', not
+# those supplied by extensions. This list of ignores suppresses errors
+# like "no directive entry".
+ignore_directives = [
+    # rstcheck does not understand 'sphinx.ext.auto*' directives
+    "autoclass",
+    "automodule",
+    "autosummary",
+]
+
+ignore_messages = '''(?x)(
+    # ignore links that look "unused" because they're there to provide stable anchors in hyperlinks
+    Hyperlink\ target\ .*\ is\ not\ referenced
+)
+'''
+
 [tool.ruff]
 line-length = 120
 
