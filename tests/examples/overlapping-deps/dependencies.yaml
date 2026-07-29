@@ -44,7 +44,7 @@ dependencies:
         packages:
           - pip
           - pip:
-            - numpy>=2.0
+              - numpy>=2.0
   depends_on_pandas:
     common:
       - output_types: [conda, requirements, pyproject]
@@ -67,9 +67,9 @@ dependencies:
           # intentional overlap (numpy) with depends_on_numpy's pip list, to
           # test that pip dependencies don't have duplicates
           - pip:
-            # intentionally not in alphabetical order
-            - numpy>=2.0
-            - folium
+              # intentionally not in alphabetical order
+              - numpy>=2.0
+              - folium
   rapids_build_skbuild:
     common:
       - output_types: [conda, requirements, pyproject]
