@@ -14,10 +14,11 @@ from rapids_dependency_file_generator import _config, _constants
         ("none", set()),
         (["none"], set()),
         (
-            ["pyproject", "requirements", "conda"],
+            ["pyproject", "requirements", "constraints", "conda"],
             {
                 _config.Output.PYPROJECT,
                 _config.Output.REQUIREMENTS,
+                _config.Output.CONSTRAINTS,
                 _config.Output.CONDA,
             },
         ),
@@ -144,7 +145,7 @@ def test_parse_file(input, output):
                         "packages": [],
                     },
                     {
-                        "output_types": ["pyproject", "requirements"],
+                        "output_types": ["pyproject", "requirements", "constraints"],
                         "packages": [
                             "package1",
                             {
@@ -192,6 +193,7 @@ def test_parse_file(input, output):
                         output_types={
                             _config.Output.PYPROJECT,
                             _config.Output.REQUIREMENTS,
+                            _config.Output.CONSTRAINTS,
                         },
                         packages=[
                             "package1",
@@ -362,7 +364,7 @@ def test_parse_config(input, path, output):
                         packages:
                           - package1
                     specific:
-                      - output_types: ["conda", "requirements"]
+                      - output_types: ["conda", "requirements", "constraints"]
                         matrices:
                           - matrix:
                             packages:
@@ -395,6 +397,7 @@ def test_parse_config(input, path, output):
                                 output_types={
                                     _config.Output.CONDA,
                                     _config.Output.REQUIREMENTS,
+                                    _config.Output.CONSTRAINTS,
                                 },
                                 matrices=[
                                     _config.MatrixMatcher(
