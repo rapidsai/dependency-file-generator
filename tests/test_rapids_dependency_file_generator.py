@@ -81,7 +81,7 @@ def test_make_dependency_file(mock_relpath):
             dependencies=["dep1", "dep2"],
             extras=None,
         )
-        assert env == header + "dep1\ndep2\n"
+        assert env == header + "dep1\ndep2\n", f"output did not match expectations for file type '{file_type.value}'"
 
 
 def test_make_dependency_file_should_raise_informative_error_when_extras_is_missing_for_pyproj():
