@@ -7,7 +7,7 @@ files:
 dependencies:
   run_deps:
     common:
-      - output_types: [requirements]
+      - output_types: [requirements, constraints]
         packages:
           - fsspec>=0.6.0
           - pip:

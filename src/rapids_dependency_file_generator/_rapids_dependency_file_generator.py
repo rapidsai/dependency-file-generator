@@ -149,10 +149,10 @@ def make_dependency_file(
         if conda_env_name is not None:
             env_dict["name"] = conda_env_name
         file_contents += yaml.dump(env_dict)
-    elif file_type == _config.Output.REQUIREMENTS:
+    elif file_type in {_config.Output.REQUIREMENTS, _config.Output.CONSTRAINTS}:
         for dep in dependencies:
             if isinstance(dep, dict):
-                raise ValueError(f"Map inputs like {dep} are not allowed for the 'requirements' file type.")
+                raise ValueError(f"Map inputs like {dep} are not allowed for the '{file_type.value}' file type.")
 
             file_contents += f"{dep}\n"
     elif file_type == _config.Output.PYPROJECT:
@@ -249,6 +249,9 @@ def get_filename(file_type: _config.Output, file_key: str, matrix_combo: dict[st
     elif file_type == _config.Output.REQUIREMENTS:
         file_ext = ".txt"
         file_type_prefix = "requirements"
+    elif file_type == _config.Output.CONSTRAINTS:
+        file_ext = ".txt"
+        file_type_prefix = "constraints"
     elif file_type == _config.Output.PYPROJECT:
         file_ext = ".toml"
         # Unlike for files like requirements.txt or conda environment YAML files, which
@@ -287,6 +290,8 @@ def get_output_dir(*, file_type: _config.Output, config_file_path: os.PathLike, 
         path.append(file_config.conda_dir)
     elif file_type == _config.Output.REQUIREMENTS:
         path.append(file_config.requirements_dir)
+    elif file_type == _config.Output.CONSTRAINTS:
+        path.append(file_config.constraints_dir)
     elif file_type == _config.Output.PYPROJECT:
         path.append(file_config.pyproject_dir)
     return os.path.join(*path)

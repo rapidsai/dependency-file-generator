@@ -40,9 +40,10 @@ Here is an example of what the `files` key might look like:
 ```yaml
 files:
   all: # used as the prefix for the generated dependency file names for conda or requirements files (has no effect on pyproject.toml files)
-    output: [conda, requirements] # which dependency file types to generate. required, can be "conda", "requirements", "pyproject", "none" or a list of non-"none" values
+    output: [conda, requirements, constraints] # which dependency file types to generate. required, can be "conda", "requirements", "constraints", "pyproject", "none" or a list of non-"none" values
     conda_dir: conda/environments # where to put conda environment.yaml files. optional, defaults to "conda/environments"
     requirements_dir: python/cudf # where to put requirements.txt files. optional, but recommended. defaults to "python"
+    constraints_dir: python/cudf # where to put constraints.txt files. optional, but recommended. defaults to "python"
     pyproject_dir: python/cudf # where to put pyproject.toml files. optional, but recommended. defaults to "python"
     matrix: # (optional) contains an arbitrary set of key/value pairs to determine which dependency files that should be generated. These values are included in the output filename.
       cuda: ["11.5", "11.6"] # which CUDA version variant files to generate.
