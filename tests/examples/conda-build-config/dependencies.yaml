@@ -1,0 +1,41 @@
+files:
+  build:
+    output: [conda]
+    conda_dir: output/actual
+    matrix:
+      cuda: ["11.5", "11.6"]
+      arch: [x86_64, arm64]
+      py: ["3.9", "3.10"]
+    includes:
+      - build
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  build:
+    common:
+      - output_types: [conda]
+        packages:
+          - clang-tools=11.1.0
+          - spdlog>=1.8.5,<1.9
+    specific:
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.6"
+            packages:
+              - cudatoolkit=11.6
+      - output_types: [conda]
+        matrices:
+          - matrix:
+              py: "3.9"
+            packages:
+              - python=3.9
+          - matrix:
+              py: "3.10"
+            packages:
+              - python=3.10
