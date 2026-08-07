@@ -1,7 +1,8 @@
 files:
   all:
-    output: requirements
-    requirements_dir: output/actual
+    output: [requirements, constraints]
+    requirements_dir: output/actual/requirements
+    constraints_dir: output/actual/constraints
     matrix:
       cuda: ["11.5", "11.6"]
       arch: [x86_64]
@@ -35,14 +36,17 @@ channels:
 dependencies:
   build:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, constraints]
         packages:
           - clang=11.1.0
       - output_types: requirements
         packages:
           - spdlog>=1.8.5,<1.9
+      - output_types: constraints
+        packages:
+          - spdlog
     specific:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, constraints]
         matrices:
           - matrix:
               cuda: "11.5"

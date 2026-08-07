@@ -70,17 +70,18 @@ def test_make_dependency_file(mock_relpath):
         }
     )
 
-    env = make_dependency_file(
-        file_type=_config.Output.REQUIREMENTS,
-        conda_env_name="tmp_env",
-        file_name="tmp_env.txt",
-        config_file="config_file",
-        output_dir="output_path",
-        conda_channels=["rapidsai", "nvidia"],
-        dependencies=["dep1", "dep2"],
-        extras=None,
-    )
-    assert env == header + "dep1\ndep2\n"
+    for file_type in [_config.Output.REQUIREMENTS, _config.Output.CONSTRAINTS]:
+        env = make_dependency_file(
+            file_type=file_type,
+            conda_env_name="tmp_env",
+            file_name="tmp_env.txt",
+            config_file="config_file",
+            output_dir="output_path",
+            conda_channels=["rapidsai", "nvidia"],
+            dependencies=["dep1", "dep2"],
+            extras=None,
+        )
+        assert env == header + "dep1\ndep2\n", f"output did not match expectations for file type '{file_type.value}'"
 
 
 def test_make_dependency_file_should_raise_informative_error_when_extras_is_missing_for_pyproj():
@@ -110,14 +111,29 @@ def test_make_dependency_files_should_raise_informative_error_when_multiple_file
             to_stdout=True
         )
 
-def test_make_dependency_files_should_raise_informative_error_on_map_inputs_for_requirements():
+@pytest.mark.parametrize(
+    ["output_type", "msg_match"],
+    [
+        pytest.param(
+            _config.Output.REQUIREMENTS,
+            r"Map inputs like {'pip': \['pandas<1.0'\]} are not allowed for the 'requirements' file type.",
+            id="requirements",
+        ),
+        pytest.param(
+            _config.Output.CONSTRAINTS,
+            r"Map inputs like {'pip': \['pandas<1.0'\]} are not allowed for the 'constraints' file type.",
+            id="constraints",
+        ),
+    ],
+)
+def test_make_dependency_files_should_raise_informative_error_on_map_inputs_for_requirements_and_constraints(output_type, msg_match):
 
     current_dir = pathlib.Path(__file__).parent
-    with pytest.raises(ValueError, match=re.escape("Map inputs like {'pip': ['pandas<1.0']} are not allowed for the 'requirements' file type.")):
+    with pytest.raises(ValueError, match=msg_match):
         make_dependency_files(
             parsed_config=_config.load_config_from_file(current_dir / "examples" / "requirements-pip-dict" / "dependencies.yaml"),
             file_keys=["all_of_the_things"],
-            output={_config.Output.REQUIREMENTS},
+            output={output_type},
             matrix=None,
             prepend_channels=[],
             to_stdout=True
@@ -147,13 +163,20 @@ def test_make_dependency_files_should_choose_correct_pyproject_toml(capsys):
     # and should NOT contain anything from the root-level pyproject.toml
     assert set(dict(doc).keys()) == {"project"}
 
-def test_make_dependency_files_requirements_to_stdout_with_multiple_file_keys_works(capsys):
+@pytest.mark.parametrize(
+    ["output_type"],
+    [
+        pytest.param(_config.Output.REQUIREMENTS, id="requirements"),
+        pytest.param(_config.Output.CONSTRAINTS, id="constraints"),
+    ],
+)
+def test_make_dependency_files_requirements_and_constraints_to_stdout_with_multiple_file_keys_works(capsys, output_type):
 
     current_dir = pathlib.Path(__file__).parent
     make_dependency_files(
         parsed_config=_config.load_config_from_file(current_dir / "examples" / "overlapping-deps" / "dependencies.yaml"),
         file_keys=["build_deps", "even_more_build_deps"],
-        output={_config.Output.REQUIREMENTS},
+        output={output_type},
         matrix={"arch": ["x86_64"]},
         prepend_channels=[],
         to_stdout=True

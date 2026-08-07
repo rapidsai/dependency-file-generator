@@ -36,7 +36,7 @@ channels:
 dependencies:
   depends_on_numpy:
     common:
-      - output_types: [requirements, pyproject]
+      - output_types: [requirements, constraints, pyproject]
         packages:
           - numpy>=2.0
       # using 'pip' intentionally to test handling of that nested list
@@ -47,7 +47,7 @@ dependencies:
               - numpy>=2.0
   depends_on_pandas:
     common:
-      - output_types: [conda, requirements, pyproject]
+      - output_types: [conda, requirements, constraints, pyproject]
         packages:
           - pandas<3.0
   depends_on_scikit_learn:
@@ -72,10 +72,10 @@ dependencies:
               - folium
   rapids_build_skbuild:
     common:
-      - output_types: [conda, requirements, pyproject]
+      - output_types: [conda, requirements, constraints, pyproject]
         packages:
           - rapids-build-backend>=0.3.1
-      - output_types: [requirements, pyproject]
+      - output_types: [requirements, constraints, pyproject]
         packages:
           - scikit-build-core[pyproject]>=0.9.0
       - output_types: [conda]

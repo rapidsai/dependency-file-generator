@@ -33,6 +33,9 @@ class Output(Enum):
     REQUIREMENTS = "requirements"
     """Generate a ``requirements.txt``."""
 
+    CONSTRAINTS = "constraints"
+    """Generate a ``constraints.txt``."""
+
     CONDA = "conda"
     """Generate a Conda environment file."""
 
@@ -66,6 +69,9 @@ class File:
 
     requirements_dir: Path = Path(_constants.default_requirements_dir)
     """The directory in which to write ``requirements.txt``."""
+
+    constraints_dir: Path = Path(_constants.default_constraints_dir)
+    """The directory in which to write ``constraints.txt``."""
 
     conda_dir: Path = Path(_constants.default_conda_dir)
     """The directory in which to write the Conda environment file."""
@@ -173,6 +179,7 @@ def _parse_file(file_config: dict[str, typing.Any]) -> File:
         includes=list(file_config["includes"]),
         matrix={key: list(value) for key, value in file_config.get("matrix", {}).items()},
         requirements_dir=Path(file_config.get("requirements_dir", _constants.default_requirements_dir)),
+        constraints_dir=Path(file_config.get("constraints_dir", _constants.default_constraints_dir)),
         conda_dir=Path(file_config.get("conda_dir", _constants.default_conda_dir)),
         pyproject_dir=Path(file_config.get("pyproject_dir", _constants.default_pyproject_dir)),
     )

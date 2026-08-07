@@ -1,6 +1,6 @@
  {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/rapidsai/dependency-file-generator/v1.21.0/src/rapids_dependency_file_generator/schema.json",
+    "$id": "https://raw.githubusercontent.com/rapidsai/dependency-file-generator/v1.22.0/src/rapids_dependency_file_generator/schema.json",
     "type": "object",
     "title": "RAPIDS Package Dependency Specification Format",
     "description": "Consolidated specification of RAPIDS project dependencies",
@@ -16,6 +16,7 @@
                         "includes": {"type": "array", "items": {"type": "string"}},
                         "matrix": {"$ref": "#/$defs/matrix"},
                         "requirements_dir": {"type": "string"},
+                        "constraints_dir": {"type": "string"},
                         "conda_dir": {"type": "string"},
                         "pyproject_dir": {"type": "string"}
                     },
@@ -121,7 +122,7 @@
             "items": {"$ref": "#/$defs/matrix-matcher"}
         },
         "output-types": {
-            "enum": ["conda", "requirements", "pyproject"]
+            "enum": ["conda", "requirements", "constraints", "pyproject"]
         },
         "output-types-array": {
             "type": "array",
