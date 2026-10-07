@@ -9,4 +9,4 @@ concurrency:
 permissions: {}
 jobs:
   build-test:
-    uses: ./.github/workflows/build-test.yaml
+    uses: $/.github/workflows/build-test.yaml

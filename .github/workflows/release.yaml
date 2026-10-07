@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: ./.github/actions/semantic-release
+      - uses: $/.github/actions/semantic-release
         id: check-release
         with:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
@@ -30,7 +30,7 @@ jobs:
   build-test:
     if: ${{ needs.check-release.outputs.release_version }}
     needs: [check-release]
-    uses: ./.github/workflows/build-test.yaml
+    uses: $/.github/workflows/build-test.yaml
     with:
       release_version: ${{ needs.check-release.outputs.release_version }}
   release:
@@ -55,7 +55,7 @@ jobs:
         with:
           name: wheel_artifacts
           path: ${{ env.WHEEL_OUTPUT_DIR }}
-      - uses: ./.github/actions/semantic-release
+      - uses: $/.github/actions/semantic-release
         with:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           PYPI_TOKEN: ${{ secrets.RAPIDSAI_PYPI_TOKEN }}
