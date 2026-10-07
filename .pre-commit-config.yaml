@@ -15,7 +15,7 @@ repos:
       - id: debug-statements
       - id: requirements-txt-fixer
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v2.3.0'
+    rev: 'v2.4.0'
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML]
@@ -28,7 +28,7 @@ repos:
         args:
           - --py39-plus
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.4
+    rev: 0.38.2
     hooks:
       - id: check-metaschema
         files: ^src/rapids_dependency_file_generator/schema.json$
@@ -37,14 +37,14 @@ repos:
         args: ["--schemafile", "src/rapids_dependency_file_generator/schema.json"]
       - id: check-github-workflows
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.22
+    rev: v0.16.10
     hooks:
       - id: ruff
         files: src/.*$
       - id: ruff-format
         files: src/.*$
   - repo: https://github.com/rstcheck/rstcheck
-    rev: v6.2.5
+    rev: v6.3.0
     hooks:
       - id: rstcheck
         args: ["--config", "pyproject.toml"]
@@ -54,11 +54,11 @@ repos:
           (?x)
             ^docs/source/_templates/.*$
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+    rev: v0.11.0.1-1
     hooks:
       - id: shellcheck
   - repo: https://github.com/rapidsai/pre-commit-hooks
-    rev: v1.6.1
+    rev: v1.7.0
     hooks:
       - id: verify-pyproject-license
         exclude:
@@ -74,7 +74,7 @@ repos:
             .*/output/expected/.*$
           )
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.27.0
+    rev: v1.30.1
     hooks:
       - id: zizmor
 default_language_version:
