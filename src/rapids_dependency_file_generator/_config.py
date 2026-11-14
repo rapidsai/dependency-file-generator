@@ -249,7 +249,7 @@ def parse_config(config: dict[str, typing.Any], path: PathLike) -> Config:
     return Config(
         path=Path(path),
         files={key: _parse_file(value) for key, value in config["files"].items()},
-        channels=_parse_channels(config.get("channels", [])),
+        channels=_parse_channels(config.get("channels", _constants.default_channels)),
         dependencies={key: _parse_dependencies(value) for key, value in config["dependencies"].items()},
     )
 

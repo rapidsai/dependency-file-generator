@@ -334,6 +334,91 @@ def test_parse_channels(input, output):
                 },
             ),
         ),
+        # no 'channels' key: the default channels should be used
+        (
+            {
+                "files": {
+                    "all": {
+                        "output": "conda",
+                        "includes": ["run"],
+                    },
+                },
+                "dependencies": {
+                    "run": {
+                        "common": [
+                            {
+                                "output_types": "conda",
+                                "packages": ["package1"],
+                            },
+                        ],
+                    },
+                },
+            },
+            "dependencies.yaml",
+            _config.Config(
+                path=Path("dependencies.yaml"),
+                files={
+                    "all": _config.File(
+                        output={_config.Output.CONDA},
+                        includes=["run"],
+                    ),
+                },
+                channels=list(_constants.default_channels),
+                dependencies={
+                    "run": _config.Dependencies(
+                        common=[
+                            _config.CommonDependencies(
+                                output_types={_config.Output.CONDA},
+                                packages=["package1"],
+                            ),
+                        ],
+                    ),
+                },
+            ),
+        ),
+        # an explicitly empty 'channels' list should be kept as-is
+        (
+            {
+                "files": {
+                    "all": {
+                        "output": "conda",
+                        "includes": ["run"],
+                    },
+                },
+                "channels": [],
+                "dependencies": {
+                    "run": {
+                        "common": [
+                            {
+                                "output_types": "conda",
+                                "packages": ["package1"],
+                            },
+                        ],
+                    },
+                },
+            },
+            "dependencies.yaml",
+            _config.Config(
+                path=Path("dependencies.yaml"),
+                files={
+                    "all": _config.File(
+                        output={_config.Output.CONDA},
+                        includes=["run"],
+                    ),
+                },
+                channels=[],
+                dependencies={
+                    "run": _config.Dependencies(
+                        common=[
+                            _config.CommonDependencies(
+                                output_types={_config.Output.CONDA},
+                                packages=["package1"],
+                            ),
+                        ],
+                    ),
+                },
+            ),
+        ),
     ],
 )
 def test_parse_config(input, path, output):
