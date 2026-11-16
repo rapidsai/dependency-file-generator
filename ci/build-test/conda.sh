@@ -5,5 +5,5 @@ set -euo pipefail
 
 mamba install -y rattler-build
 rattler-build build \
-  --output-folder "${OUTPUT_DIR:-"/tmp/output"}" \
-  recipe/
+  --output-dir "${OUTPUT_DIR:-"/tmp/output"}" \
+  --recipe-dir recipe/
