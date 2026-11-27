@@ -7,6 +7,7 @@ from ._config import Output, load_config_from_file
 from ._constants import cli_name, default_dependency_file_path
 from ._rapids_dependency_file_generator import (
     delete_existing_files,
+    delete_stale_pyproject_lists,
     make_dependency_files,
 )
 from ._rapids_dependency_file_validator import UnusedDependencySetWarning
@@ -154,6 +155,12 @@ def main(argv=None) -> None:
 
     if args.clean:
         delete_existing_files(args.clean)
+
+    # A full run regenerates every pyproject.toml list in the config, so any other list
+    # that an earlier run generated is stale. Partial runs that write to stdout don't
+    # know about every list and don't modify files, so they skip this.
+    if not to_stdout:
+        delete_stale_pyproject_lists(parsed_config)
 
     make_dependency_files(
         parsed_config=parsed_config,
